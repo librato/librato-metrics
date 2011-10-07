@@ -1,9 +1,8 @@
-## This is the rakegem gemspec template. Make sure you read and understand
-## all of the comments. Some sections require modification, and others can
-## be deleted if you don't need them. Once you understand the contents of
-## this file, feel free to delete any comments that begin with two hash marks.
-## You can find comprehensive Gem::Specification documentation, at
-## http://docs.rubygems.org/read/chapter/20
+lib = File.expand_path('../lib/', __FILE__)
+$:.unshift lib unless $:.include?(lib)
+
+require 'librato/metrics/version'
+
 Gem::Specification.new do |s|
   s.specification_version = 2 if s.respond_to? :specification_version=
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
@@ -13,7 +12,7 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'librato-metrics'
-  s.version           = '0.0.1'
+  s.version           = Librato::Metrics::VERSION
   s.date              = '2010-10-06'
   #s.rubyforge_project = 'NAME'
 
@@ -43,7 +42,7 @@ Gem::Specification.new do |s|
   ## Specify any RDoc options here. You'll want to add your README and
   ## LICENSE files to the extra_rdoc_files list.
   s.rdoc_options = ["--charset=UTF-8"]
-  s.extra_rdoc_files = %w[README LICENSE]
+  s.extra_rdoc_files = %w[LICENSE]
 
   ## List your runtime dependencies here. Runtime dependencies are those
   ## that are needed for an end user to actually USE your code.

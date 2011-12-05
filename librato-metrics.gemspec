@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
   ## development dependencies
   s.add_development_dependency 'rspec', '~>2.6.0'
   s.add_development_dependency 'yard'
+  s.add_development_dependency 'rdiscount' # for yard
 
   ## Leave this section as-is. It will be automatically generated from the
   ## contents of your Git repository via the gemspec task. DO NOT REMOVE

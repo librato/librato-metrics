@@ -1,6 +1,7 @@
 require 'bundler'
 Bundler::GemHelper.install_tasks
 
+# Testing
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.rspec_opts = '--color'
@@ -9,8 +10,17 @@ end
 task :default => :spec
 task :test => :spec
 
+# Docs
 require 'yard'
 YARD::Rake::YardocTask.new
+
+# IRB
+desc "Open an irb session preloaded with this library"
+task :console do
+  sh "irb -rubygems -r ./lib/librato/metrics.rb"
+end
+
+# Packaging
 
 #############################################################################
 #
@@ -47,17 +57,6 @@ def replace_header(head, header_name)
   head.sub!(/(\.#{header_name}\s*= ').*'/) { "#{$1}#{send(header_name)}'"}
 end
 
-#############################################################################
-#
-# Standard tasks
-#
-#############################################################################
-
-
-desc "Open an irb session preloaded with this library"
-task :console do
-  sh "irb -rubygems -r ./lib/#{name}.rb"
-end
 
 #############################################################################
 #
@@ -122,15 +121,3 @@ task :gemspec => :validate do
   puts "Updated #{gemspec_file}"
 end
 
-desc "Validate #{gemspec_file}"
-task :validate do
-  libfiles = Dir['lib/*'] - ["lib/#{name}.rb", "lib/#{name}"]
-  unless libfiles.empty?
-    puts "Directory `lib` should only contain a `#{name}.rb` file and `#{name}` dir."
-    exit!
-  end
-  unless Dir['VERSION*'].empty?
-    puts "A `VERSION` file at root level violates Gem best practices."
-    exit!
-  end
-end

@@ -10,7 +10,6 @@ Gem::Specification.new do |s|
 
   s.name              = 'librato-metrics'
   s.version           = Librato::Metrics::VERSION
-  s.date              = '2010-10-06'
 
   s.summary     = "Ruby wrapper for Librato's Metrics API"
   s.description = "An easy to use ruby wrapper for Librato's Metrics API"
@@ -32,12 +31,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'yard'
   s.add_development_dependency 'rdiscount' # for yard
 
-  ## Leave this section as-is. It will be automatically generated from the
-  ## contents of your Git repository via the gemspec task. DO NOT REMOVE
-  ## THE MANIFEST COMMENTS, they are used as delimiters by the task.
-  # = MANIFEST =
-  s.files = %w[]
-  # = MANIFEST =
-
-  s.test_files = s.files.select { |path| path =~ /^spec\/*_spec\.rb/ }
+  s.files = `git ls-files`.split("\n")
+  s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
 end

@@ -7,3 +7,4 @@ module Librato
 end
 
 require 'metrics/version'
+require 'metrics/metric_set'

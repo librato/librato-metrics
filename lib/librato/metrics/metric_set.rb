@@ -13,6 +13,18 @@ module Librato
         @queued[:counters] || []
       end
 
+      # Remove all queued metrics
+      #
+      def flush
+        @queued = {}
+      end
+
+      # The object this MetricSet will use to persist
+      #
+      def persister
+        @persister ||= Metrics::Persistence::Test.new
+      end
+
       # Currently queued gauges
       #
       # @return Array
@@ -44,6 +56,16 @@ module Librato
       # @return Hash
       def queued
         @queued
+      end
+
+      # Persist currently queued metrics
+      #
+      # @return Boolean
+      def save
+        if persister.persist(self.queued)
+          flush and return true
+        end
+        false
       end
 
     end

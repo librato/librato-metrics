@@ -71,6 +71,27 @@ module Librato
 
       end
 
+      describe "#save" do
+
+        context "when successful" do
+          it "should flush queued metrics and return true" do
+            subject.queue :steps => 2042, :distance => 1234
+            subject.save.should be_true
+            subject.queued.should be_empty
+          end
+        end
+
+        context "when failed" do
+          it "should preserve queue and return false" do
+            subject.queue :steps => 2042, :distance => 1234
+            subject.persister.return_value(false)
+            subject.save.should be_false
+            subject.queued.should_not be_empty
+          end
+        end
+
+      end
+
     end # MetricSet
 
   end

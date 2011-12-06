@@ -8,6 +8,12 @@ require 'metrics/version'
 
 module Librato
   module Metrics
+    extend SingleForwardable
+
+    # TODO: Explain exposed interface with examples.
+
+    def_delegators Librato::Metrics::Simple, :authenticate, :persistence,
+                   :persistence=, :persister, :save
 
     TYPES = [:counter, :gauge]
   end

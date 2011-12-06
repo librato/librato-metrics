@@ -18,7 +18,7 @@ Then, in your application or script:
 If you are looking for the quickest possible route to getting a data into Metrics, you only need two lines:
 
     Librato::Metrics.authenticate 'email', 'api_key'
-    Librato::Metrics.save :my_metric => 42, :my_other_metric => 1002
+    Librato::Metrics.submit :my_metric => 42, :my_other_metric => 1002
 
 Unspecified metrics will send a *gauge*, but if you need to send a different metric type or include additional properties, simply use a hash:
 
@@ -55,7 +55,7 @@ A complete [list of metric attributes](http://dev.librato.com/v1/metrics) is ava
 
 Save all queued metrics:
 
-    queue.save
+    queue.submit
 
 ## Benchmarking
 

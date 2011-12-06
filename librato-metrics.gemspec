@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = %w[LICENSE]
 
   ## runtime dependencies
-  s.add_dependency 'typhoeus', '~>0.2.4'
+  s.add_dependency 'excon', '~>0.7.12'
 
   ## development dependencies
   s.add_development_dependency 'rspec', '~>2.6.0'

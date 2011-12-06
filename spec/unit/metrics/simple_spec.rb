@@ -30,11 +30,11 @@ module Librato
 
       end
 
-      describe "#save" do
+      describe "#submit" do
 
         it "should persist metrics immediately" do
           Simple.persistence = :test
-          Simple.save(:foo => 123).should eql true
+          Simple.submit(:foo => 123).should eql true
           Simple.persister.persisted.should eql({:gauges => [{:name => 'foo', :value => 123}]})
         end
 

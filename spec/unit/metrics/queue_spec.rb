@@ -3,12 +3,50 @@ require "spec_helper.rb"
 module Librato
   module Metrics
 
-    describe MetricSet do
+    describe Queue do
+
+      describe "#add" do
+
+        context "with single hash argument" do
+          it "should record a key-value gauge" do
+            subject.add :foo => 3000
+            subject.queued.should eql({:gauges => [{:name => 'foo', :value => 3000}]})
+          end
+        end
+
+        context "with specified metric type" do
+          it "should record counters" do
+            subject.add :total_visits => {:type => :counter, :value => 4000}
+            expected = {:counters => [{:name => 'total_visits', :value => 4000}]}
+            subject.queued.should eql expected
+          end
+
+          it "should record gauges" do
+            subject.add :temperature => {:type => :gauge, :value => 34}
+            expected = {:gauges => [{:name => 'temperature', :value => 34}]}
+            subject.queued.should eql expected
+          end
+        end
+
+        context "with extra attributes" do
+          it "should record" do
+            measure_time = Time.now
+            subject.add :disk_use => {:value => 35.4, :period => 2,
+              :description => 'current disk utilization', :measure_time => measure_time,
+              :source => 'db2'}
+            expected = {:gauges => [{:value => 35.4, :name => 'disk_use', :period => 2,
+              :description => 'current disk utilization', :measure_time => measure_time,
+              :source => 'db2'}]}
+            subject.queued.should eql expected
+          end
+        end
+
+      end
 
       describe "#counters" do
 
         it "should return currently queued counters" do
-          subject.queue :transactions => {:type => :counter, :value => 12345},
+          subject.add :transactions => {:type => :counter, :value => 12345},
                         :register_cents => {:type => :gauge, :value => 211101}
           subject.counters.should eql [{:name => 'transactions', :value => 12345}]
         end
@@ -22,7 +60,7 @@ module Librato
       describe "#gauges" do
 
         it "should return currently queued gauges" do
-          subject.queue :transactions => {:type => :counter, :value => 12345},
+          subject.add :transactions => {:type => :counter, :value => 12345},
                         :register_cents => {:type => :gauge, :value => 211101}
           subject.gauges.should eql [{:name => 'register_cents', :value => 211101}]
         end
@@ -33,59 +71,21 @@ module Librato
 
       end
 
-      describe "#queue" do
-
-        context "with single hash argument" do
-          it "should record a key-value gauge" do
-            subject.queue :foo => 3000
-            subject.queued.should eql({:gauges => [{:name => 'foo', :value => 3000}]})
-          end
-        end
-
-        context "with specified metric type" do
-          it "should record counters" do
-            subject.queue :total_visits => {:type => :counter, :value => 4000}
-            expected = {:counters => [{:name => 'total_visits', :value => 4000}]}
-            subject.queued.should eql expected
-          end
-
-          it "should record gauges" do
-            subject.queue :temperature => {:type => :gauge, :value => 34}
-            expected = {:gauges => [{:name => 'temperature', :value => 34}]}
-            subject.queued.should eql expected
-          end
-        end
-
-        context "with extra attributes" do
-          it "should record" do
-            measure_time = Time.now
-            subject.queue :disk_use => {:value => 35.4, :period => 2,
-              :description => 'current disk utilization', :measure_time => measure_time,
-              :source => 'db2'}
-            expected = {:gauges => [{:value => 35.4, :name => 'disk_use', :period => 2,
-              :description => 'current disk utilization', :measure_time => measure_time,
-              :source => 'db2'}]}
-            subject.queued.should eql expected
-          end
-        end
-
-      end
-
-      describe "#save" do
+      describe "#submit" do
 
         context "when successful" do
           it "should flush queued metrics and return true" do
-            subject.queue :steps => 2042, :distance => 1234
-            subject.save.should be_true
+            subject.add :steps => 2042, :distance => 1234
+            subject.submit.should be_true
             subject.queued.should be_empty
           end
         end
 
         context "when failed" do
           it "should preserve queue and return false" do
-            subject.queue :steps => 2042, :distance => 1234
+            subject.add :steps => 2042, :distance => 1234
             subject.persister.return_value(false)
-            subject.save.should be_false
+            subject.submit.should be_false
             subject.queued.should_not be_empty
           end
         end

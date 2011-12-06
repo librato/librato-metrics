@@ -35,20 +35,20 @@ module Librato
         # Set persistence type to use when saving metrics.
         #
         # @param [Symbol] persistence_type
-        def persistence=(method)
-          @perisistence = method
+        def persistence=(persist_method)
+          @persistence = persist_method
         end
 
         def persister
-          @metric_set ? @metric_set.persister : nil
+          @queue ? @queue.persister : nil
         end
 
         # Submit a set of metrics
         #
-        def save(args)
-          @metric_set ||= MetricSet.new
-          @metric_set.queue args
-          @metric_set.save
+        def submit(args)
+          @queue ||= Queue.new
+          @queue.add args
+          @queue.submit
         end
 
       end

@@ -1,9 +1,29 @@
 module Librato
   module Metrics
-    class MetricSet
+    class Queue
 
       def initialize
         @queued ||= {}
+      end
+
+      # Add a metric entry to the metric set:
+      #
+      # @param Hash metrics metrics to add
+      # @return Hash queued_metrics the currently queued metrics
+      def add(args)
+        args.each do |key, value|
+          if value.respond_to?(:each)
+            type = (value.delete(:type) || 'gauge')
+            type = ("#{type}s").to_sym
+            value[:name] = key.to_s
+            @queued[type] ||= []
+            @queued[type] << value
+          else
+            @queued[:gauges] ||= []
+            @queued[:gauges] << {:name => key.to_s, :value => value}
+          end
+        end
+        queued
       end
 
       # Currently queued counters
@@ -32,25 +52,6 @@ module Librato
         @queued[:gauges] || []
       end
 
-      # Add a metric entry to the metric set:
-      #
-      # @param Hash metrics metrics to add
-      # @return Hash queued_metrics the currently queued metrics
-      def queue(args)
-        args.each do |key, value|
-          if value.respond_to?(:each)
-            type = (value.delete(:type) || 'gauge')
-            type = ("#{type}s").to_sym
-            value[:name] = key.to_s
-            @queued[type] ||= []
-            @queued[type] << value
-          else
-            @queued[:gauges] ||= []
-            @queued[:gauges] << {:name => key.to_s, :value => value}
-          end
-        end
-      end
-
       # All currently queued metrics
       #
       # @return Hash
@@ -61,7 +62,7 @@ module Librato
       # Persist currently queued metrics
       #
       # @return Boolean
-      def save
+      def submit
         if persister.persist(self.queued)
           flush and return true
         end

@@ -11,7 +11,6 @@ module Librato
     extend SingleForwardable
 
     # TODO: Explain exposed interface with examples.
-
     def_delegators Librato::Metrics::Simple, :authenticate, :persistence,
                    :persistence=, :persister, :save
 

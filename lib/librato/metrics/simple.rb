@@ -1,5 +1,3 @@
-# this class contains logic used when the module is called in short-form operations.
-
 module Librato
   module Metrics
 
@@ -17,20 +15,36 @@ module Librato
 
       class << self
         # class instance vars
-        attr_accessor :email, :api_key, :persistence
+        attr_accessor :email, :api_key
 
+        # Authenticate for direct persistence
+        #
+        # @param [String] email
+        # @param [String] api_key
         def authenticate(email, api_key)
           self.email, self.api_key = email, api_key
         end
 
+        # Persistence type to use when saving metrics.
+        # Default is :direct.
+        #
         def persistence
           @persistence ||= :direct
+        end
+
+        # Set persistence type to use when saving metrics.
+        #
+        # @param [Symbol] persistence_type
+        def persistence=(method)
+          @perisistence = method
         end
 
         def persister
           @metric_set ? @metric_set.persister : nil
         end
 
+        # Submit a set of metrics
+        #
         def save(args)
           @metric_set ||= MetricSet.new
           @metric_set.queue args

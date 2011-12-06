@@ -5,13 +5,36 @@ A convenient Ruby wrapper for the Librato Metrics API.
 
 ## Installation
 
+On your shell:
+
     gem install librato-metrics
 
-## Standard Usage
+Then, in your application or script:
 
-Set up your credentials:
+    require 'librato/metrics'
 
-    Librato::Metrics.authenticate 'username', 'api_key'
+## Quick Start
+
+If you are looking for the quickest possible route to getting a data into Metrics, you only need two lines:
+
+    Librato::Metrics.authenticate 'email', 'api_key'
+    Librato::Metrics.save :my_metric => 42
+
+Unspecified metrics will send a *gauge*, but if you need to send a different metric type or include additional properties, simply use a hash for the value:
+
+    Librato::Metrics.send :my_metric => {:type => :counter, :value => 1002, :source => 'myapp'}
+
+While this is all you need to get started, this probably isn't the most performant option for you, so read on...
+
+## Authentication
+
+The metrics gem supports multiple methods of persistence, but by default it communicates directly with the Metrics web API.
+
+Make sure you have an [account for Metrics](https://metrics.librato.com/) and then authenticate with your email and API key (you can find it on your account page):
+
+    Librato::Metrics.authenticate 'email', 'api_key'
+
+## Sending Metrics
 
 Queue up a simple gauge metric named `temperature`:
 
@@ -28,7 +51,7 @@ Queue up a metric with a source:
 
 Send queued metrics:
 
-    metric_set.send
+    metric_set.save
 
 ## Contribution
 

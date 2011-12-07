@@ -57,9 +57,12 @@ module Librato
         query.merge!({:count => count, :resolution => resolution})
       end
       query.merge!(options)
-      response = connection.get(:path => "v1/gauges/#{metric}.json",
+      # TODO: look up type when not specified.
+      type = options.delete(:type) || 'gauge'
+      response = connection.get(:path => "v1/#{type}s/#{metric}.json",
                                 :query => query, :expects => 200)
       parsed = JSON.parse(response.body)
+      # TODO: pagination support
       query.empty? ? parsed : parsed["measurements"]
     end
 

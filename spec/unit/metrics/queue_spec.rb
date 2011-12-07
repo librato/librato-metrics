@@ -106,6 +106,40 @@ module Librato
 
       end
 
+      describe "#time" do
+
+        context "with metric name only" do
+
+          it "should queue metric with timed value" do
+            subject.time :sleeping do
+              sleep 0.1
+            end
+            queued = subject.queued[:gauges][0]
+            queued[:name].should == 'sleeping'
+            queued[:value].should be > 100
+            queued[:value].should be_within(30).of(100)
+          end
+
+        end
+
+        context "with metric and options" do
+
+          it "should queue metric with value and options" do
+            subject.time :sleep_two, :source => 'app1', :period => 2 do
+              sleep 0.05
+            end
+            queued = subject.queued[:gauges][0]
+            queued[:name].should == 'sleep_two'
+            queued[:period].should == 2
+            queued[:source].should == 'app1'
+            queued[:value].should be > 50
+            queued[:value].should be_within(30).of(50)
+          end
+
+        end
+
+      end
+
     end # MetricSet
 
   end

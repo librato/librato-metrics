@@ -38,6 +38,7 @@ module Librato
       def flush
         @queued = {}
       end
+      alias :flush_queued :flush
 
       # The object this MetricSet will use to persist
       #
@@ -69,6 +70,33 @@ module Librato
         end
         false
       end
+
+      # Capture execution time for a block and queue
+      # it as the value for a metric. Times are recorded
+      # in milliseconds.
+      #
+      # Options are the same as for {#add}.
+      #
+      # @example Queue API request response time
+      #   queue.time :api_request_time do
+      #     # API request..
+      #   end
+      #
+      # @example Queue API request response time w/ source
+      #   queue.time :api_request_time, :source => 'app1' do
+      #     # API request..
+      #   end
+      #
+      # @param [Symbol|String] name Metric name
+      # @param [Hash] options Metric options
+      def time(name, options={})
+        start = Time.now
+        yield
+        duration = (Time.now - start) * 1000.0 # milliseconds
+        metric = {name => options.merge({:value => duration})}
+        add metric
+      end
+      alias :benchmark :time
 
     private
 

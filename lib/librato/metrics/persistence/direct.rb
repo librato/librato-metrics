@@ -6,8 +6,14 @@ module Librato
     module Persistence
       class Direct
 
-        def persist
-
+        # Persist the queued metrics directly to the
+        # Metrics web API.
+        #
+        def persist(queued)
+          payload = queued.to_json
+          Simple.connection.post(:path => '/v1/metrics.json',
+              :headers => {'Content-Type' => 'application/json'},
+              :body => payload, :expects => 200)
         end
 
       end

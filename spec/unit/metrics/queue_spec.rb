@@ -41,6 +41,14 @@ module Librato
           end
         end
 
+        context "with multiple metrics" do
+          it "should record" do
+            subject.add :foo => 123, :bar => 345, :baz => 567
+            expected = {:gauges=>[{:name=>"foo", :value=>123}, {:name=>"bar", :value=>345}, {:name=>"baz", :value=>567}]}
+            subject.queued.should eql expected
+          end
+        end
+
       end
 
       describe "#counters" do
@@ -72,6 +80,12 @@ module Librato
       end
 
       describe "#submit" do
+
+        before(:all) do
+          Librato::Metrics.authenticate 'me@librato.com', 'foo'
+          Librato::Metrics.persistence = :test
+        end
+        after(:all) { Librato::Metrics::Simple.flush_authentication }
 
         context "when successful" do
           it "should flush queued metrics and return true" do

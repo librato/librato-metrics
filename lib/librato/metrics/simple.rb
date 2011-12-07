@@ -89,6 +89,10 @@ module Librato
           "Basic #{encoded}"
         end
 
+        def flush_persistence
+          @persistence = nil
+        end
+
       end
 
     end

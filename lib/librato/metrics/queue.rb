@@ -42,7 +42,7 @@ module Librato
       # The object this MetricSet will use to persist
       #
       def persister
-        @persister ||= Metrics::Persistence::Test.new
+        @persister ||= create_persister
       end
 
       # Currently queued gauges
@@ -67,6 +67,13 @@ module Librato
           flush and return true
         end
         false
+      end
+
+    private
+
+      def create_persister
+        type = Simple.persistence.capitalize
+        Librato::Metrics::Persistence.const_get(type).new
       end
 
     end

@@ -11,6 +11,11 @@ require 'metrics/simple'
 require 'metrics/version'
 
 module Librato
+
+  # Metrics provides a simple wrapper for the Metrics web API. Some
+  # of the methods Metrics provides will be documented below. Others
+  # are delegated to {Librato::Metrics::Simple} and will be
+  # documented there.
   module Metrics
     extend SingleForwardable
 

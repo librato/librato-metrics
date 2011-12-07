@@ -26,7 +26,9 @@ module Librato
         end
 
         # Set API endpoint for use with queries and direct
-        # persistence.
+        # persistence. Generally you should not need to set this
+        # as it will default to the current Librato Metrics
+        # endpoint.
         #
         def api_endpoint=(endpoint)
           @api_endpoint = endpoint
@@ -71,7 +73,7 @@ module Librato
           @queue ? @queue.persister : nil
         end
 
-        # Submit a set of metrics
+        # Submit all queued metrics
         #
         def submit(args)
           @queue ||= Queue.new

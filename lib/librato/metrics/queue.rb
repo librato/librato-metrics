@@ -63,6 +63,7 @@ module Librato
       #
       # @return Boolean
       def submit
+        raise NoMetricsQueued if self.queued.empty?
         if persister.persist(self.queued)
           flush and return true
         end

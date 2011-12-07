@@ -22,7 +22,7 @@ If you are looking for the quickest possible route to getting a data into Metric
 
 Unspecified metrics will send a *gauge*, but if you need to send a different metric type or include additional properties, simply use a hash:
 
-    Librato::Metrics.save :my_metric => {:type => :counter, :value => 1002, :source => 'myapp'}
+    Librato::Metrics.submit :my_metric => {:type => :counter, :value => 1002, :source => 'myapp'}
 
 While this is all you need to get started, if you are sending a number of metrics regularly a queue may be easier/more performant so read on...
 

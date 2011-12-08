@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.authors  = ["Matt Sanders"]
   s.email    = 'matt@librato.com'
-  s.homepage = 'http://metrics.librato.com'
+  s.homepage = 'https://github.com/librato/librato-metrics'
 
   s.require_paths = %w[lib]
 

@@ -13,7 +13,7 @@ module Librato
       def add(args)
         args.each do |key, value|
           if value.respond_to?(:each)
-            type = (value.delete(:type) || 'gauge')
+            type = value.delete(:type) || value.delete('type') || 'gauge'
             type = ("#{type}s").to_sym
             value[:name] = key.to_s
             @queued[type] ||= []

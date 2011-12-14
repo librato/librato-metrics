@@ -76,7 +76,7 @@ module Librato
         # Submit all queued metrics
         #
         def submit(args)
-          @queue ||= Queue.new
+          @queue ||= Queue.new(:skip_measurement_times => true)
           @queue.add args
           @queue.submit
         end

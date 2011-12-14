@@ -44,7 +44,9 @@ module Librato
         end
 
         def connection
-          @connection ||= Excon.new(self.api_endpoint, :headers => common_headers)
+          # TODO: upate when excon connection recovery is improved.
+          # @connection ||= Excon.new(self.api_endpoint, :headers => common_headers)
+          Excon.new(self.api_endpoint, :headers => common_headers)
         end
 
         # Purge current credentials and connection

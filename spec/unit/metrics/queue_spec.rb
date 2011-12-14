@@ -6,7 +6,6 @@ module Librato
     describe Queue do
 
       describe "#add" do
-
         context "with single hash argument" do
           it "should record a key-value gauge" do
             subject.add :foo => 3000
@@ -54,11 +53,9 @@ module Librato
             subject.queued.should eql expected
           end
         end
-
       end
 
       describe "#counters" do
-
         it "should return currently queued counters" do
           subject.add :transactions => {:type => :counter, :value => 12345},
                         :register_cents => {:type => :gauge, :value => 211101}
@@ -68,11 +65,9 @@ module Librato
         it "should return [] when no queued counters" do
           subject.counters.should eql []
         end
-
       end
 
       describe "#gauges" do
-
         it "should return currently queued gauges" do
           subject.add :transactions => {:type => :counter, :value => 12345},
                         :register_cents => {:type => :gauge, :value => 211101}
@@ -82,11 +77,9 @@ module Librato
         it "should return [] when no queued gauges" do
           subject.gauges.should eql []
         end
-
       end
 
       describe "#submit" do
-
         before(:all) do
           Librato::Metrics.authenticate 'me@librato.com', 'foo'
           Librato::Metrics.persistence = :test
@@ -109,13 +102,10 @@ module Librato
             subject.queued.should_not be_empty
           end
         end
-
       end
 
       describe "#time" do
-
         context "with metric name only" do
-
           it "should queue metric with timed value" do
             subject.time :sleeping do
               sleep 0.1
@@ -125,11 +115,9 @@ module Librato
             queued[:value].should be > 100
             queued[:value].should be_within(30).of(100)
           end
-
         end
 
         context "with metric and options" do
-
           it "should queue metric with value and options" do
             subject.time :sleep_two, :source => 'app1', :period => 2 do
               sleep 0.05
@@ -141,9 +129,7 @@ module Librato
             queued[:value].should be > 50
             queued[:value].should be_within(30).of(50)
           end
-
         end
-
       end
 
     end # MetricSet

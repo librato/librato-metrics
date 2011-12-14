@@ -26,6 +26,12 @@ module Librato
             expected = {:gauges => [{:name => 'temperature', :value => 34}]}
             subject.queued.should eql expected
           end
+
+          it "should accept type key as string or a symbol" do
+            subject.add :total_visits => {"type" => "counter", :value => 4000}
+            expected = {:counters => [{:name => 'total_visits', :value => 4000}]}
+            subject.queued.should eql expected
+          end
         end
 
         context "with extra attributes" do

@@ -44,7 +44,7 @@ module Librato
         end
 
         def connection
-          @connection ||= Excon.new(self.api_endpoint, :headers => {'Authorization' => auth_header})
+          @connection ||= Excon.new(self.api_endpoint, :headers => common_headers)
         end
 
         # Purge current credentials and connection
@@ -81,12 +81,21 @@ module Librato
           @queue.submit
         end
 
+        def user_agent
+          ruby_ver = "#{RUBY_ENGINE}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM}"
+          "librato-metrics/#{Metrics::VERSION} (#{ruby_ver}) direct-excon/#{Excon::VERSION}"
+        end
+
       private
 
         def auth_header
           raise CredentialsMissing unless (self.email and self.api_key)
           encoded = Base64.encode64("#{email}:#{api_key}").gsub("\n", ' ')
           "Basic #{encoded}"
+        end
+
+        def common_headers
+          {'Authorization' => auth_header, 'User-Agent' => user_agent}
         end
 
         def flush_persistence

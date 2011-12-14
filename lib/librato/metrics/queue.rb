@@ -2,8 +2,11 @@ module Librato
   module Metrics
     class Queue
 
-      def initialize
+      attr_accessor :skip_measurement_times
+
+      def initialize(options={})
         @queued ||= {}
+        @skip_measurement_times = options.delete(:skip_measurement_times)
       end
 
       # Add a metric entry to the metric set:
@@ -13,15 +16,19 @@ module Librato
       def add(args)
         args.each do |key, value|
           if value.respond_to?(:each)
-            type = value.delete(:type) || value.delete('type') || 'gauge'
-            type = ("#{type}s").to_sym
-            value[:name] = key.to_s
-            @queued[type] ||= []
-            @queued[type] << value
+            metric = value
+            metric[:name] = key.to_s
+            type = metric.delete(:type) || metric.delete('type') || 'gauge'
           else
-            @queued[:gauges] ||= []
-            @queued[:gauges] << {:name => key.to_s, :value => value}
+            metric = {:name => key.to_s, :value => value}
+            type = :gauge
           end
+          type = ("#{type}s").to_sym
+          unless skip_measurement_times
+            metric[:measure_time] ||= epoch_time
+          end
+          @queued[type] ||= []
+          @queued[type] << metric
         end
         queued
       end
@@ -103,6 +110,10 @@ module Librato
       def create_persister
         type = Simple.persistence.capitalize
         Librato::Metrics::Persistence.const_get(type).new
+      end
+
+      def epoch_time
+        Time.now.to_i
       end
 
     end

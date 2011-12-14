@@ -101,6 +101,14 @@ Get the 20 most recent 15 minute data point rollups for `temperature`:
 
 There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/gauges/:name) for more details.
 
+## Known Issues & Coming Improvements
+
+This is an early release and as such is lacking some capabilities slated for future releases.
+
+* Query actions currently do not auto-paginate with large result sets
+* Very large metric POSTs are not automatically chunked for performance
+* Some error conditions currently lack gem-specific exceptions
+
 ## Contribution
 
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.

@@ -16,11 +16,12 @@ module Librato
             type = value.delete(:type) || value.delete('type') || 'gauge'
             type = ("#{type}s").to_sym
             value[:name] = key.to_s
+            value[:measure_time] ||= epoch_time
             @queued[type] ||= []
             @queued[type] << value
           else
             @queued[:gauges] ||= []
-            @queued[:gauges] << {:name => key.to_s, :value => value}
+            @queued[:gauges] << {:name => key.to_s, :value => value, :measure_time => epoch_time}
           end
         end
         queued
@@ -103,6 +104,10 @@ module Librato
       def create_persister
         type = Simple.persistence.capitalize
         Librato::Metrics::Persistence.const_get(type).new
+      end
+
+      def epoch_time
+        Time.now.to_i
       end
 
     end

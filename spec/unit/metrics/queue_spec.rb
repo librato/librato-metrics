@@ -5,24 +5,29 @@ module Librato
 
     describe Queue do
 
+      before(:all) do
+        @time = Time.now.to_i
+        Librato::Metrics::Queue.stub(:epoch_time).and_return(@time)
+      end
+
       describe "#add" do
         context "with single hash argument" do
           it "should record a key-value gauge" do
             subject.add :foo => 3000
-            subject.queued.should eql({:gauges => [{:name => 'foo', :value => 3000}]})
+            subject.queued.should eql({:gauges => [{:name => 'foo', :value => 3000, :measure_time => @time}]})
           end
         end
 
         context "with specified metric type" do
           it "should record counters" do
             subject.add :total_visits => {:type => :counter, :value => 4000}
-            expected = {:counters => [{:name => 'total_visits', :value => 4000}]}
+            expected = {:counters => [{:name => 'total_visits', :value => 4000, :measure_time => @time}]}
             subject.queued.should eql expected
           end
 
           it "should record gauges" do
             subject.add :temperature => {:type => :gauge, :value => 34}
-            expected = {:gauges => [{:name => 'temperature', :value => 34}]}
+            expected = {:gauges => [{:name => 'temperature', :value => 34, :measure_time => @time}]}
             subject.queued.should eql expected
           end
 
@@ -49,7 +54,9 @@ module Librato
         context "with multiple metrics" do
           it "should record" do
             subject.add :foo => 123, :bar => 345, :baz => 567
-            expected = {:gauges=>[{:name=>"foo", :value=>123}, {:name=>"bar", :value=>345}, {:name=>"baz", :value=>567}]}
+            expected = {:gauges=>[{:name=>"foo", :value=>123, :measure_time => @time},
+                                  {:name=>"bar", :value=>345, :measure_time => @time},
+                                  {:name=>"baz", :value=>567, :measure_time => @time}]}
             subject.queued.should eql expected
           end
         end
@@ -58,8 +65,8 @@ module Librato
       describe "#counters" do
         it "should return currently queued counters" do
           subject.add :transactions => {:type => :counter, :value => 12345},
-                        :register_cents => {:type => :gauge, :value => 211101}
-          subject.counters.should eql [{:name => 'transactions', :value => 12345}]
+                      :register_cents => {:type => :gauge, :value => 211101}
+          subject.counters.should eql [{:name => 'transactions', :value => 12345, :measure_time => @time}]
         end
 
         it "should return [] when no queued counters" do
@@ -71,7 +78,7 @@ module Librato
         it "should return currently queued gauges" do
           subject.add :transactions => {:type => :counter, :value => 12345},
                         :register_cents => {:type => :gauge, :value => 211101}
-          subject.gauges.should eql [{:name => 'register_cents', :value => 211101}]
+          subject.gauges.should eql [{:name => 'register_cents', :value => 211101, :measure_time => @time}]
         end
 
         it "should return [] when no queued gauges" do

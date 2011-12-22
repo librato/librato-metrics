@@ -45,21 +45,32 @@ module Librato
     #   data = Librato::Metrics.fetch :temperature, :count => 20,
     #                                 :resolution => 900
     #
+    # @example Get data points for the last hour
+    #   data = Librato::Metrics.fetch :start_time => Time.now-3600
+    #
+    # @example Get 15 min data points from two hours to an hour ago
+    #   data = Librato::Metrics.fetch :start_time => Time.now-7200,
+    #                                 :end_time => Time.now-3600,
+    #                                 :resolution => 900
+    #
     # A full list of query parameters can be found in the API
     # documentation: {http://dev.librato.com/v1/get/gauges/:name}
     #
     # @param [Symbol|String] metric Metric name
     # @param [Hash] options Query options
     def self.fetch(metric, options={})
-      resolution = options.delete(:resolution) || 1
-      count = options.delete(:count)
-      query = {}
-      if count
-        query.merge!({:count => count, :resolution => resolution})
-      end
-      query.merge!(options)
       # TODO: look up type when not specified.
       type = options.delete(:type) || 'gauge'
+      query = options.dup
+      if query[:start_time].respond_to?(:year)
+        query[:start_time] = query[:start_time].to_i
+      end
+      if query[:end_time].respond_to?(:year)
+        query[:end_time] = query[:end_time].to_i
+      end
+      unless query.empty?
+        query[:resolution] ||= 1
+      end
       response = connection.get(:path => "v1/#{type}s/#{metric}.json",
                                 :query => query, :expects => 200)
       parsed = JSON.parse(response.body)

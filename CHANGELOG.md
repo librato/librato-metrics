@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 0.2.1
+* Add better handling for start_time and end_time params when fetching measurements
+
 ### Version 0.2.0
 * Fix bug with stale excon connections not reconnecting
 * Add custom User-Agent

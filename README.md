@@ -99,7 +99,7 @@ Get the 20 most recent 15 minute data point rollups for `temperature`:
 
     data = Librato::Metrics.fetch :temperature, :count => 20, :resolution => 900
 
-There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/gauges/:name) for more details.
+There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/gauges/:name) or the [fetch documentation](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics.fetch)  for more details.
 
 ## Known Issues & Coming Improvements
 

@@ -108,7 +108,7 @@ module Librato
     private
 
       def create_persister
-        type = Simple.persistence.capitalize
+        type = Simple.persistence.to_s.capitalize
         Librato::Metrics::Persistence.const_get(type).new
       end
 

@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 0.2.2
+* Fix abstract persistence instantiation in Ruby 1.8/REE
+
 ### Version 0.2.1
 * Add better handling for start_time and end_time params when fetching measurements
 

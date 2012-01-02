@@ -84,7 +84,8 @@ module Librato
         end
 
         def user_agent
-          ruby_ver = "#{RUBY_ENGINE}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM}"
+          ruby_engine = Object.constants.include?(:RUBY_ENGINE) ? RUBY_ENGINE : "ruby"
+          ruby_ver = "#{ruby_engine}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM}"
           "librato-metrics/#{Metrics::VERSION} (#{ruby_ver}) direct-excon/#{Excon::VERSION}"
         end
 

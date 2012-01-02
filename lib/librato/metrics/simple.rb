@@ -84,7 +84,6 @@ module Librato
         end
 
         def user_agent
-          ruby_engine = Object.constants.include?(:RUBY_ENGINE) ? RUBY_ENGINE : "ruby"
           ruby_ver = "#{ruby_engine}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM}"
           "librato-metrics/#{Metrics::VERSION} (#{ruby_ver}) direct-excon/#{Excon::VERSION}"
         end
@@ -103,6 +102,11 @@ module Librato
 
         def flush_persistence
           @persistence = nil
+        end
+
+        def ruby_engine
+          return RUBY_ENGINE if Object.constants.include?(:RUBY_ENGINE)
+          RUBY_DESCRIPTION.split[0]
         end
 
       end

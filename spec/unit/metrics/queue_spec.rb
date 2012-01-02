@@ -33,7 +33,7 @@ module Librato
 
           it "should accept type key as string or a symbol" do
             subject.add :total_visits => {"type" => "counter", :value => 4000}
-            expected = {:counters => [{:name => 'total_visits', :value => 4000}]}
+            expected = {:counters => [{:name => 'total_visits', :value => 4000, :measure_time => @time}]}
             subject.queued.should eql expected
           end
         end

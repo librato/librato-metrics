@@ -14,8 +14,8 @@ module Librato
         response = connection.get(:path => path,
                                   :query => query, :expects => 200)
         parsed = JSON.parse(response.body)
-        query.empty? ? results = parsed : results = parsed["metrics"]
-        return results if query.empty? || parsed["query"]["found"] <= MAX_RESULTS
+        results = parsed["metrics"]
+        return results if parsed["query"]["found"] <= MAX_RESULTS
         query[:offset] = MAX_RESULTS
         while query[:offset] < parsed["query"]["found"]
           response = connection.get(:path => path,

@@ -10,6 +10,7 @@ require 'metrics/persistence'
 require 'metrics/queue'
 require 'metrics/simple'
 require 'metrics/version'
+require 'metrics/collect'
 
 module Librato
 
@@ -90,10 +91,9 @@ module Librato
     def self.list(options={})
       query = {}
       query[:name] = options[:name] if options[:name]
-      response = connection.get(:path => 'v1/metrics.json',
-                                :query => query, :expects => 200)
-      # TODO: pagination support
-      JSON.parse(response.body)["metrics"]
+      offset = 0
+      path = "v1/metrics.json"
+      Collect.paginated_metrics connection, path, query
     end
 
   end

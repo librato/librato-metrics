@@ -86,6 +86,19 @@ module Librato
         end
       end
 
+      describe "#size" do
+        it "should return empty if gauges and counters are emtpy" do
+          subject.size.should eq 0
+        end
+        it "should return count of gauges and counters if added" do
+          subject.add :transactions => {:type => :counter, :value => 12345},
+              :register_cents => {:type => :gauge, :value => 211101}
+          subject.add :transactions => {:type => :counter, :value => 12345},
+                      :register_cents => {:type => :gauge, :value => 211101}
+          subject.size.should eql 4
+        end
+      end
+
       describe "#submit" do
         before(:all) do
           Librato::Metrics.authenticate 'me@librato.com', 'foo'

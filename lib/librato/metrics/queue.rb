@@ -45,6 +45,7 @@ module Librato
       def flush
         @queued = {}
       end
+      alias :clear :flush
       alias :flush_queued :flush
 
       # The object this MetricSet will use to persist

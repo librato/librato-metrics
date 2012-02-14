@@ -74,6 +74,17 @@ module Librato
         end
       end
 
+      describe "#empty?" do
+        it "should return true when nothing queued" do
+          subject.empty?.should be_true
+        end
+
+        it "should return false with queued items" do
+          subject.add :foo => {:type => :gauge, :value => 121212}
+          subject.empty?.should be_false
+        end
+      end
+
       describe "#gauges" do
         it "should return currently queued gauges" do
           subject.add :transactions => {:type => :counter, :value => 12345},

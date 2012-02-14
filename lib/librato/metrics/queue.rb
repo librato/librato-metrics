@@ -40,6 +40,13 @@ module Librato
         @queued[:counters] || []
       end
 
+      # Are any metrics currently queued?
+      #
+      # @return Boolean
+      def empty?
+        @queued.empty?
+      end
+
       # Remove all queued metrics
       #
       def flush

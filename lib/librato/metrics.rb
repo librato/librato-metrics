@@ -72,7 +72,7 @@ module Librato
       unless query.empty?
         query[:resolution] ||= 1
       end
-      response = connection.get(:path => "v1/#{type}s/#{metric}.json",
+      response = connection.get(:path => "v1/#{type}s/#{metric}",
                                 :query => query, :expects => 200)
       parsed = JSON.parse(response.body)
       # TODO: pagination support
@@ -92,7 +92,7 @@ module Librato
       query = {}
       query[:name] = options[:name] if options[:name]
       offset = 0
-      path = "v1/metrics.json"
+      path = "v1/metrics"
       Collect.paginated_metrics connection, path, query
     end
 

@@ -11,7 +11,7 @@ module Librato
         #
         def persist(queued)
           payload = queued.to_json
-          Simple.connection.post(:path => '/v1/metrics.json',
+          Simple.connection.post(:path => '/v1/metrics',
               :headers => {'Content-Type' => 'application/json'},
               :body => payload, :expects => 200)
         end

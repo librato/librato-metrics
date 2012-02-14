@@ -3,7 +3,7 @@ $:.unshift(File.dirname(__FILE__)) unless
 
 require 'base64'
 require 'excon'
-require 'json'
+require 'multi_json'
 
 require 'metrics/errors'
 require 'metrics/persistence'
@@ -72,7 +72,7 @@ module Librato
       end
       response = connection.get(:path => "v1/metrics/#{metric}",
                                 :query => query, :expects => 200)
-      parsed = JSON.parse(response.body)
+      parsed = MultiJson.decode(response.body)
       # TODO: pagination support
       query.empty? ? parsed : parsed["measurements"]
     end

@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
 
   ## runtime dependencies
   s.add_dependency 'excon', '~>0.7.12'
+  s.add_dependency 'multi_json'
 
   ## development dependencies
   s.add_development_dependency 'rake'

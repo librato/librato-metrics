@@ -10,7 +10,7 @@ module Librato
         # Metrics web API.
         #
         def persist(queued)
-          payload = queued.to_json
+          payload = MultiJson.encode(queued)
           Simple.connection.post(:path => '/v1/metrics',
               :headers => {'Content-Type' => 'application/json'},
               :body => payload, :expects => 200)

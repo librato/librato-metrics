@@ -13,14 +13,14 @@ module Librato
         results = []
         response = connection.get(:path => path,
                                   :query => query, :expects => 200)
-        parsed = JSON.parse(response.body)
+        parsed = MultiJson.decode(response.body)
         results = parsed["metrics"]
         return results if parsed["query"]["found"] <= MAX_RESULTS
         query[:offset] = MAX_RESULTS
         begin
           response = connection.get(:path => path,
                                     :query => query, :expects => 200)
-          parsed = JSON.parse(response.body)
+          parsed = MultiJson.decode(response.body)
           results.push(*parsed["metrics"])
           query[:offset] += MAX_RESULTS
         end while query[:offset] < parsed["query"]["found"]

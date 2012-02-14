@@ -60,8 +60,6 @@ module Librato
     # @param [Symbol|String] metric Metric name
     # @param [Hash] options Query options
     def self.fetch(metric, options={})
-      # TODO: look up type when not specified.
-      type = options.delete(:type) || 'gauge'
       query = options.dup
       if query[:start_time].respond_to?(:year)
         query[:start_time] = query[:start_time].to_i
@@ -72,7 +70,7 @@ module Librato
       unless query.empty?
         query[:resolution] ||= 1
       end
-      response = connection.get(:path => "v1/#{type}s/#{metric}",
+      response = connection.get(:path => "v1/metrics/#{metric}",
                                 :query => query, :expects => 200)
       parsed = JSON.parse(response.body)
       # TODO: pagination support

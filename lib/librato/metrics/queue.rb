@@ -66,13 +66,14 @@ module Librato
       def queued
         @queued
       end
-      
+
       # Count of metrics currently queued
       #
       # @return Integer
       def size
         self.queued.inject(0) { |result, data| result + data.last.size }
       end
+      alias :length :size
 
       # Persist currently queued metrics
       #

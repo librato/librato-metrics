@@ -101,6 +101,10 @@ Get the 20 most recent 15 minute data point rollups for `temperature`:
 
 There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/gauges/:name) or the [fetch documentation](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics.fetch)  for more details.
 
+## Thread Safety
+
+The `librato-metrics` gem currently does not do internal locking for thread safety. When used in multi-threaded applications, please add your own mutexes for sensitive operations.
+
 ## Known Issues & Coming Improvements
 
 This is an early release and as such is lacking some capabilities slated for future releases.

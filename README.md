@@ -12,6 +12,12 @@ In your shell:
 Then, in your application or script:
 
     require 'librato/metrics'
+    
+### Optional steps
+
+For best performance we recommend installing [yajl-ruby](https://github.com/brianmario/yajl-ruby):
+
+    gem install yajl-ruby
 
 ## Quick Start
 

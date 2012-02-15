@@ -4,32 +4,69 @@ module Librato
   describe Metrics do
     before(:all) { prep_integration_tests }
 
-    pending "#fetch" do
+    describe "#fetch" do
+      before(:all) do
+        delete_all_metrics
+        Metrics.submit :my_counter => {:type => :counter, :value => 0}
+        1.upto(2).each do |i|
+          sleep 1
+          Metrics.submit :my_counter => {:type => :counter, :value => i}
+          Metrics.submit :my_counter => {:source => 'baz', :type => :counter, :value => i+1}
+        end
+      end
+
+      context "without arguments" do
+        it "should get metric attributes" do
+          metric = Metrics.fetch :my_counter
+          metric['name'].should == 'my_counter'
+          metric['type'].should == 'counter'
+        end
+      end
+
+      context "with a start_time" do
+        it "should return entries since that time" do
+          data = Metrics.fetch :my_counter, :start_time => Time.now-3600 # 1 hr ago
+          data['unassigned'].length.should == 3
+          data['baz'].length.should == 2
+        end
+      end
+
+      context "with a count limit" do
+        it "should return that number of entries per source" do
+          data = Metrics.fetch :my_counter, :count => 2
+          data['unassigned'].length.should == 2
+          data['baz'].length.should == 2
+        end
+      end
+
+      context "with a source limit" do
+        it "should only return that source" do
+          data = Metrics.fetch :my_counter, :source => 'baz', :start_time => Time.now-3600
+          data['baz'].length.should == 2
+          data['unassigned'].should be_nil
+        end
+      end
+
     end
 
     describe "#list" do
-
       before(:all) do
         delete_all_metrics
         Metrics.submit :foo => 123, :bar => 345, :baz => 678, :foo_2 => 901
       end
 
       context "without arguments" do
-
         it "should list all metrics" do
           metric_names = Metrics.list.map { |metric| metric['name'] }
           metric_names.sort.should == %w{foo bar baz foo_2}.sort
         end
-
       end
 
       context "with a name argument" do
-
         it "should list metrics that match" do
           metric_names = Metrics.list(:name => 'foo').map { |metric| metric['name'] }
           metric_names.sort.should == %w{foo foo_2}.sort
         end
-
       end
 
     end
@@ -75,7 +112,6 @@ module Librato
       end
 
     end
-
 
   end
 end

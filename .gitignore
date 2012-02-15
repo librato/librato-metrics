@@ -17,3 +17,5 @@ doc
 
 # rcov generated
 coverage
+
+test_env.sh

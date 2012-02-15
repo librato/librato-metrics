@@ -16,22 +16,6 @@ module Librato
 
    end
 
-   describe "#list" do
-
-     context "without arguments" do
-
-       it "should list all metrics"
-
-     end
-
-     context "with a name argument" do
-
-       it "should list metrics that match"
-
-     end
-
-   end
-
    describe "#persistence" do
 
      it "should allow configuration of persistence method" do

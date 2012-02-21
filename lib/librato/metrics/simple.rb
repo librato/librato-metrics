@@ -44,9 +44,7 @@ module Librato
         end
 
         def connection
-          # TODO: upate when excon connection recovery is improved.
-          # @connection ||= Excon.new(self.api_endpoint, :headers => common_headers)
-          Excon.new(self.api_endpoint, :headers => common_headers)
+          @connection ||= Faraday.new(api_endpoint, :headers => common_headers)
         end
 
         # Purge current credentials and connection
@@ -85,7 +83,7 @@ module Librato
 
         def user_agent
           ruby_ver = "#{ruby_engine}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM}"
-          "librato-metrics/#{Metrics::VERSION} (#{ruby_ver}) direct-excon/#{Excon::VERSION}"
+          "librato-metrics/#{Metrics::VERSION} (#{ruby_ver}) direct-faraday/#{Faraday::VERSION}"
         end
 
       private

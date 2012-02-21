@@ -22,7 +22,7 @@ RSpec.configure do |config|
     connection = Librato::Metrics.connection
     Librato::Metrics.list.each do |metric|
       #puts "deleting #{metric['name']}..."
-      connection.delete(:path => "v1/metrics/#{metric['name']}", :expects => 204)
+      connection.delete("metrics/#{metric['name']}")
     end
   end
 

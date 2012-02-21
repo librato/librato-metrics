@@ -2,7 +2,7 @@ $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 require 'base64'
-require 'excon'
+require 'faraday'
 require 'multi_json'
 
 require 'metrics/errors'
@@ -70,8 +70,7 @@ module Librato
       unless query.empty?
         query[:resolution] ||= 1
       end
-      response = connection.get(:path => "v1/metrics/#{metric}",
-                                :query => query, :expects => 200)
+      response = connection.get(connection.build_url("metrics/#{metric}", query))
       parsed = MultiJson.decode(response.body)
       # TODO: pagination support
       query.empty? ? parsed : parsed["measurements"]
@@ -90,7 +89,7 @@ module Librato
       query = {}
       query[:name] = options[:name] if options[:name]
       offset = 0
-      path = "v1/metrics"
+      path = "metrics"
       Collect.paginated_metrics connection, path, query
     end
 

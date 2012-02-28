@@ -102,8 +102,9 @@ module Librato
         end
 
         def user_agent
-          ruby_ver = "#{ruby_engine}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM}"
-          "librato-metrics/#{Metrics::VERSION} (#{ruby_ver}) direct-excon/#{Excon::VERSION}"
+          ruby_version = "#{ruby_engine}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM}"
+          app_info = "developer-program #{app_name}/#{app_version} #{app_id}"
+          "librato-metrics/#{Metrics::VERSION} (#{ruby_version}) direct-excon/#{Excon::VERSION}"
         end
 
       private

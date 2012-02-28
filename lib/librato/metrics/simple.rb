@@ -97,11 +97,17 @@ module Librato
           @queue.submit
         end
 
+        # User-agent used when making requests.
+        #
         def user_agent
-          ruby_version = "#{ruby_engine}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM}"
-          librato = "librato-metrics/#{Metrics::VERSION} (#{ruby_version}) direct-excon/#{Excon::VERSION}"
-          app_info = dev_id ? "#{app_name}/#{app_version} (dev_id-#{dev_id};) " : ""
-          app_info + librato
+          ua_chunks = []
+          if agent_identifier && !agent_identifier.empty?
+            ua_chunks << agent_identifier
+          end
+          ua_chunks << "librato-metrics/#{Metrics::VERSION}"
+          ua_chunks << "(#{ruby_engine}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM})"
+          ua_chunks << "direct-excon/#{Excon::VERSION}"
+          ua_chunks.join(' ')
         end
 
       private

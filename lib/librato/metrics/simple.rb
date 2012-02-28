@@ -17,6 +17,28 @@ module Librato
         # class instance vars
         attr_accessor :email, :api_key
 
+        # Provide agent identifier for the developer program. See:
+        # http://support.metrics.librato.com/knowledgebase/articles/53548-developer-program
+        #
+        # @example Have the gem build your identifier string
+        #   Librato::Metrics.agent_identifier 'flintstone', '0.5', 'fred'
+        #
+        # @example Provide your own identifier string
+        #   Librato::Metrics.agent_identifier 'flintstone/0.5 (dev_id:fred)'
+        #
+        # @example Remove identifier string
+        #   Librato::Metrics.agent_identifier ''
+        def agent_identifier(*args)
+          if args.length == 1
+            @agent_identifier = args.first
+          elsif args.length == 3
+            @agent_identifier = "#{args[0]}/#{args[1]} (dev_id:#{args[2]})"
+          elsif ![0,1,3].include?(args.length)
+            raise ArgumentError, 'invalid arguments, see method documentation'
+          end
+          @agent_identifier ||= ''
+        end
+
         # API endpoint to use for queries and direct
         # persistence.
         #
@@ -71,11 +93,12 @@ module Librato
           @persistence = persist_method
         end
 
+        # Current persister object.
         def persister
           @queue ? @queue.persister : nil
         end
 
-        # Submit all queued metrics
+        # Submit all queued metrics.
         #
         def submit(args)
           @queue ||= Queue.new(:skip_measurement_times => true)
@@ -83,9 +106,17 @@ module Librato
           @queue.submit
         end
 
+        # User-agent used when making requests.
+        #
         def user_agent
-          ruby_ver = "#{ruby_engine}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM}"
-          "librato-metrics/#{Metrics::VERSION} (#{ruby_ver}) direct-excon/#{Excon::VERSION}"
+          ua_chunks = []
+          if agent_identifier && !agent_identifier.empty?
+            ua_chunks << agent_identifier
+          end
+          ua_chunks << "librato-metrics/#{Metrics::VERSION}"
+          ua_chunks << "(#{ruby_engine}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM})"
+          ua_chunks << "direct-excon/#{Excon::VERSION}"
+          ua_chunks.join(' ')
         end
 
       private

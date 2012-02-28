@@ -27,3 +27,12 @@ RSpec.configure do |config|
   end
 
 end
+
+# Ex: 'foobar'.should start_with('foo') #=> true
+#
+RSpec::Matchers.define :start_with do |start_string|
+  match do |string|
+    start_length = start_string.length
+    string[0..start_length-1] == start_string
+  end
+end

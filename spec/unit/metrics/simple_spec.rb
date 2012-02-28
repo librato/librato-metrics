@@ -5,6 +5,35 @@ module Librato
 
     describe Simple do
 
+      describe "#agent_identifier" do
+        context "when given a single string argument" do
+          it "should set agent_identifier" do
+            Simple.agent_identifier 'mycollector/0.1 (dev_id:foo)'
+            Simple.agent_identifier.should == 'mycollector/0.1 (dev_id:foo)'
+          end
+        end
+
+        context "when given three arguments" do
+          it "should compose an agent string" do
+            Simple.agent_identifier('test_app', '0.5', 'foobar')
+            Simple.agent_identifier.should == 'test_app/0.5 (dev_id:foobar)'
+          end
+
+          context "when given an empty string" do
+            it "should set to empty" do
+              Simple.agent_identifier ''
+              Simple.agent_identifier.should == ''
+            end
+          end
+        end
+
+        context "when given two arguments" do
+          it "should raise error" do
+            lambda { Simple.agent_identifier('test_app', '0.5') }.should raise_error(ArgumentError)
+          end
+        end
+      end
+
       describe "#api_endpoint" do
         it "should default to metrics" do
           Simple.api_endpoint.should == 'https://metrics-api.librato.com/v1/'
@@ -72,6 +101,22 @@ module Librato
           lambda{ Simple.submit :foo => 123, :bar => 456 }.should_not raise_error
           expected = {:gauges => [{:name => 'foo', :value => 123}, {:name => 'bar', :value => 456}]}
           Simple.persister.persisted.should eql expected
+        end
+      end
+
+      describe "#user_agent" do
+        context "without an agent_identifier" do
+          it "should render standard string" do
+            Simple.agent_identifier('')
+            Simple.user_agent.should start_with('librato-metrics')
+          end
+        end
+
+        context "with an agent_identifier" do
+          it "should render agent_identifier first" do
+            Simple.agent_identifier('foo', '0.5', 'bar')
+            Simple.user_agent.should start_with('foo/0.5')
+          end
         end
       end
 

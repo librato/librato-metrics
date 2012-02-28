@@ -15,11 +15,19 @@ module Librato
 
       class << self
         # class instance vars
-        attr_accessor :email, :api_key, :app_name, :app_version, :dev_id
+        attr_accessor :email, :api_key
 
-        # Provide agent identifier for the developer program
+        # Provide agent identifier for the developer program. See:
+        # http://support.metrics.librato.com/knowledgebase/articles/53548-developer-program
         #
+        # @example Have the gem build your identifier string
+        #   Librato::Metrics.agent_identifier 'flintstone', '0.5', 'fred'
         #
+        # @example Provide your own identifier string
+        #   Librato::Metrics.agent_identifier 'flintstone/0.5 (dev_id:fred)'
+        #
+        # @example Remove identifier string
+        #   Librato::Metrics.agent_identifier ''
         def agent_identifier(*args)
           if args.length == 1
             @agent_identifier = args.first
@@ -85,6 +93,7 @@ module Librato
           @persistence = persist_method
         end
 
+        # Current persister object.
         def persister
           @queue ? @queue.persister : nil
         end

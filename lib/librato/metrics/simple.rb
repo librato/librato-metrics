@@ -60,10 +60,11 @@ module Librato
         # Provide application info to Librato for the developer program
         #
         #
-        def agent_identifier(name, version, id)
+        def agent_identifier(name, version, dev_id)
+          raise ApplicationInfoMissing unless (name and version and dev_id)
           self.app_name = name
           self.app_version = version
-          self.dev_id = id
+          self.dev_id = dev_id
         end
 
         # Purge current application info

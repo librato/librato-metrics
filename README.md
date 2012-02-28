@@ -125,7 +125,7 @@ This is an early release and as such is lacking some capabilities slated for fut
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
 * Fork the project and submit a pull request from a feature or bugfix branch.
 * Please include specs. This is important so we don't break your changes unintentionally in a future version.
-* Please don't modify the Rakefile, version, or history. If you do change these files, please isolate a separate commit so we can cherry-pick around it.
+* Please don't modify the gemspec, Rakefile, version, or changelog. If you do change these files, please isolate a separate commit so we can cherry-pick around it.
 
 ## Copyright
 

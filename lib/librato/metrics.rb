@@ -27,8 +27,8 @@ module Librato
     #
     # TODO: Explain exposed interface with examples.
     def_delegators Librato::Metrics::Simple, :api_endpoint, :api_endpoint=,
-                  :authenticate, :connection, :persistence, :persistence=,
-                  :persister, :submit
+                  :authenticate, :agent_identifier, :connection, :persistence,
+                  :persistence=, :persister, :submit
 
     # Query metric data
     #

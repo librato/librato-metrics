@@ -15,7 +15,7 @@ module Librato
 
       class << self
         # class instance vars
-        attr_accessor :email, :api_key
+        attr_accessor :email, :api_key, :app_name, :app_version, :app_id
 
         # API endpoint to use for queries and direct
         # persistence.
@@ -55,6 +55,24 @@ module Librato
           self.email = nil
           self.api_key = nil
           @connection = nil
+        end
+
+        # Provide application info to Librato for the developer program
+        #
+        #
+        def application(name, version, id)
+          self.app_name = name
+          self.app_version = version
+          self.app_id = id
+        end
+
+        # Purge current application info
+        #
+        #
+        def flush_application
+          self.app_name = nil
+          self.app_version = nil
+          self.app_id = nil
         end
 
         # Persistence type to use when saving metrics.

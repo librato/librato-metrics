@@ -15,7 +15,7 @@ module Librato
 
       class << self
         # class instance vars
-        attr_accessor :email, :api_key, :app_name, :app_version, :app_id
+        attr_accessor :email, :api_key, :app_name, :app_version, :dev_id
 
         # API endpoint to use for queries and direct
         # persistence.
@@ -60,19 +60,19 @@ module Librato
         # Provide application info to Librato for the developer program
         #
         #
-        def application(name, version, id)
+        def agent_identifier(name, version, id)
           self.app_name = name
           self.app_version = version
-          self.app_id = id
+          self.dev_id = id
         end
 
         # Purge current application info
         #
         #
-        def flush_application
+        def flush_agent_identifier
           self.app_name = nil
           self.app_version = nil
-          self.app_id = nil
+          self.dev_id = nil
         end
 
         # Persistence type to use when saving metrics.
@@ -103,8 +103,9 @@ module Librato
 
         def user_agent
           ruby_version = "#{ruby_engine}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM}"
-          app_info = "developer-program #{app_name}/#{app_version} #{app_id}"
-          "librato-metrics/#{Metrics::VERSION} (#{ruby_version}) direct-excon/#{Excon::VERSION}"
+          librato = "librato-metrics/#{Metrics::VERSION} (#{ruby_version}) direct-excon/#{Excon::VERSION}"
+          app_info = dev_id ? "#{app_name}/#{app_version} (dev_id-#{dev_id};) " : ""
+          app_info + librato
         end
 
       private

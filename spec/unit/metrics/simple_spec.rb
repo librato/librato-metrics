@@ -5,6 +5,35 @@ module Librato
 
     describe Simple do
 
+      describe "#agent_identifier" do
+        context "when given a single string argument" do
+          it "should set agent_identifier" do
+            Simple.agent_identifier 'mycollector/0.1 (dev_id:foo)'
+            Simple.agent_identifier.should == 'mycollector/0.1 (dev_id:foo)'
+          end
+        end
+
+        context "when given three arguments" do
+          it "should compose an agent string" do
+            Simple.agent_identifier('test_app', '0.5', 'foobar')
+            Simple.agent_identifier.should == 'test_app/0.5 (dev_id:foobar)'
+          end
+
+          context "when given an empty string" do
+            it "should set to empty" do
+              Simple.agent_identifier ''
+              Simple.agent_identifier.should == ''
+            end
+          end
+        end
+
+        context "when given two arguments" do
+          it "should raise error" do
+            lambda { Simple.agent_identifier('test_app', '0.5') }.should raise_error(ArgumentError)
+          end
+        end
+      end
+
       describe "#api_endpoint" do
         it "should default to metrics" do
           Simple.api_endpoint.should == 'https://metrics-api.librato.com/v1/'
@@ -38,17 +67,6 @@ module Librato
         it "should raise exception without authentication" do
           Simple.flush_authentication
           lambda{ Simple.connection }.should raise_error(Librato::Metrics::CredentialsMissing)
-        end
-      end
-
-      describe "#agent_identifier" do
-        context "when given three arguments" do
-          it "should store them as app_name, app_version, and dev_id" do
-            Simple.agent_identifier 'test_app', '0.5', 'foobar'
-            Simple.app_name.should == 'test_app'
-            Simple.app_version.should == '0.5'
-            Simple.dev_id.should == 'foobar'
-          end
         end
       end
 

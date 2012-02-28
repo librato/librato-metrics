@@ -17,6 +17,20 @@ module Librato
         # class instance vars
         attr_accessor :email, :api_key, :app_name, :app_version, :dev_id
 
+        # Provide agent identifier for the developer program
+        #
+        #
+        def agent_identifier(*args)
+          if args.length == 1
+            @agent_identifier = args.first
+          elsif args.length == 3
+            @agent_identifier = "#{args[0]}/#{args[1]} (dev_id:#{args[2]})"
+          elsif ![0,1,3].include?(args.length)
+            raise ArgumentError, 'invalid arguments, see method documentation'
+          end
+          @agent_identifier ||= ''
+        end
+
         # API endpoint to use for queries and direct
         # persistence.
         #
@@ -57,25 +71,6 @@ module Librato
           @connection = nil
         end
 
-        # Provide agent identifier for the developer program
-        #
-        #
-        def agent_identifier(app_name, app_version, dev_id)
-          raise AgentInfoMissing unless (app_name and app_version and dev_id)
-          self.app_name = app_name
-          self.app_version = app_version
-          self.dev_id = dev_id
-        end
-
-        # Purge current agent identifier
-        #
-        #
-        def flush_agent_identifier
-          self.app_name = nil
-          self.app_version = nil
-          self.dev_id = nil
-        end
-
         # Persistence type to use when saving metrics.
         # Default is :direct.
         #
@@ -94,7 +89,7 @@ module Librato
           @queue ? @queue.persister : nil
         end
 
-        # Submit all queued metrics
+        # Submit all queued metrics.
         #
         def submit(args)
           @queue ||= Queue.new(:skip_measurement_times => true)

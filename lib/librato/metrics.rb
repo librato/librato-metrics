@@ -26,8 +26,8 @@ module Librato
     # Expose class methods of Simple via Metrics itself.
     #
     # TODO: Explain exposed interface with examples.
-    def_delegators Librato::Metrics::Simple, :api_endpoint, :api_endpoint=,
-                  :authenticate, :connection, :agent_identifier, :persistence,
+    def_delegators Librato::Metrics::Simple, :agent_identifier, :api_endpoint,
+                  :api_endpoint=, :authenticate, :connection, :persistence,
                   :persistence=, :persister, :submit
 
     # Query metric data

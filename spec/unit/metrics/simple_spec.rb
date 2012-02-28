@@ -41,6 +41,17 @@ module Librato
         end
       end
 
+      describe "#agent_identifier" do
+        context "when given three arguments" do
+          it "should store them as app_name, app_version, and dev_id" do
+            Simple.agent_identifier 'test_app', '0.5', 'foobar'
+            Simple.app_name.should == 'test_app'
+            Simple.app_version.should == '0.5'
+            Simple.dev_id.should == 'foobar'
+          end
+        end
+      end
+
       describe "#persistence" do
         it "should default to direct" do
           Simple.send(:flush_persistence)

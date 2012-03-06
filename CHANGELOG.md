@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 0.4.0
+* Add ability to set agent_identifier for use with developer program (Sean Porter)
+* Documentation improvements
+
 ### Version 0.3.1
 * Upgrade excon to 0.9.5 to fix intermittent socket errors
 

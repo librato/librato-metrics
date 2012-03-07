@@ -123,7 +123,7 @@ module Librato
 
         def auth_header
           raise CredentialsMissing unless (self.email and self.api_key)
-          encoded = Base64.encode64("#{email}:#{api_key}").gsub("\n", ' ')
+          encoded = Base64.encode64("#{email}:#{api_key}").gsub("\n", '')
           "Basic #{encoded}"
         end
 

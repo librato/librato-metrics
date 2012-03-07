@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 0.4.1
+* Fix issues with auth encoding whitespace
+
 ### Version 0.4.0
 * Add ability to set agent_identifier for use with developer program (Sean Porter)
 * Documentation improvements

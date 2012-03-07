@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 0.4.2
+* Fix SSL verify peer issues with JRuby (Sean Porter)
+
 ### Version 0.4.1
 * Fix issues with auth encoding whitespace
 

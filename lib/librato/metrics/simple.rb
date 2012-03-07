@@ -68,6 +68,7 @@ module Librato
         def connection
           # TODO: upate when excon connection recovery is improved.
           # @connection ||= Excon.new(self.api_endpoint, :headers => common_headers)
+          Excon.defaults[:ssl_verify_peer] = false if RUBY_PLATFORM == "java"
           Excon.new(self.api_endpoint, :headers => common_headers)
         end
 

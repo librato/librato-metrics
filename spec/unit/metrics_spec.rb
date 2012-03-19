@@ -9,8 +9,8 @@ module Librato
      context "when given two arguments" do
        it "should store them on simple" do
          Metrics.authenticate 'tester@librato.com', 'api_key'
-         Metrics::Simple.email.should == 'tester@librato.com'
-         Metrics::Simple.api_key.should == 'api_key'
+         Metrics.client.email.should == 'tester@librato.com'
+         Metrics.client.api_key.should == 'api_key'
        end
      end
 
@@ -30,7 +30,7 @@ module Librato
        Librato::Metrics.persistence = :test
        Librato::Metrics.authenticate 'me@librato.com', 'foo'
      end
-     after(:all) { Librato::Metrics::Simple.flush_authentication }
+     after(:all) { Librato::Metrics.client.flush_authentication }
 
      it "should persist metrics immediately" do
        Metrics.persistence = :test

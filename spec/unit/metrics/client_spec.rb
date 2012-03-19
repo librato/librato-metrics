@@ -42,10 +42,8 @@ module Librato
 
       describe "#api_endpoint=" do
         it "should set api_endpoint" do
-          @prior = subject.api_endpoint
           subject.api_endpoint = 'http://test.com/'
           subject.api_endpoint.should == 'http://test.com/'
-          subject.api_endpoint = @prior
         end
 
         # TODO:
@@ -77,27 +75,22 @@ module Librato
         end
 
         it "should allow configuration of persistence method" do
-          current = subject.persistence
           subject.persistence = :fake
           subject.persistence.should == :fake
-          subject.persistence = current
         end
       end
 
       describe "#submit" do
-        before(:all) do
-          subject.persistence = :test
-          subject.authenticate 'me@librato.com', 'foo'
-        end
-        after(:all) { subject.flush_authentication }
-
         it "should persist metrics immediately" do
+          subject.authenticate 'me@librato.com', 'foo'
           subject.persistence = :test
           subject.submit(:foo => 123).should eql true
           subject.persister.persisted.should eql({:gauges => [{:name => 'foo', :value => 123}]})
         end
 
         it "should tolerate muliple metrics" do
+          subject.authenticate 'me@librato.com', 'foo'
+          subject.persistence = :test
           lambda{ subject.submit :foo => 123, :bar => 456 }.should_not raise_error
           expected = {:gauges => [{:name => 'foo', :value => 123}, {:name => 'bar', :value => 456}]}
           subject.persister.persisted.should eql expected

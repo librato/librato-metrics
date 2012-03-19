@@ -115,7 +115,6 @@ module Librato
           Librato::Metrics.authenticate 'me@librato.com', 'foo'
           Librato::Metrics.persistence = :test
         end
-        after(:all) { Librato::Metrics::Simple.flush_authentication }
 
         context "when successful" do
           it "should flush queued metrics and return true" do

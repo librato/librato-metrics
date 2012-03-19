@@ -7,6 +7,7 @@ module Librato
       def initialize(options={})
         @queued ||= {}
         @skip_measurement_times = options.delete(:skip_measurement_times)
+        @client = options.delete(:client) || Librato::Metrics.client
       end
 
       # Add a metric entry to the metric set:
@@ -98,7 +99,7 @@ module Librato
       # @return Boolean
       def submit
         raise NoMetricsQueued if self.queued.empty?
-        if persister.persist(self.queued)
+        if persister.persist(self.client, self.queued)
           flush and return true
         end
         false

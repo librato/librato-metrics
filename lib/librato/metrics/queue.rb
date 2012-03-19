@@ -33,9 +33,19 @@ module Librato
         queued
       end
 
+      # The current Client instance this queue is using to authenticate
+      # and connect to Librato Metrics. This will default to the primary
+      # client used by the Librato::Metrics module unless it has been
+      # set to something else.
+      #
+      # @return [Librato::Metrics::Client]
+      def client
+        @client ||= Librato::Metrics.client
+      end
+
       # Currently queued counters
       #
-      # @return Array
+      # @return [Array]
       def counters
         @queued[:counters] || []
       end
@@ -124,7 +134,7 @@ module Librato
     private
 
       def create_persister
-        type = Simple.persistence.to_s.capitalize
+        type = self.client.persistence.to_s.capitalize
         Librato::Metrics::Persistence.const_get(type).new
       end
 

@@ -5,12 +5,13 @@ require 'base64'
 require 'excon'
 require 'multi_json'
 
+require 'metrics/client'
+require 'metrics/collect'
 require 'metrics/errors'
 require 'metrics/persistence'
 require 'metrics/queue'
-require 'metrics/simple'
+#require 'metrics/simple'
 require 'metrics/version'
-require 'metrics/collect'
 
 module Librato
 
@@ -26,9 +27,15 @@ module Librato
     # Expose class methods of Simple via Metrics itself.
     #
     # TODO: Explain exposed interface with examples.
-    def_delegators Librato::Metrics::Simple, :agent_identifier, :api_endpoint,
+    def_delegators :client, :agent_identifier, :api_endpoint,
                   :api_endpoint=, :authenticate, :connection, :persistence,
                   :persistence=, :persister, :submit
+
+    # The Librato::Metrics::Client being used by module-level
+    # access.
+    def self.client
+      @client ||= Librato::Metrics::Client.new
+    end
 
     # Query metric data
     #

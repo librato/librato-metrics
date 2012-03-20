@@ -68,6 +68,13 @@ module Librato
         end
       end
 
+      describe "#new_queue" do
+        it "should return a new queue with client set" do
+          queue = subject.new_queue
+          queue.client.should be subject
+        end
+      end
+
       describe "#persistence" do
         it "should default to direct" do
           subject.send(:flush_persistence)

@@ -7,6 +7,7 @@ module Librato
       def initialize(options={})
         @queued ||= {}
         @skip_measurement_times = options.delete(:skip_measurement_times)
+        @client = options.delete(:client) || Librato::Metrics.client
       end
 
       # Add a metric entry to the metric set:
@@ -33,9 +34,19 @@ module Librato
         queued
       end
 
+      # The current Client instance this queue is using to authenticate
+      # and connect to Librato Metrics. This will default to the primary
+      # client used by the Librato::Metrics module unless it has been
+      # set to something else.
+      #
+      # @return [Librato::Metrics::Client]
+      def client
+        @client ||= Librato::Metrics.client
+      end
+
       # Currently queued counters
       #
-      # @return Array
+      # @return [Array]
       def counters
         @queued[:counters] || []
       end
@@ -88,7 +99,7 @@ module Librato
       # @return Boolean
       def submit
         raise NoMetricsQueued if self.queued.empty?
-        if persister.persist(self.queued)
+        if persister.persist(self.client, self.queued)
           flush and return true
         end
         false
@@ -124,7 +135,7 @@ module Librato
     private
 
       def create_persister
-        type = Simple.persistence.to_s.capitalize
+        type = self.client.persistence.to_s.capitalize
         Librato::Metrics::Persistence.const_get(type).new
       end
 

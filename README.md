@@ -107,6 +107,35 @@ Get the 20 most recent 15 minute data point rollups for `temperature`:
 
 There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/gauges/:name) or the [fetch documentation](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics.fetch)  for more details.
 
+## Using Multiple Accounts Simultaneously
+
+If you need to use metrics with multiple sets of authentication credentials simultaneously, you can do it with `Client`:
+
+    joe = Librato::Metrics::Client.new
+    joe.authenticate 'email1', 'api_key1'
+    
+    mike = Librato::Metrics::Client.new
+    mike.authenticate 'email2', 'api_key2'
+
+All of the same operations you can call directly from `Librato::Metrics` are available per-client:
+
+	# list Joe's metrics
+	joe.list
+	
+	# fetch the last 20 data points for Mike's metric, humidity 
+	mike.fetch :humidity, :count => 20
+	
+There are two ways to associate a new queue with a client:
+
+	# these are functionally equivalent
+	joe_queue = Librato::Metrics::Queue.new(:client => joe)
+	joe_queue = joe.new_queue
+    
+Once the queue is associated you can use it normally:
+
+	joe_queue.add :temperature => {:source => 'sf', :value => 65.2}
+	joe_queue.submit
+
 ## Thread Safety
 
 The `librato-metrics` gem currently does not do internal locking for thread safety. When used in multi-threaded applications, please add your own mutexes for sensitive operations.

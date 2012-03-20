@@ -5,19 +5,60 @@ require 'base64'
 require 'excon'
 require 'multi_json'
 
+require 'metrics/client'
+require 'metrics/collect'
 require 'metrics/errors'
 require 'metrics/persistence'
 require 'metrics/queue'
-require 'metrics/simple'
+#require 'metrics/simple'
 require 'metrics/version'
-require 'metrics/collect'
 
 module Librato
 
-  # Metrics provides a simple wrapper for the Metrics web API. Some
-  # of the methods Metrics provides will be documented below. Others
-  # are delegated to {Librato::Metrics::Simple} and will be
-  # documented there.
+  # Metrics provides a simple wrapper for the Metrics web API with a
+  # number of added conveniences for common use cases.
+  #
+  # See the {file:README.md README} for more information and examples.
+  #
+  # @example Simple use case
+  #   Librato::Metrics.authenticate 'email', 'api_key'
+  #
+  #   # list current metrics
+  #   Librato::Metrics.list
+  #
+  #   # submit a metric immediately
+  #   Librato::Metrics.submit :foo => 12712
+  #
+  #   # fetch the last 10 values of foo
+  #   Librato::Metrics.fetch :foo, :count => 10
+  #
+  # @example Queuing metrics for submission
+  #   queue = Librato::Metrics::Queue.new
+  #
+  #   # queue some metrics
+  #   queue.add :foo => 12312
+  #   queue.add :bar => 45678
+  #
+  #   # send the metrics
+  #   queue.submit
+  #
+  # @example Using a Client object
+  #   client = Librato::Metrics::Client.new
+  #   client.authenticate 'email', 'api_key'
+  #
+  #   # list client's metrics
+  #   client.list
+  #
+  #   # create an associated queue
+  #   queue = client.new_queue
+  #
+  #   # queue up some metrics and submit
+  #   queue.add :foo => 12345
+  #   queue.add :bar => 45678
+  #   queue.submit
+  #
+  # @note Most of the methods you can call directly on Librato::Metrics are
+  #   delegated to {Client} and are documented there.
   module Metrics
     extend SingleForwardable
 
@@ -26,72 +67,16 @@ module Librato
     # Expose class methods of Simple via Metrics itself.
     #
     # TODO: Explain exposed interface with examples.
-    def_delegators Librato::Metrics::Simple, :agent_identifier, :api_endpoint,
-                  :api_endpoint=, :authenticate, :connection, :persistence,
-                  :persistence=, :persister, :submit
+    def_delegators :client, :agent_identifier, :api_endpoint,
+                   :api_endpoint=, :authenticate, :connection, :fetch,
+                   :list, :persistence, :persistence=, :persister, :submit
 
-    # Query metric data
+    # The Librato::Metrics::Client being used by module-level
+    # access.
     #
-    # @example Get attributes for a metric
-    #   attrs = Librato::Metrics.fetch :temperature
-    #
-    # @example Get 20 most recent data points for metric
-    #   data = Librato::Metrics.fetch :temperature, :count => 20
-    #
-    # @example Get 20 most recent data points for a specific source
-    #   data = Librato::Metrics.fetch :temperature, :count => 20,
-    #                                  :source => 'app1'
-    #
-    # @example Get the 20 most recent 15 minute data point rollups
-    #   data = Librato::Metrics.fetch :temperature, :count => 20,
-    #                                 :resolution => 900
-    #
-    # @example Get data points for the last hour
-    #   data = Librato::Metrics.fetch :start_time => Time.now-3600
-    #
-    # @example Get 15 min data points from two hours to an hour ago
-    #   data = Librato::Metrics.fetch :start_time => Time.now-7200,
-    #                                 :end_time => Time.now-3600,
-    #                                 :resolution => 900
-    #
-    # A full list of query parameters can be found in the API
-    # documentation: {http://dev.librato.com/v1/get/gauges/:name}
-    #
-    # @param [Symbol|String] metric Metric name
-    # @param [Hash] options Query options
-    def self.fetch(metric, options={})
-      query = options.dup
-      if query[:start_time].respond_to?(:year)
-        query[:start_time] = query[:start_time].to_i
-      end
-      if query[:end_time].respond_to?(:year)
-        query[:end_time] = query[:end_time].to_i
-      end
-      unless query.empty?
-        query[:resolution] ||= 1
-      end
-      response = connection.get(:path => "v1/metrics/#{metric}",
-                                :query => query, :expects => 200)
-      parsed = MultiJson.decode(response.body)
-      # TODO: pagination support
-      query.empty? ? parsed : parsed["measurements"]
-    end
-
-    # List currently existing metrics
-    #
-    # @example List all metrics
-    #   Librato::Metrics.list
-    #
-    # @example List metrics with 'foo' in the name
-    #   Librato::Metrics.list :name => 'foo'
-    #
-    # @param [Hash] options
-    def self.list(options={})
-      query = {}
-      query[:name] = options[:name] if options[:name]
-      offset = 0
-      path = "v1/metrics"
-      Collect.paginated_metrics connection, path, query
+    # @return [Client]
+    def self.client
+      @client ||= Librato::Metrics::Client.new
     end
 
   end

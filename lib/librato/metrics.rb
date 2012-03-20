@@ -15,12 +15,50 @@ require 'metrics/version'
 
 module Librato
 
-  # Metrics provides a simple wrapper for the Metrics web API.
+  # Metrics provides a simple wrapper for the Metrics web API with a
+  # number of added conveniences for common use cases.
   #
-  # Some
-  # of the methods Metrics provides will be documented below. Others
-  # are delegated to {Client} and will be
-  # documented there.
+  # See the {file:README.md README} for more information and examples.
+  #
+  # @example Simple use case
+  #   Librato::Metrics.authenticate 'email', 'api_key'
+  #
+  #   # list current metrics
+  #   Librato::Metrics.list
+  #
+  #   # submit a metric immediately
+  #   Librato::Metrics.submit :foo => 12712
+  #
+  #   # fetch the last 10 values of foo
+  #   Librato::Metrics.fetch :foo, :count => 10
+  #
+  # @example Queuing metrics for submission
+  #   queue = Librato::Metrics::Queue.new
+  #
+  #   # queue some metrics
+  #   queue.add :foo => 12312
+  #   queue.add :bar => 45678
+  #
+  #   # send the metrics
+  #   queue.submit
+  #
+  # @example Using a Client object
+  #   client = Librato::Metrics::Client.new
+  #   client.authenticate 'email', 'api_key'
+  #
+  #   # list client's metrics
+  #   client.list
+  #
+  #   # create an associated queue
+  #   queue = client.new_queue
+  #
+  #   # queue up some metrics and submit
+  #   queue.add :foo => 12345
+  #   queue.add :bar => 45678
+  #   queue.submit
+  #
+  # @note Most of the methods you can call directly on Librato::Metrics are
+  #   delegated to {Client} and are documented there.
   module Metrics
     extend SingleForwardable
 
@@ -35,6 +73,8 @@ module Librato
 
     # The Librato::Metrics::Client being used by module-level
     # access.
+    #
+    # @return [Client]
     def self.client
       @client ||= Librato::Metrics::Client.new
     end

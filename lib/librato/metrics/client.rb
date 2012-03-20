@@ -52,6 +52,8 @@ module Librato
         self.email, self.api_key = email, api_key
       end
 
+      # Current connection object
+      #
       def connection
         # TODO: upate when excon connection recovery is improved.
         # @connection ||= Excon.new(self.api_endpoint, :headers => common_headers)

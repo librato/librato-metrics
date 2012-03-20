@@ -7,7 +7,24 @@ module Librato
 
       before(:all) do
         @time = Time.now.to_i
-        Librato::Metrics::Queue.stub(:epoch_time).and_return(@time)
+        Queue.stub(:epoch_time).and_return(@time)
+      end
+
+      describe "initialization" do
+        context "with specified client" do
+          it "should set to client" do
+            barney = Client
+            queue = Queue.new(:client => barney)
+            queue.client.should be barney
+          end
+        end
+
+        context "without specified client" do
+          it "should use Librato::Metrics client" do
+            queue = Queue.new
+            queue.client.should be Librato::Metrics.client
+          end
+        end
       end
 
       describe "#add" do

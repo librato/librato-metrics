@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = %w[LICENSE]
 
   ## runtime dependencies
-  s.add_dependency 'excon', '~> 0.9.5'
+  s.add_dependency 'excon', '~> 0.13.0'
   s.add_dependency 'multi_json'
 
   ## development dependencies

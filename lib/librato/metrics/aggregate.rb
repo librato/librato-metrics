@@ -5,6 +5,8 @@ module Librato
     # nested in the module?
     class Aggregate
 
+      attr_reader :source
+
       def initialize(options={})
         # XXX: When isn't this needed?
         @aggregated ||= {}
@@ -19,7 +21,10 @@ module Librato
         args.each do |k, v|
           value = v.respond_to?(:each) ? v[:value] : v
 
-          @aggregated[k] ||= Aggregate.new
+          # FIXME: This throws a warning, what's the right way to get a top-level
+          # Aggregate (not Librato::Metrics::Aggregate) here?
+          @aggregated[k] ||= Module::Aggregate.new
+
           @aggregated[k] << value
         end
       end
@@ -32,13 +37,19 @@ module Librato
             :name => k.to_s,
             :count => v.count,
             :sum => v.sum,
-            :min => v.min,
-            :max => v.max
+
+            # TODO: make float/non-float consistent in the gem
+            :min => v.min.to_f,
+            :max => v.max.to_f
             # TODO: expose v.sum2 and include
           }
         end
 
-        { :gauge => gauges, :source => @source }
+        req = { :gauges => gauges }
+
+        req[:source] = @source if @source
+
+        req
       end
 
       # Remove all queued metrics

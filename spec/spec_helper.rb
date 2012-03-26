@@ -20,10 +20,11 @@ RSpec.configure do |config|
 
   # purge all metrics from test account
   def delete_all_metrics
-    connection = Librato::Metrics.connection
+    connection = Librato::Metrics.client.connection
     Librato::Metrics.list.each do |metric|
       #puts "deleting #{metric['name']}..."
-      connection.delete(:path => "v1/metrics/#{metric['name']}", :expects => 204)
+      # expects 204
+      connection.delete("v1/metrics/#{metric['name']}")
     end
   end
 

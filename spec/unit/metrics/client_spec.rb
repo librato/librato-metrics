@@ -104,22 +104,6 @@ module Librato
         end
       end
 
-      describe "#user_agent" do
-        context "without an agent_identifier" do
-          it "should render standard string" do
-            subject.agent_identifier('')
-            subject.user_agent.should start_with('librato-metrics')
-          end
-        end
-
-        context "with an agent_identifier" do
-          it "should render agent_identifier first" do
-            subject.agent_identifier('foo', '0.5', 'bar')
-            subject.user_agent.should start_with('foo/0.5')
-          end
-        end
-      end
-
     end
 
   end

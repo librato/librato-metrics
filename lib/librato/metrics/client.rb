@@ -55,12 +55,10 @@ module Librato
       # Current connection object
       #
       def connection
-        # TODO: upate when excon connection recovery is improved.
-        # @connection ||= Excon.new(self.api_endpoint, :headers => common_headers)
-        Excon.defaults[:ssl_verify_peer] = false if RUBY_PLATFORM == "java"
-        Excon.new(self.api_endpoint, :headers => common_headers)
+        # prevent successful creation if no credentials set
+        raise CredentialsMissing unless (self.email and self.api_key)
+        @connection ||= Connection.new(:client => self, :api_endpoint => api_endpoint)
       end
-
 
       # Query metric data
       #
@@ -169,38 +167,10 @@ module Librato
         @queue.submit
       end
 
-      # User-agent used when making requests.
-      #
-      def user_agent
-        ua_chunks = []
-        if agent_identifier && !agent_identifier.empty?
-          ua_chunks << agent_identifier
-        end
-        ua_chunks << "librato-metrics/#{Metrics::VERSION}"
-        ua_chunks << "(#{ruby_engine}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM})"
-        ua_chunks << "direct-excon/#{Excon::VERSION}"
-        ua_chunks.join(' ')
-      end
-
     private
-
-      def auth_header
-        raise CredentialsMissing unless (self.email and self.api_key)
-        encoded = Base64.encode64("#{email}:#{api_key}").gsub("\n", '')
-        "Basic #{encoded}"
-      end
-
-      def common_headers
-        {'Authorization' => auth_header, 'User-Agent' => user_agent}
-      end
 
       def flush_persistence
         @persistence = nil
-      end
-
-      def ruby_engine
-        return RUBY_ENGINE if Object.constants.include?(:RUBY_ENGINE)
-        RUBY_DESCRIPTION.split[0]
       end
 
     end

@@ -1,6 +1,6 @@
 module Librato
   module Metrics
-    class Collect
+    class Collection
 
       MAX_RESULTS = 100
 

@@ -36,7 +36,7 @@ module Librato
 
       describe "#api_endpoint" do
         it "should default to metrics" do
-          subject.api_endpoint.should == 'https://metrics-api.librato.com/v1/'
+          subject.api_endpoint.should == 'https://metrics-api.librato.com'
         end
       end
 
@@ -101,22 +101,6 @@ module Librato
           lambda{ subject.submit :foo => 123, :bar => 456 }.should_not raise_error
           expected = {:gauges => [{:name => 'foo', :value => 123}, {:name => 'bar', :value => 456}]}
           subject.persister.persisted.should eql expected
-        end
-      end
-
-      describe "#user_agent" do
-        context "without an agent_identifier" do
-          it "should render standard string" do
-            subject.agent_identifier('')
-            subject.user_agent.should start_with('librato-metrics')
-          end
-        end
-
-        context "with an agent_identifier" do
-          it "should render agent_identifier first" do
-            subject.agent_identifier('foo', '0.5', 'bar')
-            subject.user_agent.should start_with('foo/0.5')
-          end
         end
       end
 

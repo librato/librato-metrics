@@ -10,7 +10,6 @@ require 'metrics/connection'
 require 'metrics/errors'
 require 'metrics/persistence'
 require 'metrics/queue'
-#require 'metrics/simple'
 require 'metrics/version'
 
 module Librato

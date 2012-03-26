@@ -100,9 +100,9 @@ module Librato
         unless query.empty?
           query[:resolution] ||= 1
         end
-        response = connection.get do |request|
-          request.uri "metrics/#{metric}", *query
-        end
+        # expects 200
+        url = connection.build_url("metrics/#{metric}", query)
+        response = connection.get(url)
         parsed = MultiJson.decode(response.body)
         # TODO: pagination support
         query.empty? ? parsed : parsed["measurements"]

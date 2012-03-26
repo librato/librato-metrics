@@ -11,9 +11,8 @@ module Librato
         #
         def persist(client, queued)
           payload = MultiJson.encode(queued)
-          client.connection.post(:path => '/v1/metrics',
-              :headers => {'Content-Type' => 'application/json'},
-              :body => payload, :expects => 200)
+          # expects 200
+          client.connection.post('metrics', payload)
         end
 
       end

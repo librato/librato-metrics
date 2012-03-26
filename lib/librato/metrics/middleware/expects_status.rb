@@ -5,6 +5,8 @@ module Librato
       class ExpectsStatus < Faraday::Response::Middleware
         
         def on_complete(env)
+          # TODO: clean up exception output
+          # TODO: catch specific status codes by request
           case env[:status]
           when 404
             raise Faraday::Error::ResourceNotFound, env.to_s

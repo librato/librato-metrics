@@ -7,6 +7,7 @@ require 'multi_json'
 
 require 'metrics/client'
 require 'metrics/collect'
+require 'metrics/connection'
 require 'metrics/errors'
 require 'metrics/persistence'
 require 'metrics/queue'

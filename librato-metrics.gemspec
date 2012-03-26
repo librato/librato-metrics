@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.rubygems_version = '1.3.5'
 
-  s.name              = 'librato-metrics'
-  s.version           = Librato::Metrics::VERSION
+  s.name        = 'librato-metrics'
+  s.version     = Librato::Metrics::VERSION
 
   s.summary     = "Ruby wrapper for Librato's Metrics API"
   s.description = "An easy to use ruby wrapper for Librato's Metrics API"
@@ -24,12 +24,13 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = %w[LICENSE]
 
   ## runtime dependencies
-  s.add_dependency 'excon', '~> 0.9.5'
+  s.add_dependency 'faraday', '~>0.7.6'
   s.add_dependency 'multi_json'
 
   ## development dependencies
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec', '~>2.6.0'
+  s.add_development_dependency 'pry'
   s.add_development_dependency 'yard'
   s.add_development_dependency 'rdiscount' # for yard
 

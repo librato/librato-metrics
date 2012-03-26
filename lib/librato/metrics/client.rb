@@ -31,7 +31,7 @@ module Librato
       #
       # @return [String] api_endpoint
       def api_endpoint
-        @api_endpoint ||= 'https://metrics-api.librato.com/v1/'
+        @api_endpoint ||= 'https://metrics-api.librato.com'
       end
 
       # Set API endpoint for use with queries and direct
@@ -55,12 +55,10 @@ module Librato
       # Current connection object
       #
       def connection
-        # TODO: upate when excon connection recovery is improved.
-        # @connection ||= Excon.new(self.api_endpoint, :headers => common_headers)
-        Excon.defaults[:ssl_verify_peer] = false if RUBY_PLATFORM == "java"
-        Excon.new(self.api_endpoint, :headers => common_headers)
+        # prevent successful creation if no credentials set
+        raise CredentialsMissing unless (self.email and self.api_key)
+        @connection ||= Connection.new(:client => self, :api_endpoint => api_endpoint)
       end
-
 
       # Query metric data
       #
@@ -102,8 +100,9 @@ module Librato
         unless query.empty?
           query[:resolution] ||= 1
         end
-        response = connection.get(:path => "v1/metrics/#{metric}",
-                                  :query => query, :expects => 200)
+        # expects 200
+        url = connection.build_url("metrics/#{metric}", query)
+        response = connection.get(url)
         parsed = MultiJson.decode(response.body)
         # TODO: pagination support
         query.empty? ? parsed : parsed["measurements"]
@@ -130,8 +129,8 @@ module Librato
         query = {}
         query[:name] = options[:name] if options[:name]
         offset = 0
-        path = "v1/metrics"
-        Collect.paginated_metrics connection, path, query
+        path = "metrics"
+        Collection.paginated_metrics(connection, path, query)
       end
 
       # Create a new queue which uses this client.
@@ -169,38 +168,10 @@ module Librato
         @queue.submit
       end
 
-      # User-agent used when making requests.
-      #
-      def user_agent
-        ua_chunks = []
-        if agent_identifier && !agent_identifier.empty?
-          ua_chunks << agent_identifier
-        end
-        ua_chunks << "librato-metrics/#{Metrics::VERSION}"
-        ua_chunks << "(#{ruby_engine}; #{RUBY_VERSION}p#{RUBY_PATCHLEVEL}; #{RUBY_PLATFORM})"
-        ua_chunks << "direct-excon/#{Excon::VERSION}"
-        ua_chunks.join(' ')
-      end
-
     private
-
-      def auth_header
-        raise CredentialsMissing unless (self.email and self.api_key)
-        encoded = Base64.encode64("#{email}:#{api_key}").gsub("\n", '')
-        "Basic #{encoded}"
-      end
-
-      def common_headers
-        {'Authorization' => auth_header, 'User-Agent' => user_agent}
-      end
 
       def flush_persistence
         @persistence = nil
-      end
-
-      def ruby_engine
-        return RUBY_ENGINE if Object.constants.include?(:RUBY_ENGINE)
-        RUBY_DESCRIPTION.split[0]
       end
 
     end

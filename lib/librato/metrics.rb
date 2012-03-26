@@ -2,15 +2,14 @@ $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 require 'base64'
-require 'excon'
 require 'multi_json'
 
 require 'metrics/client'
-require 'metrics/collect'
+require 'metrics/collection'
+require 'metrics/connection'
 require 'metrics/errors'
 require 'metrics/persistence'
 require 'metrics/queue'
-#require 'metrics/simple'
 require 'metrics/version'
 
 module Librato
@@ -66,7 +65,6 @@ module Librato
 
     # Expose class methods of Simple via Metrics itself.
     #
-    # TODO: Explain exposed interface with examples.
     def_delegators :client, :agent_identifier, :api_endpoint,
                    :api_endpoint=, :authenticate, :connection, :fetch,
                    :list, :persistence, :persistence=, :persister, :submit

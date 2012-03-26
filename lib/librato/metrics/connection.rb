@@ -1,8 +1,10 @@
+require 'faraday'
+
 module Librato
   module Metrics
     
     class Connection
-      extend SingleForwardable
+      extend Forwardable
       
       DEFAULT_API_ENDPOINT = 'https://metrics-api.librato.com/v1/'      
       
@@ -17,8 +19,6 @@ module Librato
         @api_endpoint || DEFAULT_API_ENDPOINT
       end
       
-      private
-      
       def transport
         @transport ||= Faraday::Connection.new(:url => api_endpoint) do |f|
           #f.use FaradayMiddleware::EncodeJson
@@ -27,6 +27,7 @@ module Librato
           #f.use FaradayMiddleware::ParseJson, :content_type => /\bjson$/
         end.tap do |transport|
           transport.headers[:content_type] = 'application/json'
+          raise NoClientProvided unless @client
           transport.basic_auth @client.email, @client.api_key
         end
       end

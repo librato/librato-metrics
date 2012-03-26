@@ -94,11 +94,18 @@ module Librato
       end
       alias :length :size
 
+      # Returns true if queue contains no measurements
+      #
+      # @return Boolean
+      def empty?
+        @queued.empty?
+      end
+
       # Persist currently queued metrics
       #
       # @return Boolean
       def submit
-        raise NoMetricsQueued if self.queued.empty?
+        raise NoMetricsQueued if self.empty?
         if persister.persist(self.client, self.queued)
           flush and return true
         end

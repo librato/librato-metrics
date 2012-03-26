@@ -4,12 +4,14 @@ $:.unshift(File.dirname(__FILE__)) unless
 require 'base64'
 require 'excon'
 require 'multi_json'
+require 'aggregate'
 
 require 'metrics/client'
 require 'metrics/collect'
 require 'metrics/errors'
 require 'metrics/persistence'
 require 'metrics/queue'
+require 'metrics/aggregate'
 #require 'metrics/simple'
 require 'metrics/version'
 

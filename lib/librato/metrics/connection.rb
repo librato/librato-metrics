@@ -8,7 +8,8 @@ module Librato
       
       DEFAULT_API_ENDPOINT = 'https://metrics-api.librato.com/v1/'      
       
-      def_delegators :transport, :get, :post, :head, :put, :delete
+      def_delegators :transport, :get, :post, :head, :put, :delete,
+                                 :build_url
             
       def initialize(options={})
         @client = options[:client]

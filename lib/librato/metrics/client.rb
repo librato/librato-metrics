@@ -100,8 +100,9 @@ module Librato
         unless query.empty?
           query[:resolution] ||= 1
         end
-        response = connection.get(:path => "v1/metrics/#{metric}",
-                                  :query => query, :expects => 200)
+        response = connection.get do |request|
+          request.uri "metrics/#{metric}", *query
+        end
         parsed = MultiJson.decode(response.body)
         # TODO: pagination support
         query.empty? ? parsed : parsed["measurements"]
@@ -129,7 +130,7 @@ module Librato
         query[:name] = options[:name] if options[:name]
         offset = 0
         path = "v1/metrics"
-        Collect.paginated_metrics connection, path, query
+        Collection.paginated_metrics(connection, path, query)
       end
 
       # Create a new queue which uses this client.

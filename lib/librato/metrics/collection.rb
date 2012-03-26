@@ -9,17 +9,19 @@ module Librato
       # @param [Excon] connection Connection to Metrics service
       # @param [String] path API uri
       # @param [Hash] query Query options
-      def self.paginated_metrics connection, path, query
+      def self.paginated_metrics(connection, path, query)
         results = []
-        response = connection.get(:path => path,
-                                  :query => query, :expects => 200)
+        # expects 200
+        url = connection.build_url(path, query)
+        response = connection.get(url)
         parsed = MultiJson.decode(response.body)
         results = parsed["metrics"]
         return results if parsed["query"]["found"] <= MAX_RESULTS
         query[:offset] = MAX_RESULTS
         begin
-          response = connection.get(:path => path,
-                                    :query => query, :expects => 200)
+          # expects 200
+          url = connection.build_url(path, query)
+          response = connection.get(url)
           parsed = MultiJson.decode(response.body)
           results.push(*parsed["metrics"])
           query[:offset] += MAX_RESULTS

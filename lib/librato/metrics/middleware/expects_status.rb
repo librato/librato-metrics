@@ -1,5 +1,3 @@
-require 'pry'
-
 module Librato
   module Metrics
     module Middleware

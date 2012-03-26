@@ -31,7 +31,7 @@ module Librato
       #
       # @return [String] api_endpoint
       def api_endpoint
-        @api_endpoint ||= 'https://metrics-api.librato.com/v1/'
+        @api_endpoint ||= 'https://metrics-api.librato.com'
       end
 
       # Set API endpoint for use with queries and direct
@@ -129,7 +129,7 @@ module Librato
         query = {}
         query[:name] = options[:name] if options[:name]
         offset = 0
-        path = "v1/metrics"
+        path = "metrics"
         Collection.paginated_metrics(connection, path, query)
       end
 

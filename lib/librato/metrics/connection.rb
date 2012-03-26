@@ -1,4 +1,5 @@
 require 'faraday'
+require 'metrics/middleware/expects_status'
 
 module Librato
   module Metrics
@@ -6,7 +7,7 @@ module Librato
     class Connection
       extend Forwardable
       
-      DEFAULT_API_ENDPOINT = 'https://metrics-api.librato.com/v1/'      
+      DEFAULT_API_ENDPOINT = 'https://metrics-api.librato.com'      
       
       def_delegators :transport, :get, :post, :head, :put, :delete,
                                  :build_url
@@ -24,10 +25,11 @@ module Librato
       
       def transport
         raise NoClientProvided unless @client
-        @transport ||= Faraday::Connection.new(:url => api_endpoint) do |f|
+        @transport ||= Faraday::Connection.new(:url => api_endpoint + "/v1/") do |f|
           #f.use FaradayMiddleware::EncodeJson
           f.adapter Faraday.default_adapter
-          f.use Faraday::Response::RaiseError
+          #f.use Faraday::Response::RaiseError
+          f.use Librato::Metrics::Middleware::ExpectsStatus
           #f.use FaradayMiddleware::ParseJson, :content_type => /\bjson$/
         end.tap do |transport|
           transport.headers[:user_agent] = user_agent

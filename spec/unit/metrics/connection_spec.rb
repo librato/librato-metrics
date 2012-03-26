@@ -16,7 +16,7 @@ module Librato
       describe "#api_endpoint" do
         context "when not provided" do
           it "should be default" do
-            subject.api_endpoint.should == 'https://metrics-api.librato.com/v1/'
+            subject.api_endpoint.should == 'https://metrics-api.librato.com'
           end
         end
         

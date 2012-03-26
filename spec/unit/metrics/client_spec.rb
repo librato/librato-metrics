@@ -36,7 +36,7 @@ module Librato
 
       describe "#api_endpoint" do
         it "should default to metrics" do
-          subject.api_endpoint.should == 'https://metrics-api.librato.com/v1/'
+          subject.api_endpoint.should == 'https://metrics-api.librato.com'
         end
       end
 

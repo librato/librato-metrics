@@ -1,5 +1,15 @@
 ## Changelog
 
+### Version 0.5.0
+* Support using multiple accounts simultaneously via Client
+* Switch network library to faraday for broader platform support and flexibility
+* Automatic retry support
+* Consolidate connection functions in Connection
+* Documentation improvements
+
+### Version 0.4.3
+* Bump excon to 0.13x to fix proxy support
+
 ### Version 0.4.2
 * Fix SSL verify peer issues with JRuby (Sean Porter)
 

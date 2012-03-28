@@ -92,7 +92,7 @@ module Librato
           subject.authenticate 'me@librato.com', 'foo'
           subject.persistence = :test
           subject.submit(:foo => 123).should eql true
-          subject.persister.persisted.should eql({:gauges => [{:name => 'foo', :value => 123}]})
+          subject.persister.persisted.should == {:gauges => [{:name => 'foo', :value => 123}]}
         end
 
         it "should tolerate muliple metrics" do
@@ -100,7 +100,7 @@ module Librato
           subject.persistence = :test
           lambda{ subject.submit :foo => 123, :bar => 456 }.should_not raise_error
           expected = {:gauges => [{:name => 'foo', :value => 123}, {:name => 'bar', :value => 456}]}
-          subject.persister.persisted.should eql expected
+          subject.persister.persisted.should equal_unordered(expected)
         end
       end
 

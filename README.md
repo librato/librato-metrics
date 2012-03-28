@@ -142,19 +142,23 @@ Once the queue is associated you can use it normally:
 
 The `librato-metrics` gem currently does not do internal locking for thread safety. When used in multi-threaded applications, please add your own mutexes for sensitive operations.
 
-## Known Issues & Coming Improvements
+## Feature Roadmap
 
-This is an early release and as such is lacking some capabilities slated for future releases.
+These are features we expect to add in future versions, roughly in the order of current priority. If you feel strongly about a feature, feel free to [create an issue](https://github.com/librato/librato-metrics/issues) or [join us in live chat](https://librato.campfirenow.com/269d3) and talk to us about it.
 
-* Query actions currently do not auto-paginate with large result sets
-* Very large metric POSTs are not automatically chunked for performance
-* Some error conditions currently lack gem-specific exceptions
+* Very large metric queue submissions are auto-chunked for performance
+* Queue objects support a single default measure_time to use for any measurements which don't have it set
+* Queues auto-submit when they hit a set number of records
+* Queues auto-submit when they hit a max time interval
+* Query actions return a collection object which auto-paginates large result sets
+* Standardize error behavior on gem-specific exceptions
 
 ## Contribution
 
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
 * Fork the project and submit a pull request from a feature or bugfix branch.
+* Please review our [code conventions](https://github.com/librato/librato-metrics/wiki/Code-Conventions).
 * Please include specs. This is important so we don't break your changes unintentionally in a future version.
 * Please don't modify the gemspec, Rakefile, version, or changelog. If you do change these files, please isolate a separate commit so we can cherry-pick around it.
 

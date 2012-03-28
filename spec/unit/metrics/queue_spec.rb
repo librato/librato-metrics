@@ -1,11 +1,11 @@
-require "spec_helper.rb"
+require "spec_helper"
 
 module Librato
   module Metrics
 
     describe Queue do
 
-      before(:all) do
+      before(:each) do
         @time = Time.now.to_i
         Queue.stub(:epoch_time).and_return(@time)
       end
@@ -30,8 +30,9 @@ module Librato
       describe "#add" do
         context "with single hash argument" do
           it "should record a key-value gauge" do
+            expected = {:gauges => [{:name => 'foo', :value => 3000, :measure_time => @time}]}
             subject.add :foo => 3000
-            subject.queued.should eql({:gauges => [{:name => 'foo', :value => 3000, :measure_time => @time}]})
+            subject.queued.should equal_unordered(expected)
           end
         end
 
@@ -39,19 +40,19 @@ module Librato
           it "should record counters" do
             subject.add :total_visits => {:type => :counter, :value => 4000}
             expected = {:counters => [{:name => 'total_visits', :value => 4000, :measure_time => @time}]}
-            subject.queued.should eql expected
+            subject.queued.should equal_unordered(expected)
           end
 
           it "should record gauges" do
             subject.add :temperature => {:type => :gauge, :value => 34}
             expected = {:gauges => [{:name => 'temperature', :value => 34, :measure_time => @time}]}
-            subject.queued.should eql expected
+            subject.queued.should equal_unordered(expected)
           end
 
           it "should accept type key as string or a symbol" do
             subject.add :total_visits => {"type" => "counter", :value => 4000}
             expected = {:counters => [{:name => 'total_visits', :value => 4000, :measure_time => @time}]}
-            subject.queued.should eql expected
+            subject.queued.should equal_unordered(expected)
           end
         end
 
@@ -64,7 +65,7 @@ module Librato
             expected = {:gauges => [{:value => 35.4, :name => 'disk_use', :period => 2,
               :description => 'current disk utilization', :measure_time => measure_time,
               :source => 'db2'}]}
-            subject.queued.should eql expected
+            subject.queued.should equal_unordered(expected)
           end
         end
 
@@ -74,7 +75,7 @@ module Librato
             expected = {:gauges=>[{:name=>"foo", :value=>123, :measure_time => @time},
                                   {:name=>"bar", :value=>345, :measure_time => @time},
                                   {:name=>"baz", :value=>567, :measure_time => @time}]}
-            subject.queued.should eql expected
+            subject.queued.should equal_unordered(expected)
           end
         end
       end
@@ -159,7 +160,7 @@ module Librato
             end
             queued = subject.queued[:gauges][0]
             queued[:name].should == 'sleeping'
-            queued[:value].should be > 100
+            queued[:value].should be >= 100
             queued[:value].should be_within(30).of(100)
           end
         end
@@ -173,7 +174,7 @@ module Librato
             queued[:name].should == 'sleep_two'
             queued[:period].should == 2
             queued[:source].should == 'app1'
-            queued[:value].should be > 50
+            queued[:value].should be >= 50
             queued[:value].should be_within(30).of(50)
           end
         end

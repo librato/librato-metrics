@@ -35,13 +35,13 @@ module Librato
      it "should persist metrics immediately" do
        Metrics.persistence = :test
        Metrics.submit(:foo => 123).should eql true
-       Metrics.persister.persisted.should eql({:gauges => [{:name => 'foo', :value => 123}]})
+       Metrics.persister.persisted.should == {:gauges => [{:name => 'foo', :value => 123}]}
      end
 
      it "should tolerate multiple metrics" do
        lambda{ Librato::Metrics.submit :foo => 123, :bar => 456 }.should_not raise_error
        expected = {:gauges => [{:name => 'foo', :value => 123}, {:name => 'bar', :value => 456}]}
-       Librato::Metrics.persister.persisted.should eql expected
+       Librato::Metrics.persister.persisted.should equal_unordered(expected)
      end
 
    end

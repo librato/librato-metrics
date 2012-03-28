@@ -5,7 +5,7 @@ module Librato
 
     describe Queue do
 
-      before(:all) do
+      before(:each) do
         @time = Time.now.to_i
         Queue.stub(:epoch_time).and_return(@time)
       end

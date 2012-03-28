@@ -1,8 +1,10 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
-require 'pry'
+# only load pry for MRI > 1.8
+require 'pry' if RUBY_ENGINE == 'ruby' rescue nil
 require 'rspec'
 require 'rspec/mocks/standalone'
+require 'set'
 
 require 'librato/metrics'
 
@@ -36,5 +38,18 @@ RSpec::Matchers.define :start_with do |start_string|
   match do |string|
     start_length = start_string.length
     string[0..start_length-1] == start_string
+  end
+end
+
+# Compares hashes of arrays by converting the arrays to 
+# sets before comparision
+# 
+# @example
+#   {:foo => [1,3,2]}.should equal_unordered({:foo => [1,2,3]})
+RSpec::Matchers.define :equal_unordered do |result|
+  result.each { |key, value| result[key] = value.to_set }
+  match do |target|
+    target.each { |key, value| target[key] = value.to_set }
+    target == result
   end
 end

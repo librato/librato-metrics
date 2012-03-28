@@ -1,6 +1,8 @@
 Librato Metrics
 =======
 
+[![Build Status](https://secure.travis-ci.org/librato/librato-metrics.png?branch=master)](http://travis-ci.org/librato/librato-metrics)
+
 A convenient Ruby wrapper for the Librato Metrics API.
 
 ## Installation

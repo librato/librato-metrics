@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
-require 'pry'
+# only load pry for MRI > 1.8
+require 'pry' if RUBY_ENGINE == 'ruby' rescue nil
 require 'rspec'
 require 'rspec/mocks/standalone'
 require 'set'

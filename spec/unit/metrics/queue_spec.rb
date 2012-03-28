@@ -160,7 +160,7 @@ module Librato
             end
             queued = subject.queued[:gauges][0]
             queued[:name].should == 'sleeping'
-            queued[:value].should be > 100
+            queued[:value].should be >= 100
             queued[:value].should be_within(30).of(100)
           end
         end
@@ -174,7 +174,7 @@ module Librato
             queued[:name].should == 'sleep_two'
             queued[:period].should == 2
             queued[:source].should == 'app1'
-            queued[:value].should be > 50
+            queued[:value].should be >= 50
             queued[:value].should be_within(30).of(50)
           end
         end

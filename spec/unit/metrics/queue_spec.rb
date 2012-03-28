@@ -1,4 +1,4 @@
-require "spec_helper.rb"
+require "spec_helper"
 
 module Librato
   module Metrics

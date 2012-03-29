@@ -11,7 +11,7 @@ require 'metrics/collect'
 require 'metrics/errors'
 require 'metrics/persistence'
 require 'metrics/queue'
-require 'metrics/aggregate'
+require 'metrics/aggregator'
 #require 'metrics/simple'
 require 'metrics/version'
 

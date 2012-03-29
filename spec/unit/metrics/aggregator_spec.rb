@@ -2,39 +2,39 @@ require "spec_helper.rb"
 module Librato
   module Metrics
 
-    describe Aggregate do
+    describe Aggregator do
 
       before(:all) do
         @time = Time.now.to_i
-        Aggregate.stub(:epoch_time).and_return(@time)
+        Aggregator.stub(:epoch_time).and_return(@time)
       end
 
       describe "initialization" do
         context "with specified client" do
           it "should set to client" do
             barney = Client
-            a = Aggregate.new(:client => barney)
+            a = Aggregator.new(:client => barney)
             a.client.should be barney
           end
         end
 
         context "without specified client" do
           it "should use Librato::Metrics client" do
-            a = Aggregate.new
+            a = Aggregator.new
             a.client.should be Librato::Metrics.client
           end
         end
 
         context "with specified source" do
           it "should set to source" do
-            a = Aggregate.new(:source => 'rubble')
+            a = Aggregator.new(:source => 'rubble')
             a.source.should == 'rubble'
           end
         end
 
         context "without specified source" do
           it "should not have a source" do
-            a = Aggregate.new
+            a = Aggregator.new
             a.source.should be nil
           end
         end

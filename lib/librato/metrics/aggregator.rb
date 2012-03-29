@@ -1,10 +1,7 @@
 module Librato
   module Metrics
 
-    # FIXME: is this bad had to use the same class name? even though it's
-    # nested in the module?
-    class Aggregate
-
+    class Aggregator
       attr_reader :source
 
       def initialize(options={})
@@ -21,10 +18,7 @@ module Librato
         args.each do |k, v|
           value = v.respond_to?(:each) ? v[:value] : v
 
-          # FIXME: This throws a warning, what's the right way to get a top-level
-          # Aggregate (not Librato::Metrics::Aggregate) here?
-          @aggregated[k] ||= Module::Aggregate.new
-
+          @aggregated[k] ||= Aggregate.new
           @aggregated[k] << value
         end
       end

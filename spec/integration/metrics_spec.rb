@@ -9,7 +9,7 @@ module Librato
         delete_all_metrics
         Metrics.submit :my_counter => {:type => :counter, :value => 0}
         1.upto(2).each do |i|
-          sleep 1
+          sleep 1.1
           Metrics.submit :my_counter => {:type => :counter, :value => i}
           Metrics.submit :my_counter => {:source => 'baz', :type => :counter, :value => i+1}
         end

@@ -1,13 +1,16 @@
 module Librato
   module Metrics
     class Queue
+      MEASUREMENTS_PER_REQUEST = 500
 
+      attr_reader :per_request
       attr_accessor :skip_measurement_times
 
       def initialize(options={})
-        @queued ||= {}
-        @skip_measurement_times = options.delete(:skip_measurement_times)
-        @client = options.delete(:client) || Librato::Metrics.client
+        @queued = {}
+        @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
+        @skip_measurement_times = options[:skip_measurement_times]
+        @client = options[:client] || Librato::Metrics.client
       end
 
       # Add a metric entry to the metric set:
@@ -99,7 +102,8 @@ module Librato
       # @return Boolean
       def submit
         raise NoMetricsQueued if self.queued.empty?
-        if persister.persist(self.client, self.queued)
+        options = {:per_request => @per_request}
+        if persister.persist(self.client, self.queued, options)
           flush and return true
         end
         false

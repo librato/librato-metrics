@@ -114,6 +114,12 @@ module Librato
           subject.gauges.should eql []
         end
       end
+      
+      describe "#per_request" do
+        it "should default to 500" do
+          subject.per_request.should == 500
+        end
+      end
 
       describe "#size" do
         it "should return empty if gauges and counters are emtpy" do

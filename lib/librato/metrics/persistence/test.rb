@@ -6,7 +6,7 @@ module Librato
       class Test
 
         # persist the given metrics
-        def persist(client, metrics)
+        def persist(client, metrics, options={})
           @persisted = metrics
           return !@return_value.nil? ? @return_value : true
         end

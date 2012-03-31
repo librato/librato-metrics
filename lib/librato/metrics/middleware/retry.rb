@@ -12,13 +12,15 @@ module Librato
 
         def call(env)
           retries = @retries
-          @app.call(env)
-        rescue StandardError, Timeout::Error
-          if retries > 0
-            retries -= 1
-            retry
+          begin
+            @app.call(env)
+          rescue StandardError, Timeout::Error
+            if retries > 0
+              retries -= 1
+              retry
+            end
+            raise
           end
-          raise
         end
         
       end

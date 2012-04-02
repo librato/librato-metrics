@@ -12,7 +12,10 @@ module Librato
     class NetworkError < StandardError; end
     
     class ClientError < NetworkError; end
+    class Unauthorized < ClientError; end
+    class Forbidden < ClientError; end
     class NotFound < ClientError; end
+    class EntityAlreadyExists < ClientError; end
     
     class ServerError < NetworkError; end
 

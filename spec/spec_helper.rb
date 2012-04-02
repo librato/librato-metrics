@@ -2,6 +2,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 # only load pry for MRI > 1.8
 require 'pry' if RUBY_ENGINE == 'ruby' rescue nil
+require 'popen4'
 require 'rspec'
 require 'rspec/mocks/standalone'
 require 'set'
@@ -9,7 +10,17 @@ require 'set'
 require 'librato/metrics'
 
 RSpec.configure do |config|
-
+  
+  # purge all metrics from test account
+  def delete_all_metrics
+    connection = Librato::Metrics.client.connection
+    Librato::Metrics.list.each do |metric|
+      #puts "deleting #{metric['name']}..."
+      # expects 204
+      connection.delete("metrics/#{metric['name']}")
+    end
+  end
+  
   # set up test account credentials for integration tests
   def prep_integration_tests
     raise 'no TEST_API_USER specified in environment' unless ENV['TEST_API_USER']
@@ -19,14 +30,26 @@ RSpec.configure do |config|
     end
     Librato::Metrics.authenticate ENV['TEST_API_USER'], ENV['TEST_API_KEY']
   end
-
-  # purge all metrics from test account
-  def delete_all_metrics
-    connection = Librato::Metrics.client.connection
-    Librato::Metrics.list.each do |metric|
-      #puts "deleting #{metric['name']}..."
-      # expects 204
-      connection.delete("metrics/#{metric['name']}")
+  
+  def rackup_path(*parts)
+    File.expand_path(File.join(File.dirname(__FILE__), 'rackups', *parts))
+  end
+  
+  # fire up a given rackup file for the enclosed tests
+  def with_rackup(name)
+    if RUBY_PLATFORM == 'java'
+      pid, w, r, e = IO.popen4("rackup", rackup_path(name), '-p 9296')
+    else
+      GC.disable
+      pid, w, r, e = Open4.popen4("rackup", rackup_path(name), '-p 9296')
+    end
+    until e.gets =~ /HTTPServer#start:/; end
+    yield
+  ensure
+    Process.kill(9, pid)
+    if RUBY_PLATFORM != 'java'
+      GC.enable
+      Process.wait(pid)
     end
   end
 

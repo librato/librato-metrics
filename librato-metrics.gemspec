@@ -33,6 +33,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'pry'
   s.add_development_dependency 'yard'
   s.add_development_dependency 'rdiscount' # for yard
+  s.add_development_dependency 'sinatra'
+  s.add_development_dependency 'popen4'
 
   s.files = `git ls-files`.split("\n")
   s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")

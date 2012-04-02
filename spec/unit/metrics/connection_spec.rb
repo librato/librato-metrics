@@ -54,7 +54,6 @@ module Librato
             client.api_endpoint = 'http://127.0.0.1:9296'
             client.authenticate 'foo', 'bar'
             with_rackup('status.ru') do
-              #binding.pry
               lambda {
                 client.connection.transport.post 'not_found'
               }.should raise_error(NotFound)
@@ -73,7 +72,6 @@ module Librato
             client.api_endpoint = 'http://127.0.0.1:9296'
             client.authenticate 'foo', 'bar'
             with_rackup('status.ru') do
-              #binding.pry
               lambda {
                 client.connection.transport.post 'service_unavailable'
               }.should raise_error(ServerError)

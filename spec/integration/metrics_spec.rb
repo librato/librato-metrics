@@ -7,11 +7,12 @@ module Librato
     describe "#fetch" do
       before(:all) do
         delete_all_metrics
-        Metrics.submit :my_counter => {:type => :counter, :value => 0}
+        Metrics.submit :my_counter => {:type => :counter, :value => 0, :measure_time => Time.now.to_i-60}
         1.upto(2).each do |i|
-          sleep 1.1
-          Metrics.submit :my_counter => {:type => :counter, :value => i}
-          Metrics.submit :my_counter => {:source => 'baz', :type => :counter, :value => i+1}
+          measure_time = Time.now.to_i - (5+i)
+          opts = {:measure_time => measure_time, :type => :counter}
+          Metrics.submit :my_counter => opts.merge(:value => i)
+          Metrics.submit :my_counter => opts.merge(:source => 'baz', :value => i+1)
         end
       end
 

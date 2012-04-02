@@ -8,7 +8,7 @@ module Librato
       describe "network operations" do
         context "when missing client" do
           it "should raise exception" do
-            lambda { subject.get 'metrics' }#.should raise(NoClientProvided)
+            lambda { subject.get 'metrics' }.should raise_error(NoClientProvided)
           end
         end
       end

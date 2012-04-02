@@ -8,10 +8,18 @@ module Librato
           # TODO: clean up exception output
           # TODO: catch specific status codes by request
           case env[:status]
+          when 401
+            raise Unauthorized, env.to_s
+          when 403
+            raise Forbidden, env.to_s
           when 404
-            raise Faraday::Error::ResourceNotFound, env.to_s
-          when 400..600
-            raise Faraday::Error::ClientError, env.to_s
+            raise NotFound, env.to_s
+          when 422
+            raise EntityAlreadyExists, env.to_s
+          when 400..499
+            raise ClientError, env.to_s
+          when 500..599
+            raise ServerError, env.to_s
           end
         end
         

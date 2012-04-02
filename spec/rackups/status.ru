@@ -1,15 +1,15 @@
 require 'sinatra'
 
 class App < Sinatra::Base
-  get('/success') do
+  get('/v1/success') do
     status 200
   end
 
-  post('/404') do
+  get('/v1/not_found') do
     status 404
   end
   
-  post('/503')  do
+  post('/v1/service_unavailable')  do
     status 503
   end
 end

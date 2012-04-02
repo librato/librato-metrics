@@ -5,6 +5,10 @@ class App < Sinatra::Base
     status 200
   end
 
+  post('/v1/forbidden') do
+    status 403
+  end
+
   get('/v1/not_found') do
     status 404
   end

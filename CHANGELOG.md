@@ -3,6 +3,7 @@
 ### Version 0.5.0
 * Support using multiple accounts simultaneously via Client
 * Switch network library to faraday for broader platform support and flexibility
+* Automatically break large submissions into multiple requests for better performance
 * Automatic retry support
 * Consolidate connection functions in Connection
 * Documentation improvements

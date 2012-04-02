@@ -146,12 +146,10 @@ The `librato-metrics` gem currently does not do internal locking for thread safe
 
 These are features we expect to add in future versions, roughly in the order of current priority. If you feel strongly about a feature, feel free to [create an issue](https://github.com/librato/librato-metrics/issues) or [join us in live chat](https://librato.campfirenow.com/269d3) and talk to us about it.
 
-* Very large metric queue submissions are auto-chunked for performance
 * Queue objects support a single default measure_time to use for any measurements which don't have it set
 * Queues auto-submit when they hit a set number of records
 * Queues auto-submit when they hit a max time interval
 * Query actions return a collection object which auto-paginates large result sets
-* Standardize error behavior on gem-specific exceptions
 
 ## Contribution
 

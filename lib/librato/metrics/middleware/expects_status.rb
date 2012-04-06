@@ -5,8 +5,7 @@ module Librato
       class ExpectsStatus < Faraday::Response::Middleware
         
         def on_complete(env)
-          # TODO: clean up exception output
-          # TODO: catch specific status codes by request
+          # TODO: make exception output prettier
           case env[:status]
           when 401
             raise Unauthorized, env.to_s

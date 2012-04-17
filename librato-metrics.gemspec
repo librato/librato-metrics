@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
   ## runtime dependencies
   s.add_dependency 'faraday', '~>0.7.6'
   s.add_dependency 'multi_json'
+  s.add_dependency 'aggregate', '~> 0.2.2'
 
   ## development dependencies
   s.add_development_dependency 'rake'

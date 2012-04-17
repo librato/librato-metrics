@@ -65,15 +65,48 @@ Save all queued metrics:
 
     queue.submit
 
+## Aggregating Metrics
+
+If you are measuring something very frequently e.g. per-request in a
+web application (order mS)  you may not want to send each individual
+measurement, but rather periodically send a single aggregate measurement,
+spanning multiple seconds or even minutes. Use `Aggregate` for this.
+
+Aggregate up a simple gauge metric named `response_latency`:
+
+    aggregate = Librato::Metrics::Aggregate.new
+    aggregate.add :response_latency => 85.0
+    aggregate.add :response_latency => 100.5
+    aggregate.add :response_latency => 150.2
+    aggregate.add :response_latency => 90.1
+    aggregate.add :response_latency => 92.0
+
+You can optionally set a source during aggregate construction:
+
+    aggregate = Librato::Metrics::Aggregate.new(:source => 'foobar')
+
+You can aggregate multiple metrics at once.
+
+    aggregate.add :app_latency => 35.2, :db_latency => 120.7
+
+Save the current aggregated metrics:
+
+    aggregate.submit
+
 ## Benchmarking
 
-If you have operations in your application you want to record execution time for, you can use the `#time` method:
+If you have operations in your application you want to record execution time
+for, both `Queue` and `Aggregate` support the `#time` method:
 
-    queue.time :my_measurement do
+    aggregate.time :my_measurement do
       # do work...
     end
 
-If you need extra attributes for the measurement, simply add them on:
+The difference between the two is that while `Aggregate` submits a
+single timing measurement spanning all executions, `Queue` submits each
+timing measurement individually.
+
+If you need extra attributes for a `Queue` timing measurement, simply add them on:
 
     queue.time :my_measurement, :source => 'app1' do
       # do work...

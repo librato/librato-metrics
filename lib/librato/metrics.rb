@@ -1,9 +1,11 @@
 $:.unshift(File.dirname(__FILE__)) unless
   $:.include?(File.dirname(__FILE__)) || $:.include?(File.expand_path(File.dirname(__FILE__)))
 
+require 'aggregate'
 require 'base64'
 require 'multi_json'
 
+require 'metrics/aggregator'
 require 'metrics/client'
 require 'metrics/collection'
 require 'metrics/connection'

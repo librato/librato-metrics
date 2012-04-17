@@ -78,6 +78,10 @@ Aggregate a simple gauge metric named `response_latency`:
     aggregator.add :response_latency => 90.1
     aggregator.add :response_latency => 92.0
 
+Which would result in a gauge measurement like:
+
+    {:name => "response_latency", :count => 5, :sum => 517.8, :min => 85.0, :max => 150.2}
+
 You can specify a source during aggregate construction:
 
     aggregator = Librato::Metrics::Aggregator.new(:source => 'foobar')

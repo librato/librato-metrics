@@ -67,7 +67,7 @@ Save all queued metrics:
 
 ## Aggregate Measurements
 
-If you are measuring something very frequently e.g. per-request in a web application (order mS)  you may not want to send each individual measurement, but rather periodically send a single aggregate measurement, spanning multiple seconds or even minutes. Use an `Aggregator` for this.
+If you are measuring something very frequently e.g. per-request in a web application (order mS)  you may not want to send each individual measurement, but rather periodically send a [single aggregate measurement](http://dev.librato.com/v1/post/metrics#gauge_specific), spanning multiple seconds or even minutes. Use an `Aggregator` for this.
 
 Aggregate a simple gauge metric named `response_latency`:
 

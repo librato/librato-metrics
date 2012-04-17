@@ -17,7 +17,7 @@ module Librato
             requests = [queued]
           end
           requests.each do |request|
-            payload = MultiJson.encode(request)
+            payload = MultiJson.dump(request)
             # expects 200
             client.connection.post('metrics', payload)
           end

@@ -103,7 +103,7 @@ module Librato
         # expects 200
         url = connection.build_url("metrics/#{metric}", query)
         response = connection.get(url)
-        parsed = MultiJson.decode(response.body)
+        parsed = MultiJson.load(response.body)
         # TODO: pagination support
         query.empty? ? parsed : parsed["measurements"]
       end

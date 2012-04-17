@@ -12,7 +12,7 @@ module Librato
       describe "initialization" do
         context "with specified client" do
           it "should set to client" do
-            barney = Client
+            barney = Client.new
             a = Aggregator.new(:client => barney)
             a.client.should be barney
           end
@@ -35,7 +35,7 @@ module Librato
         context "without specified source" do
           it "should not have a source" do
             a = Aggregator.new
-            a.source.should be nil
+            a.source.should be_nil
           end
         end
       end
@@ -44,8 +44,7 @@ module Librato
         context "with single hash argument" do
           it "should record a single aggregate" do
             subject.add :foo => 3000
-            subject.queued.should eql(
-              { #:measure_time => @time, TODO: support specific time
+            expected = { #:measure_time => @time, TODO: support specific time
                 :gauges => [
                 { :name => 'foo',
                   :count => 1,
@@ -53,7 +52,8 @@ module Librato
                   :min => 3000.0,
                   :max => 3000.0}
                 ]
-            })
+            }
+            subject.queued.should equal_unordered(expected)
           end
 
           it "should aggregate multiple measurements" do
@@ -62,15 +62,15 @@ module Librato
             subject.add :foo => 3
             subject.add :foo => 4
             subject.add :foo => 5
-            subject.queued.should eql(
-              { :gauges => [
+            expected = { :gauges => [
                 { :name => 'foo',
                   :count => 5,
                   :sum => 15.0,
                   :min => 1.0,
                   :max => 5.0}
                 ]
-            })
+            }
+            subject.queued.should equal_unordered(expected)
           end
         end
 
@@ -78,9 +78,9 @@ module Librato
           it "should record a single aggregate" do
             subject.add :foo => 3000
             subject.add :bar => 30
-            subject.queued.should eql(
-              { #:measure_time => @time, TODO: support specific time
-                :gauges => [
+            expected = { 
+              #:measure_time => @time, TODO: support specific time
+              :gauges => [
                 { :name => 'foo',
                   :count => 1,
                   :sum => 3000.0,
@@ -92,7 +92,8 @@ module Librato
                   :min => 30.0,
                   :max => 30.0},
                 ]
-            })
+            }
+            subject.queued.should equal_unordered(expected)
           end
 
           it "should aggregate multiple measurements" do
@@ -107,8 +108,7 @@ module Librato
             subject.add :bar => 8
             subject.add :bar => 9
             subject.add :bar => 10
-            subject.queued.should eql(
-              { :gauges => [
+            expected = { :gauges => [
                 { :name => 'foo',
                   :count => 5,
                   :sum => 15.0,
@@ -120,7 +120,8 @@ module Librato
                   :min => 6.0,
                   :max => 10.0}
                 ]
-            })
+            }
+            subject.queued.should equal_unordered(expected)
           end
         end
       end

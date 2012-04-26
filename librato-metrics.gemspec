@@ -33,9 +33,11 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec', '~>2.6.0'
   s.add_development_dependency 'pry'
   s.add_development_dependency 'yard'
-  s.add_development_dependency 'rdiscount' # for yard
   s.add_development_dependency 'sinatra'
   s.add_development_dependency 'popen4'
+  
+  # omitting for now because jruby-19mode can't handle
+  #s.add_development_dependency 'rdiscount' # for yard
 
   s.files = `git ls-files`.split("\n")
   s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")

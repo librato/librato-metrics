@@ -9,6 +9,7 @@ module Librato
 
       def initialize(options={})
         @queued = {}
+        @autosubmit_count = options[:autosubmit_count]
         @client = options[:client] || Librato::Metrics.client
         @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
         @skip_measurement_times = options[:skip_measurement_times]
@@ -35,6 +36,7 @@ module Librato
           @queued[type] ||= []
           @queued[type] << metric
         end
+        submit_check
         self
       end
 
@@ -81,6 +83,14 @@ module Librato
         self.queued.inject(0) { |result, data| result + data.last.size }
       end
       alias :length :size
+      
+    private
+    
+      def submit_check
+        if @autosubmit_count && self.length >= @autosubmit_count
+          self.submit
+        end
+      end
 
     end
   end

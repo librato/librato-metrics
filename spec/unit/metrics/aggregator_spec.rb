@@ -41,6 +41,10 @@ module Librato
       end
 
       describe "#add" do
+        it "should allow chaining" do
+          subject.add(:foo => 1234).should == subject
+        end
+        
         context "with single hash argument" do
           it "should record a single aggregate" do
             subject.add :foo => 3000

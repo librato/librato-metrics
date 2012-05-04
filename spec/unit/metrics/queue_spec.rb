@@ -28,6 +28,10 @@ module Librato
       end
 
       describe "#add" do
+        it "should allow chaining" do
+          subject.add(:foo => 123).should == subject
+        end
+        
         context "with single hash argument" do
           it "should record a key-value gauge" do
             expected = {:gauges => [{:name => 'foo', :value => 3000, :measure_time => @time}]}

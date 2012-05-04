@@ -18,6 +18,7 @@ module Librato
       # Add a metric entry to the metric set:
       #
       # @param Hash metrics metrics to add
+      # @return Aggregator returns self
       def add(args)
         args.each do |k, v|
           value = v.respond_to?(:each) ? v[:value] : v
@@ -25,6 +26,7 @@ module Librato
           @aggregated[k] ||= Aggregate.new
           @aggregated[k] << value
         end
+        self
       end
       
       # Returns true if aggregate contains no measurements

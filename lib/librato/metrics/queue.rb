@@ -1,6 +1,5 @@
 require 'metrics/processor'
 
-
 module Librato
   module Metrics
     class Queue
@@ -18,7 +17,7 @@ module Librato
       # Add a metric entry to the metric set:
       #
       # @param Hash metrics metrics to add
-      # @return Hash queued_metrics the currently queued metrics
+      # @return Queue returns self
       def add(args)
         args.each do |key, value|
           if value.respond_to?(:each)
@@ -36,7 +35,7 @@ module Librato
           @queued[type] ||= []
           @queued[type] << metric
         end
-        queued
+        self
       end
 
       # Currently queued counters

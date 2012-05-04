@@ -203,7 +203,7 @@ module Librato
         end
       end
 
-    end # MetricSet
+    end # Queue
 
   end
 end

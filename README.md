@@ -61,9 +61,19 @@ Queue up a metric with a specified source:
 
 A complete [list of metric attributes](http://dev.librato.com/v1/metrics) is available in the [API documentation](http://dev.librato.com/v1).
 
-Save all queued metrics:
+You can persist queued measurements at any time:
 
     queue.submit
+    
+Queues also support two forms of auto-submission, volume-based and time-based:
+
+	# submit when the 100th measurement is queued
+	volume_queue = Librato::Metrics::Queue.new(:autosubmit_count => 100)
+	
+	# submit once per minute
+	timed_queue = Librato::Metrics::Queue.new(:autosubmit_interval => 60)
+	
+These options can also be combined for more flexible behavior. Both options are driven by the addition of measurements to the queue. If you are adding measurements irregularly or less than once per second, time-based auto-submission will lag past your specified interval until the next measurement is queued.
 
 ## Aggregate Measurements
 

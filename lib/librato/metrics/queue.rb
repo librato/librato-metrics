@@ -10,9 +10,11 @@ module Librato
       def initialize(options={})
         @queued = {}
         @autosubmit_count = options[:autosubmit_count]
+        @autosubmit_interval = options[:autosubmit_interval]
         @client = options[:client] || Librato::Metrics.client
         @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
         @skip_measurement_times = options[:skip_measurement_times]
+        @create_time = Time.now
       end
 
       # Add a metric entry to the metric set:
@@ -89,6 +91,9 @@ module Librato
       def submit_check
         if @autosubmit_count && self.length >= @autosubmit_count
           self.submit
+        elsif @autosubmit_interval
+          last = @last_submit_time || @create_time
+          self.submit if (Time.now - last).to_i >= @autosubmit_interval
         end
       end
 

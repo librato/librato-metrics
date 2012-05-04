@@ -38,7 +38,7 @@ module Librato
         end
       end
     
-      context "with a volume max" do
+      context "with an autosubmit count" do
         it "should submit when the max is reached" do
           Middleware::CountRequests.reset
           vol_queue = Queue.new(:autosubmit_count => 2)
@@ -53,6 +53,24 @@ module Librato
           vol_queue.add :foo => 1
           vol_queue.add :bar => 2
           Middleware::CountRequests.total_requests.should == 0
+        end
+      end
+      
+      context "with an autosubmit interval" do
+        it "should not submit immediately" do
+          Middleware::CountRequests.reset
+          vol_queue = Queue.new(:autosubmit_interval => 1)
+          vol_queue.add :foo => 1
+          Middleware::CountRequests.total_requests.should == 0
+        end
+        
+        it "should submit after interval" do
+          Middleware::CountRequests.reset
+          vol_queue = Queue.new(:autosubmit_interval => 1)
+          vol_queue.add :foo => 1
+          sleep 1
+          vol_queue.add :foo => 2
+          Middleware::CountRequests.total_requests.should == 1
         end
       end
     end

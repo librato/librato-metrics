@@ -115,6 +115,19 @@ module Librato
         end
       end
       
+      describe "#last_submit_time" do
+        it "should default to nil" do
+          subject.last_submit_time.should be_nil
+        end
+        
+        it "should store last submission time" do
+          prior = Time.now
+          subject.add :foo => 123
+          subject.submit
+          subject.last_submit_time.should >= prior
+        end
+      end
+      
       describe "#per_request" do
         it "should default to 500" do
           subject.per_request.should == 500

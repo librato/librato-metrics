@@ -165,7 +165,7 @@ module Librato
             queued = subject.queued[:gauges][0]
             queued[:name].should == 'sleeping'
             queued[:count].should be 5
-            queued[:sum].should be > 500
+            queued[:sum].should be >= 500.0
             queued[:sum].should be_within(150).of(500)
           end
         end

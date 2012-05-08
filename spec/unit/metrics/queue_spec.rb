@@ -28,6 +28,10 @@ module Librato
       end
 
       describe "#add" do
+        it "should allow chaining" do
+          subject.add(:foo => 123).should == subject
+        end
+        
         context "with single hash argument" do
           it "should record a key-value gauge" do
             expected = {:gauges => [{:name => 'foo', :value => 3000, :measure_time => @time}]}
@@ -115,6 +119,19 @@ module Librato
         end
       end
       
+      describe "#last_submit_time" do
+        it "should default to nil" do
+          subject.last_submit_time.should be_nil
+        end
+        
+        it "should store last submission time" do
+          prior = Time.now
+          subject.add :foo => 123
+          subject.submit
+          subject.last_submit_time.should >= prior
+        end
+      end
+      
       describe "#per_request" do
         it "should default to 500" do
           subject.per_request.should == 500
@@ -186,7 +203,7 @@ module Librato
         end
       end
 
-    end # MetricSet
+    end # Queue
 
   end
 end

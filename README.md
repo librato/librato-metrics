@@ -48,8 +48,20 @@ Queue up a simple gauge metric named `temperature`:
 
     queue = Librato::Metrics::Queue.new
     queue.add :temperature => 32.2
+    
+While symbols are used by convention for metric names, strings will work just as well:
 
-If you are tracking measurements over several seconds/minutes, the queue will handle storing measurement time for you (otherwise all metrics will be recorded as measured when they are submitted).
+	queue.add 'myapp.request_time' => 86.7
+
+If you are tracking measurements over several seconds/minutes, the queue will handle storing measurement time for you (otherwise all metrics will be recorded as measured when they are submitted). 
+
+If you want to specify a time other than queuing time for the measurement:
+
+	# use a epoch integer
+	queue.add :humidity => {:measure_time => 1336508422, :value => 48.2}
+	
+	# use a Time object to correct for a 5 second delay
+	queue.add :humidity => {:measure_time => Time.now-5, :value => 37.6}
 
 You can queue multiple metrics at once. Here's a gauge (`load`) and a counter (`visits`):
 

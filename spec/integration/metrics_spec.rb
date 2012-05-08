@@ -50,6 +50,25 @@ module Librato
 
     end
 
+    describe "#delete" do
+      before(:all) { delete_all_metrics }
+      
+      context "with a single argument" do
+        it "should delete named metric" do
+          Metrics.submit :foo => 123
+          Metrics.list(:name => :foo).should_not be_empty
+          Metrics.delete :foo
+          Metrics.list(:name => :foo).should be_empty
+        end
+      end
+      
+      context "with multiple arguments" do
+        it "should delete named metrics" do
+          
+        end
+      end
+    end
+
     describe "#list" do
       before(:all) do
         delete_all_metrics

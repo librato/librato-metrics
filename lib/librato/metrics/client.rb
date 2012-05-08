@@ -59,6 +59,23 @@ module Librato
         raise CredentialsMissing unless (self.email and self.api_key)
         @connection ||= Connection.new(:client => self, :api_endpoint => api_endpoint)
       end
+      
+      # Completely delete metrics with the given names. Be
+      # careful with this, this is instant and permanent.
+      #
+      # @example Delete metric 'temperature'
+      #   Librato::Metrics.delete :temperature
+      # 
+      # @example Delete metrics 'foo' and 'bar'
+      #   Librato::Metrics.delete :foo, :bar
+      def delete(metric_names)
+        params = {:names => metric_names}
+        connection.delete do |request|
+          request.url connection.build_url("metrics")
+          request.body = MultiJson.dump(params)
+        end
+        # expects 204
+      end
 
       # Query metric data
       #

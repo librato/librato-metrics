@@ -25,6 +25,7 @@ module Librato
           @aggregated[k] ||= Aggregate.new
           @aggregated[k] << value
         end
+        autosubmit_check
         self
       end
       

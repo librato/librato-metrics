@@ -86,11 +86,9 @@ module Librato
     private
     
       def submit_check
+        autosubmit_check # in Processor
         if @autosubmit_count && self.length >= @autosubmit_count
           self.submit
-        elsif @autosubmit_interval
-          last = @last_submit_time || @create_time
-          self.submit if (Time.now - last).to_i >= @autosubmit_interval
         end
       end
 

@@ -4,6 +4,45 @@ module Librato
   describe Metrics do
     before(:all) { prep_integration_tests }
 
+    describe "#delete" do
+      before(:each) { delete_all_metrics }
+      
+      context "with a single argument" do
+        it "should delete named metric" do
+          Metrics.submit :foo => 123
+          Metrics.list(:name => :foo).should_not be_empty
+          Metrics.delete :foo
+          Metrics.list(:name => :foo).should be_empty
+        end
+      end
+      
+      context "with multiple arguments" do
+        it "should delete named metrics" do
+          Metrics.submit :foo => 123, :bar => 345, :baz => 567
+          Metrics.delete :foo, :bar
+          Metrics.list(:name => :foo).should be_empty
+          Metrics.list(:name => :bar).should be_empty
+          Metrics.list(:name => :baz).should_not be_empty
+        end
+      end
+      
+      context "with missing metric" do
+        it "should run cleanly" do
+          # the API currently returns success even if
+          # the metric has already been deleted or is absent.
+          Metrics.delete :missing
+        end
+      end
+      
+      context "with no arguments" do
+        it "should not make request" do
+          lambda {
+            Metrics.delete
+          }.should raise_error(Metrics::NoMetricsProvided)
+        end
+      end
+    end
+
     describe "#fetch" do
       before(:all) do
         delete_all_metrics

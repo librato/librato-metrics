@@ -159,6 +159,15 @@ Get the 20 most recent 15 minute data point rollups for `temperature`:
 
 There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/gauges/:name) or the [fetch documentation](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics.fetch)  for more details.
 
+## Deleting Metrics
+
+If you ever need to remove a metric and all of its measurements, doing so is easy:
+
+	# Delete the metrics 'temperature' and 'humidity'
+	Librato::Metrics.delete :temperature, :humidity
+	
+Note that deleted metrics and their measurements are unrecoverable, so use with care.
+
 ## Using Multiple Accounts Simultaneously
 
 If you need to use metrics with multiple sets of authentication credentials simultaneously, you can do it with `Client`:

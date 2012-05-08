@@ -41,6 +41,10 @@ module Librato
       end
 
       describe "#add" do
+        it "should allow chaining" do
+          subject.add(:foo => 1234).should == subject
+        end
+        
         context "with single hash argument" do
           it "should record a single aggregate" do
             subject.add :foo => 3000
@@ -164,6 +168,28 @@ module Librato
             queued[:sum].should be > 500
             queued[:sum].should be_within(150).of(500)
           end
+        end
+      end
+      
+      context "with an autosubmit interval" do
+        let(:client) do
+          client = Client.new
+          client.persistence = :test
+          client
+        end
+        
+        it "should not submit immediately" do
+          timed_agg = Aggregator.new(:client => client, :autosubmit_interval => 1)
+          timed_agg.add :foo => 1
+          timed_agg.persister.persisted.should be_nil # nothing sent
+        end
+        
+        it "should submit after interval" do
+          timed_agg = Aggregator.new(:client => client, :autosubmit_interval => 1)
+          timed_agg.add :foo => 1
+          sleep 1
+          timed_agg.add :foo => 2
+          timed_agg.persister.persisted.should_not be_nil # sent
         end
       end
 

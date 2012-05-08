@@ -4,7 +4,7 @@ module Librato
     module Processor
       MEASUREMENTS_PER_REQUEST = 500
       
-      attr_reader :per_request
+      attr_reader :per_request, :last_submit_time
       
       # The current Client instance this queue is using to authenticate
       # and connect to Librato Metrics. This will default to the primary
@@ -29,6 +29,7 @@ module Librato
         raise NoMetricsQueued if self.queued.empty?
         options = {:per_request => @per_request}
         if persister.persist(self.client, self.queued, options)
+          @last_submit_time = Time.now
           flush and return true
         end
         false
@@ -70,6 +71,21 @@ module Librato
 
       def epoch_time
         Time.now.to_i
+      end
+      
+      def setup_common_options(options)
+        @autosubmit_interval = options[:autosubmit_interval]
+        @client = options[:client] || Librato::Metrics.client
+        @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
+        @source = options[:source]
+        @create_time = Time.now
+      end
+      
+      def autosubmit_check
+        if @autosubmit_interval
+          last = @last_submit_time || @create_time
+          self.submit if (Time.now - last).to_i >= @autosubmit_interval
+        end
       end
       
     end

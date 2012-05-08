@@ -37,6 +37,7 @@ module Librato
           gauge['unassigned'][0]['value'].should == 5
         end
       end
+    
     end
     
   end

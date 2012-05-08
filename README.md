@@ -61,7 +61,7 @@ Queue up a metric with a specified source:
 
 A complete [list of metric attributes](http://dev.librato.com/v1/metrics) is available in the [API documentation](http://dev.librato.com/v1).
 
-Save all queued metrics:
+Send currently queued measurements to Metrics:
 
     queue.submit
 
@@ -90,7 +90,7 @@ You can aggregate multiple metrics at once:
 
     aggregator.add :app_latency => 35.2, :db_latency => 120.7
 
-Send the current aggregated metrics to Metrics:
+Send the currently aggregated metrics to Metrics:
 
     aggregator.submit
 
@@ -109,6 +109,25 @@ If you need extra attributes for a `Queue` timing measurement, simply add them o
     queue.time :my_measurement, :source => 'app1' do
       # do work...
     end
+    
+## Auto-Submitting Metrics
+
+Both `Queue` and `Aggregator` support automatically submitting measurements on a given time interval:
+
+	# submit once per minute
+	timed_queue = Librato::Metrics::Queue.new(:autosubmit_interval => 60)
+	
+	# submit every 5 minutes
+	timed_aggregator = Librato::Metrics::Aggregator.new(:autosubmit_interval => 300)
+	
+`Queue` also supports auto-submission based on measurement volume:
+
+	# submit when the 400th measurement is queued
+	volume_queue = Librato::Metrics::Queue.new(:autosubmit_count => 400)
+
+These options can also be combined for more flexible behavior. 
+
+Both options are driven by the addition of measurements. Specifically for time-based autosubmission if you are adding measurements irregularly (less than once per second), submission may lag past your specified interval until the next measurement is added.
 
 ## Querying Metrics
 

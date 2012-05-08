@@ -1,6 +1,5 @@
 require 'metrics/processor'
 
-
 module Librato
   module Metrics
     class Queue
@@ -10,15 +9,15 @@ module Librato
 
       def initialize(options={})
         @queued = {}
-        @client = options[:client] || Librato::Metrics.client
-        @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
+        @autosubmit_count = options[:autosubmit_count]
         @skip_measurement_times = options[:skip_measurement_times]
+        setup_common_options(options)
       end
 
       # Add a metric entry to the metric set:
       #
       # @param Hash metrics metrics to add
-      # @return Hash queued_metrics the currently queued metrics
+      # @return Queue returns self
       def add(args)
         args.each do |key, value|
           if value.respond_to?(:each)
@@ -36,7 +35,8 @@ module Librato
           @queued[type] ||= []
           @queued[type] << metric
         end
-        queued
+        submit_check
+        self
       end
 
       # Currently queued counters
@@ -82,6 +82,15 @@ module Librato
         self.queued.inject(0) { |result, data| result + data.last.size }
       end
       alias :length :size
+      
+    private
+    
+      def submit_check
+        autosubmit_check # in Processor
+        if @autosubmit_count && self.length >= @autosubmit_count
+          self.submit
+        end
+      end
 
     end
   end

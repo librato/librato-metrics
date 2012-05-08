@@ -10,11 +10,8 @@ module Librato
       def initialize(options={})
         @queued = {}
         @autosubmit_count = options[:autosubmit_count]
-        @autosubmit_interval = options[:autosubmit_interval]
-        @client = options[:client] || Librato::Metrics.client
-        @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
         @skip_measurement_times = options[:skip_measurement_times]
-        @create_time = Time.now
+        setup_common_options(options)
       end
 
       # Add a metric entry to the metric set:

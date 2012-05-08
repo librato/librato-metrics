@@ -11,8 +11,7 @@ module Librato
 
       def initialize(options={})
         @aggregated = {}
-        @client = options[:client] || Librato::Metrics.client
-        @source = options[:source]
+        setup_common_options(options)
       end
 
       # Add a metric entry to the metric set:

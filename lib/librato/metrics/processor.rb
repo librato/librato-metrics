@@ -73,6 +73,21 @@ module Librato
         Time.now.to_i
       end
       
+      def setup_common_options(options)
+        @autosubmit_interval = options[:autosubmit_interval]
+        @client = options[:client] || Librato::Metrics.client
+        @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
+        @source = options[:source]
+        @create_time = Time.now
+      end
+      
+      def autosubmit_check
+        if @autosubmit_interval
+          last = @last_submit_time || @create_time
+          self.submit if (Time.now - last).to_i >= @autosubmit_interval
+        end
+      end
+      
     end
     
   end

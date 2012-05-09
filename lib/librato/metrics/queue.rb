@@ -29,8 +29,10 @@ module Librato
             type = :gauge
           end
           type = ("#{type}s").to_sym
-          unless skip_measurement_times
-            metric[:measure_time] ||= epoch_time
+          if metric[:measure_time]
+            check_measure_time(metric)
+          elsif !skip_measurement_times
+            metric[:measure_time] = epoch_time
           end
           @queued[type] ||= []
           @queued[type] << metric
@@ -84,6 +86,12 @@ module Librato
       alias :length :size
       
     private
+    
+      def check_measure_time(data)
+        if data[:measure_time].to_i < Metrics::MIN_MEASURE_TIME
+          raise InvalidMeasureTime, "Measure time for submitted metric (#{data}) is invalid."
+        end
+      end
     
       def submit_check
         autosubmit_check # in Processor

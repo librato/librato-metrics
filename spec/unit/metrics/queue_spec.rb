@@ -82,6 +82,32 @@ module Librato
             subject.queued.should equal_unordered(expected)
           end
         end
+        
+        context "with a measure_time" do
+          it "should accept time objects" do
+            time = Time.now-5
+            subject.add :foo => {:measure_time => time, :value => 123}
+            subject.queued[:gauges][0][:measure_time].should == time
+          end
+          
+          it "should accept integers" do
+            time = 1336574713
+            subject.add :foo => {:measure_time => time, :value => 123}
+            subject.queued[:gauges][0][:measure_time].should == time
+          end
+          
+          it "should accept strings" do
+            time = '1336574713'
+            subject.add :foo => {:measure_time => time, :value => 123}
+            subject.queued[:gauges][0][:measure_time].should == time
+          end
+          
+          it "should raise exception in invalid time" do
+            lambda {
+              subject.add :foo => {:measure_time => '12', :value => 123}
+            }.should raise_error(InvalidMeasureTime)
+          end
+        end
       end
 
       describe "#counters" do

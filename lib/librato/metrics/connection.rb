@@ -27,7 +27,7 @@ module Librato
       end
       
       def transport
-        raise NoClientProvided unless @client
+        raise(NoClientProvided, "No client provided.") unless @client
         @transport ||= Faraday::Connection.new(:url => api_endpoint + "/v1/") do |f|
           #f.use FaradayMiddleware::EncodeJson
           f.use Librato::Metrics::Middleware::RequestBody

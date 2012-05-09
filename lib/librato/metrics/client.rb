@@ -69,7 +69,7 @@ module Librato
       # @example Delete metrics 'foo' and 'bar'
       #   Librato::Metrics.delete :foo, :bar
       def delete(*metric_names)
-        raise NoMetricsProvided if metric_names.empty?
+        raise(NoMetricsProvided, 'Metric name missing.') if metric_names.empty?
         params = {:names => metric_names}
         connection.delete do |request|
           request.url connection.build_url("metrics")

@@ -1,5 +1,16 @@
 ## Changelog
 
+### Version 0.6.0
+* Add Aggregator class for aggregating measurements client-side
+* Queue and Aggregator can auto-submit on a time interval
+* Queue can auto-submit on a specified volume of measurements
+* Support deleting individual metrics
+* Validate user-specified measurement times
+* Update to MultiJSON 1.3 syntax
+* Run tests for rubinius and jruby in both 1.8 and 1.9 modes
+* Include request body in output for failed requests
+* Documentation improvements
+
 ### Version 0.5.0
 * Support using multiple accounts simultaneously via Client
 * Switch network library to faraday for broader platform support and flexibility

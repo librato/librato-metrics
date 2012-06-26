@@ -24,13 +24,13 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = %w[LICENSE]
 
   ## runtime dependencies
-  s.add_dependency 'faraday', '~>0.7.6'
-  s.add_dependency 'multi_json', '~>1.3.1'
-  s.add_dependency 'aggregate', '~>0.2.2'
+  s.add_dependency 'faraday', '~> 0.7'
+  s.add_dependency 'multi_json', '~> 1.3'
+  s.add_dependency 'aggregate', '~> 0.2.2'
 
   ## development dependencies
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec', '~>2.6.0'
+  s.add_development_dependency 'rspec', '~> 2.6.0'
   s.add_development_dependency 'pry'
   s.add_development_dependency 'yard'
   s.add_development_dependency 'sinatra'

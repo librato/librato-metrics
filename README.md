@@ -20,6 +20,10 @@ Then, in your application or script:
 For best performance we recommend installing [yajl-ruby](https://github.com/brianmario/yajl-ruby):
 
     gem install yajl-ruby
+    
+If you are using jruby, you need to ensure [jruby-openssl](https://github.com/jruby/jruby-ossl) is available:
+
+    gem install jruby-openssl
 
 ## Quick Start
 

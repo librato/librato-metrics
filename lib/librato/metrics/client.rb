@@ -157,8 +157,9 @@ module Librato
       # Create a new queue which uses this client.
       #
       # @return [Queue]
-      def new_queue
-        Queue.new(:client => self)
+      def new_queue(options={})
+        options[:client] = self
+        Queue.new(options)
       end
 
       # Persistence type to use when saving metrics.

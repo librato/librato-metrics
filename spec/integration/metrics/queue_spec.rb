@@ -5,6 +5,7 @@ module Librato
    
     describe Queue do
       before(:all) { prep_integration_tests }
+      before(:each) { delete_all_metrics }
       
       context "with a large number of metrics" do
         it "should submit them in multiple requests" do
@@ -25,8 +26,6 @@ module Librato
           (1..3).each do |i|
             queue.add "counter_#{i}" => {:type => :counter, :value => i}
           end
-          
-          delete_all_metrics
           queue.submit
           
           metrics = Metrics.list
@@ -36,6 +35,19 @@ module Librato
           gauge = Metrics.fetch :gauge_5, :count => 1
           gauge['unassigned'][0]['value'].should == 5
         end
+      end
+      
+      it "should respect default and individual sources" do
+        queue = Queue.new(:source => 'default')
+        queue.add :foo => 123
+        queue.add :bar => {:value => 456, :source => 'barsource'}
+        queue.submit
+        
+        foo = Metrics.fetch :foo, :count => 2
+        foo['default'][0]['value'].should == 123
+        
+        bar = Metrics.fetch :bar, :count => 2
+        bar['barsource'][0]['value'].should == 456
       end
     
     end

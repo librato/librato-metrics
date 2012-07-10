@@ -74,7 +74,10 @@ module Librato
       #
       # @return Hash
       def queued
-        @queued
+        return {} if @queued.empty?
+        globals = {}
+        globals[:source] = @source if @source
+        @queued.merge(globals)
       end
 
       # Count of metrics currently queued

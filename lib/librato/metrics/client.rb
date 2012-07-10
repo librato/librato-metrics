@@ -70,7 +70,8 @@ module Librato
       #   Librato::Metrics.delete :foo, :bar
       def delete(*metric_names)
         raise(NoMetricsProvided, 'Metric name missing.') if metric_names.empty?
-        params = {:names => metric_names}
+        metric_names.map!{|i| i.to_s}
+        params = {:names => metric_names }
         connection.delete do |request|
           request.url connection.build_url("metrics")
           request.body = MultiJson.dump(params)

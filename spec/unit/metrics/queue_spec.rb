@@ -146,6 +146,11 @@ module Librato
       end
       
       describe "#last_submit_time" do
+        before(:all) do
+          Librato::Metrics.authenticate 'me@librato.com', 'foo'
+          Librato::Metrics.persistence = :test
+        end
+        
         it "should default to nil" do
           subject.last_submit_time.should be_nil
         end

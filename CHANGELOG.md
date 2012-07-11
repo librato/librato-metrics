@@ -1,5 +1,11 @@
 ## Changelog
 
+### Version 0.6.1
+* Loosen restrictions to older versions of faraday and multi_json
+* Fix symbol casting issue in jruby with metric delete
+* client#new_queue now respects passed options
+* Queue objects support default source properly
+
 ### Version 0.6.0
 * Add Aggregator class for aggregating measurements client-side
 * Queue and Aggregator can auto-submit on a time interval

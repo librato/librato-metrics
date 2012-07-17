@@ -163,6 +163,37 @@ module Librato
         end
       end
       
+      describe "#merge" do
+        context "with another queue" do
+          it "should merge gauges" do
+            q1 = Queue.new
+            q1.add :foo => 123, :bar => 456
+            q2 = Queue.new
+            q2.add :baz => 678
+            q2.merge!(q1)
+            expected = {:gauges=>[{:name=>"foo", :value=>123, :measure_time => @time},
+                                  {:name=>"bar", :value=>456, :measure_time => @time},
+                                  {:name=>"baz", :value=>678, :measure_time => @time}]}
+            q2.queued.should equal_unordered(expected)
+          end
+          
+          it "should merge counters" do
+            
+          end
+          
+          it "should maintain specified sources" do
+            
+          end
+          
+          it "should not change default source" do
+            
+          end
+        end
+        
+        context "with an aggregator" do
+        end
+      end
+      
       describe "#per_request" do
         it "should default to 500" do
           subject.per_request.should == 500

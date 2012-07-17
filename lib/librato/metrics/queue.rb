@@ -69,6 +69,23 @@ module Librato
       def gauges
         @queued[:gauges] || []
       end
+      
+      # Combines queueable measures from the given object
+      # into this queue. 
+      #
+      # @example Merging queues for more performant submission
+      #   queue1.merge!(queue2)
+      #   queue1.submit  # submits combined contents
+      #
+      # @return self
+      def merge!(mergeable)
+        raise NotMergeable unless mergeable.respond_to?(:queued)
+        other_queued = mergeable.queued
+        if other_queued[:gauges]
+          @queued[:gauges] += other_queued[:gauges]
+        end
+        self
+      end
 
       # All currently queued metrics
       #

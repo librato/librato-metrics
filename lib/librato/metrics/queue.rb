@@ -79,8 +79,13 @@ module Librato
       #
       # @return self
       def merge!(mergeable)
-        raise NotMergeable unless mergeable.respond_to?(:queued)
-        to_merge = mergeable.queued
+        if mergeable.respond_to?(:queued)
+          to_merge = mergeable.queued
+        elsif mergeable.respond_to?(:has_key?)
+          to_merge = mergeable
+        else
+          raise NotMergeable
+        end
         Metrics::PLURAL_TYPES.each do |type|
           if to_merge[type]
             measurements = reconcile_source(to_merge[type], to_merge[:source])

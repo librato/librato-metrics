@@ -245,6 +245,17 @@ module Librato
             
           end
         end
+        
+        context "with a hash" do
+          it "should merge" do
+            to_merge = {:gauges=>[{:name => 'foo', :value => 123}],
+                        :counters=>[{:name => 'bar', :value => 456}]}
+            q = Queue.new
+            q.merge!(to_merge)
+            q.gauges.length.should == 1
+            q.counters.length.should == 1
+          end
+        end
       end
       
       describe "#per_request" do

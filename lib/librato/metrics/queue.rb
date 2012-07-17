@@ -81,8 +81,14 @@ module Librato
       def merge!(mergeable)
         raise NotMergeable unless mergeable.respond_to?(:queued)
         other_queued = mergeable.queued
-        if other_queued[:gauges]
-          @queued[:gauges] += other_queued[:gauges]
+        Metrics::PLURAL_TYPES.each do |type|
+          if other_queued[type]
+            if @queued[type]
+              @queued[type] += other_queued[type]
+            else
+              @queued[type] = other_queued[type]
+            end
+          end
         end
         self
       end

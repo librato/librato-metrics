@@ -178,7 +178,16 @@ module Librato
           end
           
           it "should merge counters" do
-            
+            q1 = Queue.new
+            q1.add :users => {:type => :counter, :value => 1000}
+            q1.add :sales => {:type => :counter, :value => 250}
+            q2 = Queue.new
+            q2.add :signups => {:type => :counter, :value => 500}
+            q2.merge!(q1)
+            expected = {:counters=>[{:name=>"users", :value=>1000, :measure_time => @time},
+                                    {:name=>"sales", :value=>250, :measure_time => @time},
+                                    {:name=>"signups", :value=>500, :measure_time => @time}]}
+            q2.queued.should equal_unordered(expected)
           end
           
           it "should maintain specified sources" do
@@ -187,6 +196,16 @@ module Librato
           
           it "should not change default source" do
             
+          end
+          
+          it "should handle empty cases" do
+            q1 = Queue.new
+            q1.add :foo => 123, :users => {:type => :counter, :value => 1000}
+            q2 = Queue.new
+            q2.merge!(q1)
+            expected = {:counters => [{:name=>"users", :value=>1000, :measure_time => @time}],
+                        :gauges => [{:name=>"foo", :value=>123, :measure_time => @time}]}
+            q2.queued.should == expected
           end
         end
         

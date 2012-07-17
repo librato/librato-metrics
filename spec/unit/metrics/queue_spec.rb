@@ -191,11 +191,32 @@ module Librato
           end
           
           it "should maintain specified sources" do
-            
+            q1 = Queue.new
+            q1.add :neo => {:source => 'matrix', :value => 123}
+            q2 = Queue.new(:source => 'red_pill')
+            q2.merge!(q1)
+            q2.queued[:gauges][0][:source].should == 'matrix'
           end
           
           it "should not change default source" do
-            
+            q1 = Queue.new(:source => 'matrix')
+            q1.add :neo => 456
+            q2 = Queue.new(:source => 'red_pill')
+            q2.merge!(q1)
+            q2.queued[:source].should == 'red_pill'
+          end
+          
+          it "should track previous default source" do
+            q1 = Queue.new(:source => 'matrix')
+            q1.add :neo => 456
+            q2 = Queue.new(:source => 'red_pill')
+            q2.add :morpheus => 678
+            q2.merge!(q1)
+            q2.queued[:gauges].each do |gauge|
+              if gauge[:name] == 'neo'
+                gauge[:source].should == 'matrix'
+              end
+            end
           end
           
           it "should handle empty cases" do

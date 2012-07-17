@@ -71,7 +71,7 @@ module Librato
       end
       
       # Combines queueable measures from the given object
-      # into this queue. 
+      # into this queue.
       #
       # @example Merging queues for more performant submission
       #   queue1.merge!(queue2)
@@ -80,13 +80,14 @@ module Librato
       # @return self
       def merge!(mergeable)
         raise NotMergeable unless mergeable.respond_to?(:queued)
-        other_queued = mergeable.queued
+        to_merge = mergeable.queued
         Metrics::PLURAL_TYPES.each do |type|
-          if other_queued[type]
+          if to_merge[type]
+            measurements = reconcile_source(to_merge[type], to_merge[:source])
             if @queued[type]
-              @queued[type] += other_queued[type]
+              @queued[type] += measurements
             else
-              @queued[type] = other_queued[type]
+              @queued[type] = measurements
             end
           end
         end
@@ -117,6 +118,17 @@ module Librato
         if data[:measure_time].to_i < Metrics::MIN_MEASURE_TIME
           raise InvalidMeasureTime, "Measure time for submitted metric (#{data}) is invalid."
         end
+      end
+    
+      def reconcile_source(measurements, source)
+        return measurements if !source || source == @source
+        measurements.map! do |measurement|
+          unless measurement[:source]
+            measurement[:source] = source
+          end
+          measurement
+        end
+        measurements
       end
     
       def submit_check

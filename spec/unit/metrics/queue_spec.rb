@@ -163,7 +163,7 @@ module Librato
         end
       end
       
-      describe "#merge" do
+      describe "#merge!" do
         context "with another queue" do
           it "should merge gauges" do
             q1 = Queue.new
@@ -231,6 +231,19 @@ module Librato
         end
         
         context "with an aggregator" do
+          it "should merge" do
+            aggregator = Aggregator.new(:source => 'aggregator')
+            aggregator.add :timing => 102
+            aggregator.add :timing => 203
+            queue = Queue.new(:source => 'queue')
+            queue.add :gauge => 42
+            queue.merge!(aggregator)
+            expected = {:gauges=>[{:name=>"gauge", :value=>42, :measure_time=>@time}, 
+                                  {:name=>"timing", :count=>2, :sum=>305.0, :min=>102.0, :max=>203.0, :source=>"aggregator"}],
+                        :source=>'queue'}
+            queue.queued.should equal_unordered(expected)
+            
+          end
         end
       end
       

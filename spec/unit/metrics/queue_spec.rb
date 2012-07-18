@@ -163,6 +163,101 @@ module Librato
         end
       end
       
+      describe "#merge!" do
+        context "with another queue" do
+          it "should merge gauges" do
+            q1 = Queue.new
+            q1.add :foo => 123, :bar => 456
+            q2 = Queue.new
+            q2.add :baz => 678
+            q2.merge!(q1)
+            expected = {:gauges=>[{:name=>"foo", :value=>123, :measure_time => @time},
+                                  {:name=>"bar", :value=>456, :measure_time => @time},
+                                  {:name=>"baz", :value=>678, :measure_time => @time}]}
+            q2.queued.should equal_unordered(expected)
+          end
+          
+          it "should merge counters" do
+            q1 = Queue.new
+            q1.add :users => {:type => :counter, :value => 1000}
+            q1.add :sales => {:type => :counter, :value => 250}
+            q2 = Queue.new
+            q2.add :signups => {:type => :counter, :value => 500}
+            q2.merge!(q1)
+            expected = {:counters=>[{:name=>"users", :value=>1000, :measure_time => @time},
+                                    {:name=>"sales", :value=>250, :measure_time => @time},
+                                    {:name=>"signups", :value=>500, :measure_time => @time}]}
+            q2.queued.should equal_unordered(expected)
+          end
+          
+          it "should maintain specified sources" do
+            q1 = Queue.new
+            q1.add :neo => {:source => 'matrix', :value => 123}
+            q2 = Queue.new(:source => 'red_pill')
+            q2.merge!(q1)
+            q2.queued[:gauges][0][:source].should == 'matrix'
+          end
+          
+          it "should not change default source" do
+            q1 = Queue.new(:source => 'matrix')
+            q1.add :neo => 456
+            q2 = Queue.new(:source => 'red_pill')
+            q2.merge!(q1)
+            q2.queued[:source].should == 'red_pill'
+          end
+          
+          it "should track previous default source" do
+            q1 = Queue.new(:source => 'matrix')
+            q1.add :neo => 456
+            q2 = Queue.new(:source => 'red_pill')
+            q2.add :morpheus => 678
+            q2.merge!(q1)
+            q2.queued[:gauges].each do |gauge|
+              if gauge[:name] == 'neo'
+                gauge[:source].should == 'matrix'
+              end
+            end
+          end
+          
+          it "should handle empty cases" do
+            q1 = Queue.new
+            q1.add :foo => 123, :users => {:type => :counter, :value => 1000}
+            q2 = Queue.new
+            q2.merge!(q1)
+            expected = {:counters => [{:name=>"users", :value=>1000, :measure_time => @time}],
+                        :gauges => [{:name=>"foo", :value=>123, :measure_time => @time}]}
+            q2.queued.should == expected
+          end
+        end
+        
+        context "with an aggregator" do
+          it "should merge" do
+            aggregator = Aggregator.new(:source => 'aggregator')
+            aggregator.add :timing => 102
+            aggregator.add :timing => 203
+            queue = Queue.new(:source => 'queue')
+            queue.add :gauge => 42
+            queue.merge!(aggregator)
+            expected = {:gauges=>[{:name=>"gauge", :value=>42, :measure_time=>@time}, 
+                                  {:name=>"timing", :count=>2, :sum=>305.0, :min=>102.0, :max=>203.0, :source=>"aggregator"}],
+                        :source=>'queue'}
+            queue.queued.should equal_unordered(expected)
+            
+          end
+        end
+        
+        context "with a hash" do
+          it "should merge" do
+            to_merge = {:gauges=>[{:name => 'foo', :value => 123}],
+                        :counters=>[{:name => 'bar', :value => 456}]}
+            q = Queue.new
+            q.merge!(to_merge)
+            q.gauges.length.should == 1
+            q.counters.length.should == 1
+          end
+        end
+      end
+      
       describe "#per_request" do
         it "should default to 500" do
           subject.per_request.should == 500

@@ -70,9 +70,13 @@ end
 # @example
 #   {:foo => [1,3,2]}.should equal_unordered({:foo => [1,2,3]})
 RSpec::Matchers.define :equal_unordered do |result|
-  result.each { |key, value| result[key] = value.to_set }
+  result.each do |key, value|
+    result[key] = value.to_set if value.respond_to?(:to_set)
+  end
   match do |target|
-    target.each { |key, value| target[key] = value.to_set }
+    target.each do |key, value|
+      target[key] = value.to_set if value.respond_to?(:to_set)
+    end
     target == result
   end
 end

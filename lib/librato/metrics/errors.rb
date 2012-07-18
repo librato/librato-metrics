@@ -9,6 +9,7 @@ module Librato
     class NoMetricsProvided < MetricsError; end
     class NoClientProvided < MetricsError; end
     class InvalidMeasureTime < MetricsError; end
+    class NotMergeable < MetricsError; end
     
     class NetworkError < StandardError; end
     

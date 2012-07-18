@@ -63,6 +63,7 @@ module Librato
     extend SingleForwardable
 
     TYPES = [:counter, :gauge]
+    PLURAL_TYPES = [:counters, :gauges]
     MIN_MEASURE_TIME = (Time.now-(3600*24*365)).to_i
 
     # Expose class methods of Simple via Metrics itself.

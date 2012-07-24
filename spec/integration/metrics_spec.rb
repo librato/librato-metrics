@@ -150,6 +150,17 @@ module Librato
           data['baz'][0]['value'] == 456.0
         end
       end
+      
+      it "should not retain errors" do
+        delete_all_metrics
+        Metrics.submit :foo => {:type => :counter, :value => 12}
+        lambda {
+          Metrics.submit :foo => 15 # submitting as gauge
+        }.should raise_error
+        lambda {
+          Metrics.submit :foo => {:type => :counter, :value => 17}
+        }.should_not raise_error
+      end
 
     end
 

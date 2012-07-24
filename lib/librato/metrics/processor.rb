@@ -30,9 +30,13 @@ module Librato
         options = {:per_request => @per_request}
         if persister.persist(self.client, self.queued, options)
           @last_submit_time = Time.now
-          flush and return true
+          clear and return true
         end
         false
+      rescue ClientError
+        # clean up if we hit exceptions if asked to
+        clear if @clear_on_failure
+        raise
       end
       
       # Capture execution time for a block and queue
@@ -79,6 +83,7 @@ module Librato
         @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
         @source = options[:source]
         @create_time = Time.now
+        @clear_on_failure = options[:clear_failures] || false
       end
       
       def autosubmit_check

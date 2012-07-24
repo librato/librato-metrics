@@ -47,10 +47,10 @@ module Librato
 
       # Remove all queued metrics
       #
-      def flush
+      def clear
         @aggregated = {}
       end
-      alias :clear :flush
+      alias :flush :clear
 
       def queued
         gauges = []

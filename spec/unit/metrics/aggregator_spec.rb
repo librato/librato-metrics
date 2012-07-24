@@ -76,6 +76,20 @@ module Librato
             }
             subject.queued.should equal_unordered(expected)
           end
+          
+          it "should respect source argument" do
+            subject.add :foo => {:source => 'alpha', :value => 1}
+            subject.add :foo => 5
+            subject.add :foo => {:source => :alpha, :value => 6}
+            subject.add :foo => 10
+            expected = { :gauges => [
+              { :name => 'foo', :source => 'alpha', :count => 2,
+                :sum => 7.0, :min => 1.0, :max => 6.0 },
+              { :name => 'foo', :count => 2, 
+                :sum => 15.0, :min => 5.0, :max => 10.0 }
+            ]}
+            subject.queued.should equal_unordered(expected)
+          end
         end
 
         context "with multiple hash arguments" do

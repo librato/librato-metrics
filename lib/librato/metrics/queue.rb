@@ -57,11 +57,10 @@ module Librato
 
       # Remove all queued metrics
       #
-      def flush
+      def clear
         @queued = {}
       end
-      alias :clear :flush
-      alias :flush_queued :flush
+      alias :flush :clear
 
       # Currently queued gauges
       #

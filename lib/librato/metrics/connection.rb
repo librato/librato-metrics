@@ -48,6 +48,7 @@ module Librato
       # User-agent used when making requests.
       #
       def user_agent
+        return @client.custom_user_agent if @client.custom_user_agent
         ua_chunks = []
         agent_identifier = @client.agent_identifier
         if agent_identifier && !agent_identifier.empty?

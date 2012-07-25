@@ -71,7 +71,7 @@ module Librato
     def_delegators :client, :agent_identifier, :api_endpoint,
                    :api_endpoint=, :authenticate, :connection, :delete, 
                    :fetch, :list, :persistence, :persistence=, :persister, 
-                   :submit
+                   :submit, :update
 
     # The Librato::Metrics::Client being used by module-level
     # access.

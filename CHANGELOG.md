@@ -1,5 +1,13 @@
 ## Changelog
 
+### Version 0.7.0
+* Add ability to update metric properties (Christoph Bünte)
+* Add ability to merge queue and aggregator data into a queue
+* Aggregator supports custom source by measurement
+* Add option to clear queued measurements after failed submit
+* Custom user agent support
+* Documentation improvements
+
 ### Version 0.6.1
 * Loosen restrictions to older versions of faraday and multi_json
 * Fix symbol casting issue in jruby with metric delete

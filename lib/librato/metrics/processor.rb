@@ -43,7 +43,7 @@ module Librato
       # it as the value for a metric. Times are recorded
       # in milliseconds.
       #
-      # Options are the same as for {#add}.
+      # Options are the same as for #add.
       #
       # @example Queue API request response time
       #   queue.time :api_request_time do

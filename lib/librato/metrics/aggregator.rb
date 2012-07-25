@@ -18,10 +18,10 @@ module Librato
 
       # Add a metric entry to the metric set:
       #
-      # @param Hash metrics metrics to add
-      # @return Aggregator returns self
-      def add(args)
-        args.each do |metric, data|
+      # @param [Hash] measurements measurements to add
+      # @return [Aggregator] returns self
+      def add(measurements)
+        measurements.each do |metric, data|
           if data.respond_to?(:each) # hash form
             value = data[:value]
             if data[:source]

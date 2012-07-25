@@ -16,10 +16,10 @@ module Librato
 
       # Add a metric entry to the metric set:
       #
-      # @param Hash metrics metrics to add
-      # @return Queue returns self
-      def add(args)
-        args.each do |key, value|
+      # @param [Hash] measurements measurements to add
+      # @return [Queue] returns self
+      def add(measurements)
+        measurements.each do |key, value|
           if value.respond_to?(:each)
             metric = value
             metric[:name] = key.to_s

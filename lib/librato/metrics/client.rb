@@ -104,7 +104,7 @@ module Librato
       #
       # @example Get 20 most recent data points for a specific source
       #   data = Librato::Metrics.fetch :temperature, :count => 20,
-      #                                  :source => 'app1'
+      #                                 :source => 'app1'
       #
       # @example Get the 20 most recent 15 minute data point rollups
       #   data = Librato::Metrics.fetch :temperature, :count => 20,
@@ -185,7 +185,7 @@ module Librato
 
       # Set persistence type to use when saving metrics.
       #
-      # @param [Symbol] persistence_type
+      # @param [Symbol] persist_method
       def persistence=(persist_method)
         @persistence = persist_method
       end
@@ -208,11 +208,10 @@ module Librato
       # Update metric with the given name.
       #
       # @example Update metric 'temperature'
-      #   Librato::Metrics.update :temperature, :attributes => { :color => 'F00' }
+      #   Librato::Metrics.update :temperature, :period => 15, :attributes => { :color => 'F00' }
       #
       # @example Update metric 'humidity', creating it if it doesn't exist
-      #   Librato::Metrics.update 'humidity', :type => :gauge, :period => 60, 
-      #                                       :display_name => 'Humidity'
+      #   Librato::Metrics.update 'humidity', :type => :gauge, :period => 60, :display_name => 'Humidity'
       #
       def update(metric, options = {})
         connection.put do |request|

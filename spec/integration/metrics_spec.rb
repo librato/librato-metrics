@@ -163,6 +163,56 @@ module Librato
       end
 
     end
+    
+    describe "#update" do
+      
+      context "with existing metric" do
+        before do
+          delete_all_metrics
+          Metrics.submit :foo => 123
+        end
+        
+        it "should upate the metric" do
+          Metrics.update :foo, :display_name => "Foo Metric",
+                               :period => 15,
+                               :attributes => {
+                                 :display_max => 1000
+                               }
+          foo = Metrics.fetch :foo
+          foo['display_name'].should == 'Foo Metric'
+          foo['period'].should == 15
+          foo['attributes'].should == {'display_max' => 1000}
+        end
+      end
+      
+      context "without an existing metric" do
+        it "should create the metric if type specified" do
+          delete_all_metrics
+          Metrics.update :foo, :display_name => "Foo Metric",
+                               :type => :gauge,
+                               :period => 15,
+                               :attributes => {
+                                 :display_max => 1000
+                               }
+          foo = Metrics.fetch :foo
+          foo['display_name'].should == 'Foo Metric'
+          foo['period'].should == 15
+          foo['attributes'].should == {'display_max' => 1000}
+        end
+        
+        it "should raise error if no type specified" do
+          delete_all_metrics
+          lambda {
+            Metrics.update :foo, :display_name => "Foo Metric",
+                                 :period => 15,
+                                 :attributes => {
+                                   :display_max => 1000
+                                 }
+          }.should raise_error
+        end
+      end
+      
+    end
 
   end
 end

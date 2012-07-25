@@ -204,6 +204,17 @@ module Librato
         @queue.add args
         @queue.submit
       end
+      
+      # Update metric with the given name.
+      #
+      # @example Update metric 'temperature'
+      #   Librato::Metrics.update :temperature, :attributes => { :color => 'F00' }
+      def update(metric, options = {})
+        connection.put do |request|
+          request.url connection.build_url("metrics/#{metric}")
+          request.body = MultiJson.dump(options)
+        end
+      end
 
     private
 

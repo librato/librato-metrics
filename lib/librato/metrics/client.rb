@@ -60,6 +60,19 @@ module Librato
         @connection ||= Connection.new(:client => self, :api_endpoint => api_endpoint)
       end
       
+      # Overrride user agent for this client's connections. If you
+      # are trying to specify an agent identifier for developer
+      # program, see #agent_identifier.
+      #
+      def custom_user_agent=(agent)
+        @user_agent = agent
+        @connection = nil
+      end
+      
+      def custom_user_agent
+        @user_agent
+      end
+      
       # Completely delete metrics with the given names. Be
       # careful with this, this is instant and permanent.
       #

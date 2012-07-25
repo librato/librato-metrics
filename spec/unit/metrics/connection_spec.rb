@@ -37,6 +37,15 @@ module Librato
           end
         end
         
+        context "with a custom user agent set" do
+          it "should use custom user agent" do
+            client = Client.new
+            client.custom_user_agent = 'foo agent'
+            connection = Connection.new(:client => client)
+            connection.user_agent.should == 'foo agent'
+          end
+        end
+        
         # TODO: verify user agent is being sent with rackup test
       end
       

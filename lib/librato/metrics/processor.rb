@@ -59,10 +59,11 @@ module Librato
       # @param [Hash] options Metric options
       def time(name, options={})
         start = Time.now
-        yield
-        duration = (Time.now - start) * 1000.0 # milliseconds
-        metric = {name => options.merge({:value => duration})}
-        add metric
+        yield.tap do
+          duration = (Time.now - start) * 1000.0 # milliseconds
+          metric = {name => options.merge({:value => duration})}
+          add metric
+        end
       end
       alias :benchmark :time
       

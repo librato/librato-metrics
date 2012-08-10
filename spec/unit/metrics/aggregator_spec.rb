@@ -182,6 +182,14 @@ module Librato
             queued[:sum].should be >= 500.0
             queued[:sum].should be_within(150).of(500)
           end
+
+          it "should return the result of the block" do
+            result = subject.time :returning do
+              :hi_there
+            end
+
+            result.should == :hi_there
+          end
         end
       end
       

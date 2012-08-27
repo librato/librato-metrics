@@ -82,7 +82,7 @@ module Librato
         @autosubmit_interval = options[:autosubmit_interval]
         @client = options[:client] || Librato::Metrics.client
         @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
-        @source = options[:source]
+        @source = options[:source] || ENV['LIBRATO_SOURCE']
         @create_time = Time.now
         @clear_on_failure = options[:clear_failures] || false
       end

@@ -3,6 +3,11 @@ module Librato
 
     class Client
       attr_accessor :email, :api_key
+      
+      def initialize(args={})
+        @email    = args[:email] || ENV['LIBRATO_USERNAME']
+        @api_key  = args[:api_key] || ENV['LIBRATO_KEY']
+      end
 
       # Provide agent identifier for the developer program. See:
       # http://support.metrics.librato.com/knowledgebase/articles/53548-developer-program

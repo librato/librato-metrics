@@ -1,3 +1,5 @@
+require 'csv'
+
 module Librato
   module Metrics
 
@@ -162,9 +164,9 @@ module Librato
 
         csv_measures = {}
         measures.each do |k,v|
-          csv_measures[k] = measures[k].
-            map{|m| "%d,%.6f" % [m['measure_time'],m[key]]}.
-            join("\n")
+          csv_measures[k] = CSV.generate do |csv|
+            measures[k].each {|m| csv << [m['measure_time'], "%.6f" % [m[key]]]}
+          end
         end
 
         csv_measures

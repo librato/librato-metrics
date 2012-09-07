@@ -121,6 +121,9 @@ module Librato
       end
 
       def fetch_measures(metric, options)
+        # Option that should not be passed to API
+        format = options.delete(:format)
+
         query = interval_params(options)
 
         #TODO: bail if a count >100
@@ -132,6 +135,7 @@ module Librato
           # Get the next set of measurements
           parsed = fetch_metric(metric, query)
           partial_measures = parsed.delete("measurements")
+          attributes = parsed
 
           # append them to previous results
           partial_measures.each do |k,v|
@@ -146,13 +150,24 @@ module Librato
           query[:start_time] = parsed['query']['next_time'].to_i
         end
 
-        measures
+        if format == :csv
+          to_csv(measures, attributes['type'])
+        else
+          measures
+        end
       end
 
-      def to_csv(type, measures)
+      def to_csv(measures, type)
         key = (type == 'counter') ? 'delta' : 'value'
-        csv_ary = measures['all'].map{|m| "%d,%.6f" % [m['measure_time'],m[key]]}
-        csv_ary.join("\n")
+
+        csv_measures = {}
+        measures.each do |k,v|
+          csv_measures[k] = measures[k].
+            map{|m| "%d,%.6f" % [m['measure_time'],m[key]]}.
+            join("\n")
+        end
+
+        csv_measures
       end
 
       # Query metric data
@@ -186,20 +201,11 @@ module Librato
       # @param [Hash] options Query options
       def fetch(metric, options={})
 
-        # Option that should not be passed to API
-        format = options.delete(:format)
-
         # Much simpler if we're not getting measurements
         if options.empty?
           fetch_metric(metric)
         else
-          measures = fetch_measures(metric, options)
-
-          if format == :csv
-            to_csv(measures)
-          else
-            measures
-          end
+          fetch_measures(metric, options)
         end
       end
 

@@ -85,6 +85,7 @@ module Librato
         @source = options[:source]
         @create_time = Time.now
         @clear_on_failure = options[:clear_failures] || false
+        @prefix = options[:prefix]
       end
       
       def autosubmit_check

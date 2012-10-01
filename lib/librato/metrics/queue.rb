@@ -28,6 +28,9 @@ module Librato
             metric = {:name => key.to_s, :value => value}
             type = :gauge
           end
+          if @prefix
+            metric[:name] = "#{@prefix}.#{metric[:name]}"
+          end
           type = ("#{type}s").to_sym
           if metric[:measure_time]
             check_measure_time(metric)

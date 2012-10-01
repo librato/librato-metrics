@@ -71,6 +71,17 @@ module Librato
               :source => 'db2'}]}
             subject.queued.should equal_unordered(expected)
           end
+          
+          context "with a prefix set" do
+            it "should auto-prepend names" do
+              subject = Queue.new(:prefix => 'foo')
+              subject.add :bar => 1
+              subject.add :baz => {:value => 23}
+              expected = {:gauges => [{:name =>'foo.bar', :value => 1, :measure_time => @time}, 
+                                      {:name => 'foo.baz', :value => 23, :measure_time => @time}]}
+              subject.queued.should equal_unordered(expected)
+            end
+          end
         end
 
         context "with multiple metrics" do

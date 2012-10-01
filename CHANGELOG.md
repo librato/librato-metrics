@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 0.7.1
+* Add prefix option to Queues
+
 ### Version 0.7.0
 * Add ability to update metric properties (Christoph Bünte)
 * Add ability to merge queue and aggregator data into a queue

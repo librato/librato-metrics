@@ -22,6 +22,9 @@ module Librato
       # @return [Aggregator] returns self
       def add(measurements)
         measurements.each do |metric, data|
+          if @prefix
+            metric = "#{@prefix}.#{metric}"
+          end
           if data.respond_to?(:each) # hash form
             value = data[:value]
             if data[:source]

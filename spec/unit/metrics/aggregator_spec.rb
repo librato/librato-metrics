@@ -90,6 +90,24 @@ module Librato
             ]}
             subject.queued.should equal_unordered(expected)
           end
+          
+          context "with a prefix set" do
+            it "should auto-prepend names" do
+              subject = Aggregator.new(:prefix => 'foo')
+              subject.add :bar => 1
+              subject.add :bar => 12
+              expected = {:gauges => [
+                { :name =>'foo.bar', 
+                  :count => 2,
+                  :sum => 13.0,
+                  :min => 1.0,
+                  :max => 12.0
+                  }
+                ]
+              }
+              subject.queued.should equal_unordered(expected)
+            end
+          end
         end
 
         context "with multiple hash arguments" do

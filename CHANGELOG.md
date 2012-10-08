@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 0.7.2
+* Extend prefix option support to Aggregators
+
 ### Version 0.7.1
 * Add prefix option to Queues
 

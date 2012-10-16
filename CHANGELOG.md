@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 0.7.3
+* Allow prefixes to be changed after instantiation on Queues/Aggregators
+
 ### Version 0.7.2
 * Extend prefix option support to Aggregators
 

@@ -4,7 +4,7 @@ platforms :jruby do
   gem 'jruby-openssl'
 end
 
-platforms :ruby do
+platforms :ruby_19 do
   # make available for yard under C rubies
   gem 'redcarpet'
 end

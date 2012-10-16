@@ -217,13 +217,6 @@ Once the queue is associated you can use it normally:
 
 The `librato-metrics` gem currently does not do internal locking for thread safety. When used in multi-threaded applications, please add your own mutexes for sensitive operations.
 
-## Feature Roadmap
-
-These are features we expect to add in future versions, roughly in the order of current priority. If you feel strongly about a feature, feel free to [create an issue](https://github.com/librato/librato-metrics/issues) or [join us in live chat](https://librato.campfirenow.com/269d3) and talk to us about it.
-
-* Queue objects support a single default measure_time to use for any measurements which don't have it set
-* Query actions return a collection object which auto-paginates large result sets
-
 ## Contribution
 
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.

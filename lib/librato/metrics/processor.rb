@@ -5,6 +5,7 @@ module Librato
       MEASUREMENTS_PER_REQUEST = 500
       
       attr_reader :per_request, :last_submit_time
+      attr_accessor :prefix
       
       # The current Client instance this queue is using to authenticate
       # and connect to Librato Metrics. This will default to the primary

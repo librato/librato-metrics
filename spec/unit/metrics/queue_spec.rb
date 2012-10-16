@@ -82,6 +82,24 @@ module Librato
               subject.queued.should equal_unordered(expected)
             end
           end
+          
+          context "when dynamically changing prefix" do
+            it "should auto-append names" do
+              subject.add :bar => 12
+              subject.prefix = 'foo' # with string
+              subject.add :bar => 23
+              subject.prefix = :foo  # with symbol
+              subject.add :bar => 34
+              subject.prefix = nil   # unsetting
+              subject.add :bar => 45
+              expected = {:gauges => [
+                {:name => 'bar', :value => 12, :measure_time => @time},
+                {:name => 'foo.bar', :value => 23, :measure_time => @time}, 
+                {:name => 'foo.bar', :value => 34, :measure_time => @time},
+                {:name => 'bar', :value => 45, :measure_time => @time}]}
+              subject.queued.should equal_unordered(expected)
+            end
+          end
         end
 
         context "with multiple metrics" do

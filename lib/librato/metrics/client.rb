@@ -1,3 +1,5 @@
+require 'csv'
+
 module Librato
   module Metrics
 
@@ -94,6 +96,82 @@ module Librato
         true
       end
 
+      def fetch_metric(metric, query=nil)
+        # expects 200
+        url = connection.build_url("metrics/#{metric}", query)
+        response = connection.get(url)
+        MultiJson.load(response.body)
+      end
+
+      def interval_params(options)
+        query = options.dup
+
+        # Ensure that start/end times are in epoch
+        # seconds if specified
+        if query[:start_time].respond_to?(:year)
+          query[:start_time] = query[:start_time].to_i
+        end
+
+        if query[:end_time].respond_to?(:year)
+          query[:end_time] = query[:end_time].to_i
+        end
+
+        # default resolution
+        query[:resolution] ||= 1
+
+        query
+      end
+
+      def fetch_measures(metric, options)
+        # Option that should not be passed to API
+        format = options.delete(:format)
+
+        query = interval_params(options)
+
+        #TODO: bail if a count >100
+
+        # Might be paginated
+        measures = {}
+        attributes = nil
+        loop do
+          # Get the next set of measurements
+          parsed = fetch_metric(metric, query)
+          partial_measures = parsed.delete("measurements")
+          attributes = parsed
+
+          # append them to previous results
+          partial_measures.each do |k,v|
+            measures[k] ||= []
+            measures[k] += v
+          end
+
+          # determine if there are more measurements to get
+          break unless parsed['query'] and parsed['query']['next_time']
+
+          # massage parameters for the next one
+          query[:start_time] = parsed['query']['next_time'].to_i
+        end
+
+        if format == :csv
+          to_csv(measures, attributes['type'])
+        else
+          measures
+        end
+      end
+
+      def to_csv(measures, type)
+        key = (type == 'counter') ? 'delta' : 'value'
+
+        csv_measures = {}
+        measures.each do |k,v|
+          csv_measures[k] = CSV.generate do |csv|
+            measures[k].each {|m| csv << [m['measure_time'], "%.6f" % [m[key]]]}
+          end
+        end
+
+        csv_measures
+      end
+
       # Query metric data
       #
       # @example Get attributes for a metric
@@ -124,22 +202,13 @@ module Librato
       # @param [Symbol|String] metric Metric name
       # @param [Hash] options Query options
       def fetch(metric, options={})
-        query = options.dup
-        if query[:start_time].respond_to?(:year)
-          query[:start_time] = query[:start_time].to_i
+
+        # Much simpler if we're not getting measurements
+        if options.empty?
+          fetch_metric(metric)
+        else
+          fetch_measures(metric, options)
         end
-        if query[:end_time].respond_to?(:year)
-          query[:end_time] = query[:end_time].to_i
-        end
-        unless query.empty?
-          query[:resolution] ||= 1
-        end
-        # expects 200
-        url = connection.build_url("metrics/#{metric}", query)
-        response = connection.get(url)
-        parsed = MultiJson.load(response.body)
-        # TODO: pagination support
-        query.empty? ? parsed : parsed["measurements"]
       end
 
       # Purge current credentials and connection.

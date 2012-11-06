@@ -80,7 +80,7 @@ module Librato
 
         req = { :gauges => gauges }
         req[:source] = @source if @source
-        #req[:measure_time] = @measure_time if @measure_time
+        req[:measure_time] = @measure_time if @measure_time
 
         req
       end

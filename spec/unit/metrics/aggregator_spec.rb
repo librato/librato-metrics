@@ -162,6 +162,21 @@ module Librato
         end
       end
 
+      describe "#queued" do
+        it "should include global source if set" do
+          a = Aggregator.new(:source => 'blah')
+          a.add :foo => 12
+          a.queued[:source].should == 'blah'
+        end
+
+        it "should include global measure_time if set" do
+          measure_time = (Time.now-1000).to_i
+          a = Aggregator.new(:measure_time => measure_time)
+          a.add :foo => 12
+          a.queued[:measure_time].should == measure_time
+        end
+      end
+
       describe "#submit" do
         before(:all) do
           Librato::Metrics.authenticate 'me@librato.com', 'foo'

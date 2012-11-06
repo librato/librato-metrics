@@ -84,6 +84,7 @@ module Librato
         @client = options[:client] || Librato::Metrics.client
         @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
         @source = options[:source]
+        @measure_time = options[:measure_time]
         @create_time = Time.now
         @clear_on_failure = options[:clear_failures] || false
         @prefix = options[:prefix]

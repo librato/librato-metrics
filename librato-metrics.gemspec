@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
 
   ## runtime dependencies
   s.add_dependency 'faraday', '~> 0.7'
-  s.add_dependency 'multi_json', '~> 1.3'
+  s.add_dependency 'multi_json'
   s.add_dependency 'aggregate', '~> 0.2.2'
 
   ## development dependencies
@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'yard'
   s.add_development_dependency 'sinatra'
   s.add_development_dependency 'popen4'
-  
+
   # omitting for now because jruby-19mode can't handle
   #s.add_development_dependency 'rdiscount' # for yard
 

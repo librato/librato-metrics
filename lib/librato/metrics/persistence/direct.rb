@@ -17,14 +17,14 @@ module Librato
             requests = [queued]
           end
           requests.each do |request|
-            payload = MultiJson.dump(request)
+            payload = SmartJSON.write(request)
             # expects 200
             client.connection.post('metrics', payload)
           end
         end
-        
+
       private
-        
+
         def chunk_queued(queued, per_request)
           return [queued] if queue_count(queued) <= per_request
           reqs = []
@@ -42,7 +42,7 @@ module Librato
           end
           reqs
         end
-        
+
         def queue_count(queued)
           queued.inject(0) { |result, data| result + data.last.size }
         end

@@ -10,15 +10,15 @@ module Librato
     class NoClientProvided < MetricsError; end
     class InvalidMeasureTime < MetricsError; end
     class NotMergeable < MetricsError; end
-    
+
     class NetworkError < StandardError; end
-    
+
     class ClientError < NetworkError; end
     class Unauthorized < ClientError; end
     class Forbidden < ClientError; end
     class NotFound < ClientError; end
     class EntityAlreadyExists < ClientError; end
-    
+
     class ServerError < NetworkError; end
 
   end

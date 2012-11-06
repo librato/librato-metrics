@@ -10,7 +10,7 @@ require 'set'
 require 'librato/metrics'
 
 RSpec.configure do |config|
-  
+
   # purge all metrics from test account
   def delete_all_metrics
     connection = Librato::Metrics.client.connection
@@ -20,7 +20,7 @@ RSpec.configure do |config|
       connection.delete("metrics/#{metric['name']}")
     end
   end
-  
+
   # set up test account credentials for integration tests
   def prep_integration_tests
     raise 'no TEST_API_USER specified in environment' unless ENV['TEST_API_USER']
@@ -30,11 +30,11 @@ RSpec.configure do |config|
     end
     Librato::Metrics.authenticate ENV['TEST_API_USER'], ENV['TEST_API_KEY']
   end
-  
+
   def rackup_path(*parts)
     File.expand_path(File.join(File.dirname(__FILE__), 'rackups', *parts))
   end
-  
+
   # fire up a given rackup file for the enclosed tests
   def with_rackup(name)
     if RUBY_PLATFORM == 'java'
@@ -64,9 +64,9 @@ RSpec::Matchers.define :start_with do |start_string|
   end
 end
 
-# Compares hashes of arrays by converting the arrays to 
+# Compares hashes of arrays by converting the arrays to
 # sets before comparision
-# 
+#
 # @example
 #   {:foo => [1,3,2]}.should equal_unordered({:foo => [1,2,3]})
 RSpec::Matchers.define :equal_unordered do |result|

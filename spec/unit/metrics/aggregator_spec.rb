@@ -44,7 +44,7 @@ module Librato
         it "should allow chaining" do
           subject.add(:foo => 1234).should == subject
         end
-        
+
         context "with single hash argument" do
           it "should record a single aggregate" do
             subject.add :foo => 3000
@@ -76,7 +76,7 @@ module Librato
             }
             subject.queued.should equal_unordered(expected)
           end
-          
+
           it "should respect source argument" do
             subject.add :foo => {:source => 'alpha', :value => 1}
             subject.add :foo => 5
@@ -85,19 +85,19 @@ module Librato
             expected = { :gauges => [
               { :name => 'foo', :source => 'alpha', :count => 2,
                 :sum => 7.0, :min => 1.0, :max => 6.0 },
-              { :name => 'foo', :count => 2, 
+              { :name => 'foo', :count => 2,
                 :sum => 15.0, :min => 5.0, :max => 10.0 }
             ]}
             subject.queued.should equal_unordered(expected)
           end
-          
+
           context "with a prefix set" do
             it "should auto-prepend names" do
               subject = Aggregator.new(:prefix => 'foo')
               subject.add :bar => 1
               subject.add :bar => 12
               expected = {:gauges => [
-                { :name =>'foo.bar', 
+                { :name =>'foo.bar',
                   :count => 2,
                   :sum => 13.0,
                   :min => 1.0,
@@ -114,7 +114,7 @@ module Librato
           it "should record a single aggregate" do
             subject.add :foo => 3000
             subject.add :bar => 30
-            expected = { 
+            expected = {
               #:measure_time => @time, TODO: support specific time
               :gauges => [
                 { :name => 'foo',
@@ -210,20 +210,20 @@ module Librato
           end
         end
       end
-      
+
       context "with an autosubmit interval" do
         let(:client) do
           client = Client.new
           client.persistence = :test
           client
         end
-        
+
         it "should not submit immediately" do
           timed_agg = Aggregator.new(:client => client, :autosubmit_interval => 1)
           timed_agg.add :foo => 1
           timed_agg.persister.persisted.should be_nil # nothing sent
         end
-        
+
         it "should submit after interval" do
           timed_agg = Aggregator.new(:client => client, :autosubmit_interval => 1)
           timed_agg.add :foo => 1

@@ -1,12 +1,12 @@
 module Librato
   module Metrics
-    
+
     module Processor
       MEASUREMENTS_PER_REQUEST = 500
-      
+
       attr_reader :per_request, :last_submit_time
       attr_accessor :prefix
-      
+
       # The current Client instance this queue is using to authenticate
       # and connect to Librato Metrics. This will default to the primary
       # client used by the Librato::Metrics module unless it has been
@@ -39,7 +39,7 @@ module Librato
         clear if @clear_on_failure
         raise
       end
-      
+
       # Capture execution time for a block and queue
       # it as the value for a metric. Times are recorded
       # in milliseconds.
@@ -67,7 +67,7 @@ module Librato
         end
       end
       alias :benchmark :time
-      
+
     private
 
       def create_persister
@@ -78,7 +78,7 @@ module Librato
       def epoch_time
         Time.now.to_i
       end
-      
+
       def setup_common_options(options)
         @autosubmit_interval = options[:autosubmit_interval]
         @client = options[:client] || Librato::Metrics.client
@@ -88,15 +88,15 @@ module Librato
         @clear_on_failure = options[:clear_failures] || false
         @prefix = options[:prefix]
       end
-      
+
       def autosubmit_check
         if @autosubmit_interval
           last = @last_submit_time || @create_time
           self.submit if (Time.now - last).to_i >= @autosubmit_interval
         end
       end
-      
+
     end
-    
+
   end
 end

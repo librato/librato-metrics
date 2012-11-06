@@ -31,7 +31,7 @@ module Librato
         it "should allow chaining" do
           subject.add(:foo => 123).should == subject
         end
-        
+
         context "with single hash argument" do
           it "should record a key-value gauge" do
             expected = {:gauges => [{:name => 'foo', :value => 3000, :measure_time => @time}]}
@@ -71,18 +71,18 @@ module Librato
               :source => 'db2'}]}
             subject.queued.should equal_unordered(expected)
           end
-          
+
           context "with a prefix set" do
             it "should auto-prepend names" do
               subject = Queue.new(:prefix => 'foo')
               subject.add :bar => 1
               subject.add :baz => {:value => 23}
-              expected = {:gauges => [{:name =>'foo.bar', :value => 1, :measure_time => @time}, 
+              expected = {:gauges => [{:name =>'foo.bar', :value => 1, :measure_time => @time},
                                       {:name => 'foo.baz', :value => 23, :measure_time => @time}]}
               subject.queued.should equal_unordered(expected)
             end
           end
-          
+
           context "when dynamically changing prefix" do
             it "should auto-append names" do
               subject.add :bar => 12
@@ -94,7 +94,7 @@ module Librato
               subject.add :bar => 45
               expected = {:gauges => [
                 {:name => 'bar', :value => 12, :measure_time => @time},
-                {:name => 'foo.bar', :value => 23, :measure_time => @time}, 
+                {:name => 'foo.bar', :value => 23, :measure_time => @time},
                 {:name => 'foo.bar', :value => 34, :measure_time => @time},
                 {:name => 'bar', :value => 45, :measure_time => @time}]}
               subject.queued.should equal_unordered(expected)
@@ -111,26 +111,26 @@ module Librato
             subject.queued.should equal_unordered(expected)
           end
         end
-        
+
         context "with a measure_time" do
           it "should accept time objects" do
             time = Time.now-5
             subject.add :foo => {:measure_time => time, :value => 123}
             subject.queued[:gauges][0][:measure_time].should == time
           end
-          
+
           it "should accept integers" do
             time = 1336574713
             subject.add :foo => {:measure_time => time, :value => 123}
             subject.queued[:gauges][0][:measure_time].should == time
           end
-          
+
           it "should accept strings" do
             time = '1336574713'
             subject.add :foo => {:measure_time => time, :value => 123}
             subject.queued[:gauges][0][:measure_time].should == time
           end
-          
+
           it "should raise exception in invalid time" do
             lambda {
               subject.add :foo => {:measure_time => '12', :value => 123}
@@ -173,17 +173,17 @@ module Librato
           subject.gauges.should eql []
         end
       end
-      
+
       describe "#last_submit_time" do
         before(:all) do
           Librato::Metrics.authenticate 'me@librato.com', 'foo'
           Librato::Metrics.persistence = :test
         end
-        
+
         it "should default to nil" do
           subject.last_submit_time.should be_nil
         end
-        
+
         it "should store last submission time" do
           prior = Time.now
           subject.add :foo => 123
@@ -191,7 +191,7 @@ module Librato
           subject.last_submit_time.should >= prior
         end
       end
-      
+
       describe "#merge!" do
         context "with another queue" do
           it "should merge gauges" do
@@ -205,7 +205,7 @@ module Librato
                                   {:name=>"baz", :value=>678, :measure_time => @time}]}
             q2.queued.should equal_unordered(expected)
           end
-          
+
           it "should merge counters" do
             q1 = Queue.new
             q1.add :users => {:type => :counter, :value => 1000}
@@ -218,7 +218,7 @@ module Librato
                                     {:name=>"signups", :value=>500, :measure_time => @time}]}
             q2.queued.should equal_unordered(expected)
           end
-          
+
           it "should maintain specified sources" do
             q1 = Queue.new
             q1.add :neo => {:source => 'matrix', :value => 123}
@@ -226,7 +226,7 @@ module Librato
             q2.merge!(q1)
             q2.queued[:gauges][0][:source].should == 'matrix'
           end
-          
+
           it "should not change default source" do
             q1 = Queue.new(:source => 'matrix')
             q1.add :neo => 456
@@ -234,7 +234,7 @@ module Librato
             q2.merge!(q1)
             q2.queued[:source].should == 'red_pill'
           end
-          
+
           it "should track previous default source" do
             q1 = Queue.new(:source => 'matrix')
             q1.add :neo => 456
@@ -247,7 +247,7 @@ module Librato
               end
             end
           end
-          
+
           it "should handle empty cases" do
             q1 = Queue.new
             q1.add :foo => 123, :users => {:type => :counter, :value => 1000}
@@ -258,7 +258,7 @@ module Librato
             q2.queued.should == expected
           end
         end
-        
+
         context "with an aggregator" do
           it "should merge" do
             aggregator = Aggregator.new(:source => 'aggregator')
@@ -267,14 +267,14 @@ module Librato
             queue = Queue.new(:source => 'queue')
             queue.add :gauge => 42
             queue.merge!(aggregator)
-            expected = {:gauges=>[{:name=>"gauge", :value=>42, :measure_time=>@time}, 
+            expected = {:gauges=>[{:name=>"gauge", :value=>42, :measure_time=>@time},
                                   {:name=>"timing", :count=>2, :sum=>305.0, :min=>102.0, :max=>203.0, :source=>"aggregator"}],
                         :source=>'queue'}
             queue.queued.should equal_unordered(expected)
-            
+
           end
         end
-        
+
         context "with a hash" do
           it "should merge" do
             to_merge = {:gauges=>[{:name => 'foo', :value => 123}],
@@ -286,7 +286,7 @@ module Librato
           end
         end
       end
-      
+
       describe "#per_request" do
         it "should default to 500" do
           subject.per_request.should == 500

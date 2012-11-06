@@ -6,7 +6,7 @@ module Librato
 
     describe "#delete" do
       before(:each) { delete_all_metrics }
-      
+
       context "with a single argument" do
         it "should delete named metric" do
           Metrics.submit :foo => 123
@@ -15,7 +15,7 @@ module Librato
           Metrics.list(:name => :foo).should be_empty
         end
       end
-      
+
       context "with multiple arguments" do
         it "should delete named metrics" do
           Metrics.submit :foo => 123, :bar => 345, :baz => 567
@@ -25,7 +25,7 @@ module Librato
           Metrics.list(:name => :baz).should_not be_empty
         end
       end
-      
+
       context "with missing metric" do
         it "should run cleanly" do
           # the API currently returns success even if
@@ -33,7 +33,7 @@ module Librato
           Metrics.delete :missing
         end
       end
-      
+
       context "with no arguments" do
         it "should not make request" do
           lambda {
@@ -150,7 +150,7 @@ module Librato
           data['baz'][0]['value'] == 456.0
         end
       end
-      
+
       it "should not retain errors" do
         delete_all_metrics
         Metrics.submit :foo => {:type => :counter, :value => 12}
@@ -163,15 +163,15 @@ module Librato
       end
 
     end
-    
+
     describe "#update" do
-      
+
       context "with existing metric" do
         before do
           delete_all_metrics
           Metrics.submit :foo => 123
         end
-        
+
         it "should upate the metric" do
           Metrics.update :foo, :display_name => "Foo Metric",
                                :period => 15,
@@ -184,7 +184,7 @@ module Librato
           foo['attributes'].should == {'display_max' => 1000}
         end
       end
-      
+
       context "without an existing metric" do
         it "should create the metric if type specified" do
           delete_all_metrics
@@ -199,7 +199,7 @@ module Librato
           foo['period'].should == 15
           foo['attributes'].should == {'display_max' => 1000}
         end
-        
+
         it "should raise error if no type specified" do
           delete_all_metrics
           lambda {
@@ -211,7 +211,7 @@ module Librato
           }.should raise_error
         end
       end
-      
+
     end
 
   end

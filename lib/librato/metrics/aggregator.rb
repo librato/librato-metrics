@@ -6,7 +6,7 @@ module Librato
 
     class Aggregator
       SOURCE_SEPARATOR = '%%' # must not be in valid source name criteria
-      
+
       include Processor
 
       attr_reader :source
@@ -40,7 +40,7 @@ module Librato
         autosubmit_check
         self
       end
-      
+
       # Returns true if aggregate contains no measurements
       #
       # @return Boolean
@@ -80,6 +80,7 @@ module Librato
 
         req = { :gauges => gauges }
         req[:source] = @source if @source
+        #req[:measure_time] = @measure_time if @measure_time
 
         req
       end

@@ -6,37 +6,37 @@ require 'metrics/middleware/retry'
 
 module Librato
   module Metrics
-    
+
     class Connection
       extend Forwardable
-      
-      DEFAULT_API_ENDPOINT = 'https://metrics-api.librato.com'      
-      
+
+      DEFAULT_API_ENDPOINT = 'https://metrics-api.librato.com'
+
       def_delegators :transport, :get, :post, :head, :put, :delete,
                                  :build_url
-            
+
       def initialize(options={})
         @client = options[:client]
         @api_endpoint = options[:api_endpoint]
       end
-      
+
       # API endpoint that will be used for requests.
       #
       def api_endpoint
         @api_endpoint || DEFAULT_API_ENDPOINT
       end
-      
+
       def transport
         raise(NoClientProvided, "No client provided.") unless @client
         @transport ||= Faraday::Connection.new(:url => api_endpoint + "/v1/") do |f|
           #f.use FaradayMiddleware::EncodeJson
           f.use Librato::Metrics::Middleware::RequestBody
           f.use Librato::Metrics::Middleware::Retry
-          f.use Librato::Metrics::Middleware::CountRequests 
-          
+          f.use Librato::Metrics::Middleware::CountRequests
+
           f.use Librato::Metrics::Middleware::ExpectsStatus
           #f.use FaradayMiddleware::ParseJson, :content_type => /\bjson$/
-          
+
           f.adapter Faraday.default_adapter
         end.tap do |transport|
           transport.headers[:user_agent] = user_agent
@@ -44,7 +44,7 @@ module Librato
           transport.basic_auth @client.email, @client.api_key
         end
       end
-      
+
       # User-agent used when making requests.
       #
       def user_agent
@@ -61,7 +61,7 @@ module Librato
         #ua_chunks << "(#{transport_adapter})"
         ua_chunks.join(' ')
       end
-      
+
     private
 
       def adapter_version
@@ -82,17 +82,17 @@ module Librato
         return RUBY_ENGINE if Object.constants.include?(:RUBY_ENGINE)
         RUBY_DESCRIPTION.split[0]
       end
-      
+
       # figure out which adapter faraday is using
       def transport_adapter
         transport.builder.handlers.each do |handler|
           if handler.name[0,16] == "Faraday::Adapter"
             return handler.name[18..-1]
-          end 
+          end
         end
       end
-      
+
     end
-    
+
   end
 end

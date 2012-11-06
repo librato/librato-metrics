@@ -71,7 +71,7 @@ module Librato
       def gauges
         @queued[:gauges] || []
       end
-      
+
       # Combines queueable measures from the given object
       # into this queue.
       #
@@ -118,15 +118,15 @@ module Librato
         self.queued.inject(0) { |result, data| result + data.last.size }
       end
       alias :length :size
-      
+
     private
-    
+
       def check_measure_time(data)
         if data[:measure_time].to_i < Metrics::MIN_MEASURE_TIME
           raise InvalidMeasureTime, "Measure time for submitted metric (#{data}) is invalid."
         end
       end
-    
+
       def reconcile_source(measurements, source)
         return measurements if !source || source == @source
         measurements.map! do |measurement|
@@ -137,7 +137,7 @@ module Librato
         end
         measurements
       end
-    
+
       def submit_check
         autosubmit_check # in Processor
         if @autosubmit_count && self.length >= @autosubmit_count

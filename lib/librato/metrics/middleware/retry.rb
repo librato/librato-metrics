@@ -2,9 +2,9 @@
 module Librato
   module Metrics
     module Middleware
-      
+
       class Retry < Faraday::Middleware
-        
+
         def initialize(app, retries = 3)
           @retries = retries
           super(app)
@@ -21,9 +21,9 @@ module Librato
             raise
           end
         end
-        
+
       end
-    
+
     end
   end
 end

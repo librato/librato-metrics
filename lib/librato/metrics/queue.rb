@@ -108,6 +108,7 @@ module Librato
         return {} if @queued.empty?
         globals = {}
         globals[:source] = @source if @source
+        globals[:measure_time] = @measure_time if @measure_time
         @queued.merge(globals)
       end
 

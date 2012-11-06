@@ -293,6 +293,21 @@ module Librato
         end
       end
 
+      describe "#queued" do
+        it "should include global source if set" do
+          q = Queue.new(:source => 'blah')
+          q.add :foo => 12
+          q.queued[:source].should == 'blah'
+        end
+
+        it "should include global measure_time if set" do
+          measure_time = (Time.now-1000).to_i
+          q = Queue.new(:measure_time => measure_time)
+          q.add :foo => 12
+          q.queued[:measure_time].should == measure_time
+        end
+      end
+
       describe "#size" do
         it "should return empty if gauges and counters are emtpy" do
           subject.size.should eq 0

@@ -7,7 +7,7 @@ module Librato
 
       before(:each) do
         @time = Time.now.to_i
-        Queue.stub(:epoch_time).and_return(@time)
+        Processor.stub(:epoch_time).and_return(@time)
       end
 
       describe "initialization" do

@@ -14,7 +14,7 @@ module Librato
         # expects 200
         url = connection.build_url(path, query)
         response = connection.get(url)
-        parsed = MultiJson.load(response.body)
+        parsed = SmartJSON.read(response.body)
         results = parsed["metrics"]
         return results if parsed["query"]["found"] <= MAX_RESULTS
         query[:offset] = MAX_RESULTS
@@ -22,7 +22,7 @@ module Librato
           # expects 200
           url = connection.build_url(path, query)
           response = connection.get(url)
-          parsed = MultiJson.load(response.body)
+          parsed = SmartJSON.read(response.body)
           results.push(*parsed["metrics"])
           query[:offset] += MAX_RESULTS
         end while query[:offset] < parsed["query"]["found"]

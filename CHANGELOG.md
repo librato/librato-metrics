@@ -2,7 +2,7 @@
 
 ### Version 0.7.4
 * Support global measure_time option for Queues/Aggregators
-* Support all versions of multi_json so we can relax version constraint_
+* Support all versions of multi_json so we can relax version constraint
 
 ### Version 0.7.3
 * Allow prefixes to be changed after instantiation on Queues/Aggregators

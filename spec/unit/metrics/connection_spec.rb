@@ -4,21 +4,21 @@ module Librato
   module Metrics
 
     describe Connection do
-      
+
       describe "#api_endpoint" do
         context "when not provided" do
           it "should be default" do
             subject.api_endpoint.should == 'https://metrics-api.librato.com'
           end
         end
-        
+
         context "when provided" do
           it "should be respected" do
             connection = Connection.new(:api_endpoint => 'http://test.com/')
             connection.api_endpoint.should == 'http://test.com/'
           end
         end
-      end  
+      end
 
       describe "#user_agent" do
         context "without an agent_identifier" do
@@ -36,7 +36,7 @@ module Librato
             connection.user_agent.should start_with('foo/0.5')
           end
         end
-        
+
         context "with a custom user agent set" do
           it "should use custom user agent" do
             client = Client.new
@@ -45,17 +45,17 @@ module Librato
             connection.user_agent.should == 'foo agent'
           end
         end
-        
+
         # TODO: verify user agent is being sent with rackup test
       end
-      
+
       describe "network operations" do
         context "when missing client" do
           it "should raise exception" do
             lambda { subject.get 'metrics' }.should raise_error(NoClientProvided)
           end
         end
-        
+
         context "with 400 class errors" do
           it "should not retry" do
             Middleware::CountRequests.reset
@@ -73,7 +73,7 @@ module Librato
             Middleware::CountRequests.total_requests.should == 2
           end
         end
-        
+
         context "with 500 class errors" do
           it "should retry" do
             Middleware::CountRequests.reset
@@ -89,8 +89,8 @@ module Librato
           end
         end
       end
-      
+
     end
-    
+
   end
 end

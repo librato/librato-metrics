@@ -59,7 +59,7 @@ module Librato
         raise CredentialsMissing unless (self.email and self.api_key)
         @connection ||= Connection.new(:client => self, :api_endpoint => api_endpoint)
       end
-      
+
       # Overrride user agent for this client's connections. If you
       # are trying to specify an agent identifier for developer
       # program, see #agent_identifier.
@@ -68,17 +68,17 @@ module Librato
         @user_agent = agent
         @connection = nil
       end
-      
+
       def custom_user_agent
         @user_agent
       end
-      
+
       # Completely delete metrics with the given names. Be
       # careful with this, this is instant and permanent.
       #
       # @example Delete metric 'temperature'
       #   Librato::Metrics.delete :temperature
-      # 
+      #
       # @example Delete metrics 'foo' and 'bar'
       #   Librato::Metrics.delete :foo, :bar
       def delete(*metric_names)
@@ -87,7 +87,7 @@ module Librato
         params = {:names => metric_names }
         connection.delete do |request|
           request.url connection.build_url("metrics")
-          request.body = MultiJson.dump(params)
+          request.body = SmartJSON.write(params)
         end
         # expects 204, middleware will raise exception
         # otherwise.
@@ -137,7 +137,7 @@ module Librato
         # expects 200
         url = connection.build_url("metrics/#{metric}", query)
         response = connection.get(url)
-        parsed = MultiJson.load(response.body)
+        parsed = SmartJSON.read(response.body)
         # TODO: pagination support
         query.empty? ? parsed : parsed["measurements"]
       end
@@ -198,13 +198,13 @@ module Librato
       # Submit all queued metrics.
       #
       def submit(args)
-        @queue ||= Queue.new(:client => self, 
-                             :skip_measurement_times => true, 
+        @queue ||= Queue.new(:client => self,
+                             :skip_measurement_times => true,
                              :clear_failures => true)
         @queue.add args
         @queue.submit
       end
-      
+
       # Update metric with the given name.
       #
       # @example Update metric 'temperature'
@@ -216,7 +216,7 @@ module Librato
       def update(metric, options = {})
         connection.put do |request|
           request.url connection.build_url("metrics/#{metric}")
-          request.body = MultiJson.dump(options)
+          request.body = SmartJSON.write(options)
         end
       end
 

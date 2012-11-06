@@ -11,6 +11,7 @@ require 'metrics/connection'
 require 'metrics/errors'
 require 'metrics/persistence'
 require 'metrics/queue'
+require 'metrics/smart_json'
 require 'metrics/version'
 
 module Librato
@@ -69,8 +70,8 @@ module Librato
     # Expose class methods of Simple via Metrics itself.
     #
     def_delegators :client, :agent_identifier, :api_endpoint,
-                   :api_endpoint=, :authenticate, :connection, :delete, 
-                   :fetch, :list, :persistence, :persistence=, :persister, 
+                   :api_endpoint=, :authenticate, :connection, :delete,
+                   :fetch, :list, :persistence, :persistence=, :persister,
                    :submit, :update
 
     # The Librato::Metrics::Client being used by module-level

@@ -13,6 +13,24 @@ module Librato
        end
      end
    end
+   
+   describe "#faraday_adapter" do
+     it "should return current default adapter" do
+       Metrics.faraday_adapter.should_not be nil
+     end
+   end
+   
+   describe "#faraday_adapter=" do
+     before(:all) { @current_adapter = Metrics.faraday_adapter }
+     after(:all) { Metrics.faraday_adapter = @current_adapter }
+     
+     it "should allow setting of faraday adapter" do
+       Metrics.faraday_adapter = :excon
+       Metrics.faraday_adapter.should == :excon
+       Metrics.faraday_adapter = :patron
+       Metrics.faraday_adapter.should == :patron
+     end
+   end
 
    describe "#persistence" do
      it "should allow configuration of persistence method" do

@@ -67,7 +67,9 @@ module Librato
     PLURAL_TYPES = [:counters, :gauges]
     MIN_MEASURE_TIME = (Time.now-(3600*24*365)).to_i
 
-    # Expose class methods of Simple via Metrics itself.
+    # Most of the singleton methods of Librato::Metrics are actually
+    # being called on a global Client instance. See further docs on
+    # Client.
     #
     def_delegators :client, :agent_identifier, :api_endpoint,
                    :api_endpoint=, :authenticate, :connection, :delete,

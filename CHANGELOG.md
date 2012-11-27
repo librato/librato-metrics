@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 0.7.5
+* Catch a broader range of connection failures for retrying
+* Add Metrics.faraday_adapter config option (Mathieu Ravaux)_
+
 ### Version 0.7.4
 * Support global measure_time option for Queues/Aggregators
 * Support all versions of multi_json so we can relax version constraint

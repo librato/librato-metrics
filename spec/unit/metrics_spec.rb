@@ -5,7 +5,6 @@ module Librato
   describe Metrics do
 
    describe "#authorize" do
-
      context "when given two arguments" do
        it "should store them on simple" do
          Metrics.authenticate 'tester@librato.com', 'api_key'
@@ -13,16 +12,13 @@ module Librato
          Metrics.client.api_key.should == 'api_key'
        end
      end
-
    end
 
    describe "#persistence" do
-
      it "should allow configuration of persistence method" do
        Metrics.persistence = :test
        Metrics.persistence.should == :test
      end
-
    end
 
    describe "#submit" do
@@ -43,7 +39,6 @@ module Librato
        expected = {:gauges => [{:name => 'foo', :value => 123}, {:name => 'bar', :value => 456}]}
        Librato::Metrics.persister.persisted.should equal_unordered(expected)
      end
-
    end
 
   end

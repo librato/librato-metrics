@@ -2,7 +2,7 @@
 
 ### Version 0.7.5
 * Catch a broader range of connection failures for retrying
-* Add Metrics.faraday_adapter config option (Mathieu Ravaux)_
+* Add Metrics.faraday_adapter config option (Mathieu Ravaux)
 
 ### Version 0.7.4
 * Support global measure_time option for Queues/Aggregators

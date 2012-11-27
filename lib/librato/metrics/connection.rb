@@ -18,6 +18,7 @@ module Librato
       def initialize(options={})
         @client = options[:client]
         @api_endpoint = options[:api_endpoint]
+        @adapter = options[:adapter]
       end
 
       # API endpoint that will be used for requests.
@@ -37,7 +38,7 @@ module Librato
           f.use Librato::Metrics::Middleware::ExpectsStatus
           #f.use FaradayMiddleware::ParseJson, :content_type => /\bjson$/
 
-          f.adapter Faraday.default_adapter
+          f.adapter @adapter || Metrics.faraday_adapter
         end.tap do |transport|
           transport.headers[:user_agent] = user_agent
           transport.headers[:content_type] = 'application/json'

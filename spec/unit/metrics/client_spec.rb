@@ -67,6 +67,23 @@ module Librato
           lambda{ subject.connection }.should raise_error(Librato::Metrics::CredentialsMissing)
         end
       end
+      
+      describe "#faraday_adapter" do
+        it "should default to Metrics default adapter" do
+          Metrics.faraday_adapter = :typhoeus
+          Client.new.faraday_adapter.should == Metrics.faraday_adapter
+          Metrics.faraday_adapter = nil
+        end
+      end
+   
+      describe "#faraday_adapter=" do
+        it "should allow setting of faraday adapter" do
+          subject.faraday_adapter = :excon
+          subject.faraday_adapter.should == :excon
+          subject.faraday_adapter = :patron
+          subject.faraday_adapter.should == :patron
+        end
+      end
 
       describe "#new_queue" do
         it "should return a new queue with client set" do

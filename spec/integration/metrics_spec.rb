@@ -4,6 +4,45 @@ module Librato
   describe Metrics do
     before(:all) { prep_integration_tests }
 
+    describe "#annotate" do
+      before(:all) { @annotator = Metrics::Annotator.new }
+      before(:each) { delete_all_annotations }
+
+      it "should create new annotation" do
+        Metrics.annotate :deployment, "deployed v68"
+        annos = @annotator.fetch(:deployment, :start_time => Time.now.to_i-60)
+        annos["events"]["unassigned"].length.should == 1
+        annos["events"]["unassigned"][0]["title"].should == 'deployed v68'
+      end
+      it "should support sources" do
+        Metrics.annotate :deployment, 'deployed v69', :source => 'box1'
+        annos = @annotator.fetch(:deployment, :start_time => Time.now.to_i-60)
+        annos["events"]["box1"].length.should == 1
+        first = annos["events"]["box1"][0]
+        first['title'].should == 'deployed v69'
+      end
+      it "should support start and end times" do
+        start_time = Time.now.to_i-120
+        end_time = Time.now.to_i-30
+        Metrics.annotate :deployment, 'deployed v70', :start_time => start_time,
+                    :end_time => end_time
+        annos = @annotator.fetch(:deployment, :start_time => Time.now.to_i-180)
+        annos["events"]["unassigned"].length.should == 1
+        first = annos["events"]["unassigned"][0]
+        first['title'].should == 'deployed v70'
+        first['start_time'].should == start_time
+        first['end_time'].should == end_time
+      end
+      it "should support description" do
+        Metrics.annotate :deployment, 'deployed v71', :description => 'deployed foobar!'
+        annos = @annotator.fetch(:deployment, :start_time => Time.now.to_i-180)
+        annos["events"]["unassigned"].length.should == 1
+        first = annos["events"]["unassigned"][0]
+        first['title'].should == 'deployed v71'
+        first['description'].should == 'deployed foobar!'
+      end
+    end
+
     describe "#delete" do
       before(:each) { delete_all_metrics }
 

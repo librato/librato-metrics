@@ -5,6 +5,7 @@ require 'base64'
 require 'multi_json'
 
 require 'metrics/aggregator'
+require 'metrics/annotator'
 require 'metrics/client'
 require 'metrics/collection'
 require 'metrics/connection'
@@ -73,8 +74,8 @@ module Librato
     #
     def_delegators :client, :agent_identifier, :api_endpoint,
                    :api_endpoint=, :authenticate, :connection, :delete,
-                   :faraday_adapter, :faraday_adapter=, :fetch, :list, 
-                   :persistence, :persistence=, :persister, :submit, 
+                   :faraday_adapter, :faraday_adapter=, :fetch, :list,
+                   :persistence, :persistence=, :persister, :submit,
                    :update
 
     # The Librato::Metrics::Client being used by module-level

@@ -14,6 +14,25 @@ module Librato
           annos["events"]["unassigned"].length.should == 1
           annos["events"]["unassigned"][0]["title"].should == 'deployed v68'
         end
+        it "should support sources" do
+          subject.add :deployment, 'deployed v69', :source => 'box1'
+          annos = subject.fetch(:deployment, :start_time => Time.now.to_i-60)
+          annos["events"]["box1"].length.should == 1
+          first = annos["events"]["box1"][0]
+          first['title'].should == 'deployed v69'
+        end
+        it "should support start and end times" do
+          start_time = Time.now.to_i-120
+          end_time = Time.now.to_i-30
+          subject.add :deployment, 'deployed v70', :start_time => start_time,
+                      :end_time => end_time
+          annos = subject.fetch(:deployment, :start_time => Time.now.to_i-180)
+          annos["events"]["unassigned"].length.should == 1
+          first = annos["events"]["unassigned"][0]
+          first['title'].should == 'deployed v70'
+          first['start_time'].should == start_time
+          first['end_time'].should == end_time
+        end
       end
 
       describe "#delete" do

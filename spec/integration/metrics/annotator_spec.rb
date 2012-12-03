@@ -55,8 +55,15 @@ module Librato
       end
 
       describe "#fetch" do
-        it "should return annotations" do
-
+        it "should return stream properties" do
+          subject.add :backups, "backup 21"
+          properties = subject.fetch :backups
+          properties['name'].should == 'backups'
+        end
+        it "should return exception if annotation is missing" do
+          lambda {
+            subject.fetch :backups
+          }.should raise_error(Metrics::NotFound)
         end
       end
 

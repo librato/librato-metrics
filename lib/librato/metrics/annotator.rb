@@ -20,6 +20,10 @@ module Librato::Metrics
     # @example Annotation with a specific source
     #   annotator.add :deployments, 'deployed v60', :source => 'app12'
     #
+    # @example Annotation with a description
+    #   annotator.add :deployments, 'deployed v61',
+    #                 :description => '9b562b2: shipped new feature foo!'
+    #
     def add(stream, title, options={})
       options[:title] = title
       payload = SmartJSON.write(options)

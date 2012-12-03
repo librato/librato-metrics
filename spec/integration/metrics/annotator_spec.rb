@@ -33,6 +33,14 @@ module Librato
           first['start_time'].should == start_time
           first['end_time'].should == end_time
         end
+        it "should support description" do
+          subject.add :deployment, 'deployed v71', :description => 'deployed foobar!'
+          annos = subject.fetch(:deployment, :start_time => Time.now.to_i-180)
+          annos["events"]["unassigned"].length.should == 1
+          first = annos["events"]["unassigned"][0]
+          first['title'].should == 'deployed v71'
+          first['description'].should == 'deployed foobar!'
+        end
       end
 
       describe "#delete" do

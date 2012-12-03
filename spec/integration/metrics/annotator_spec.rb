@@ -116,16 +116,6 @@ module Librato
         end
       end
 
-      private
-
-      def delete_all_annotations
-        streams = subject.list
-        if streams['annotations']
-          names = streams['annotations'].map{|s| s['name']}
-          names.each { |name| subject.delete name}
-        end
-      end
-
     end
 
   end

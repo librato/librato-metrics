@@ -61,11 +61,11 @@ module Librato::Metrics
     #   annotator.fetch :deployments, :start_time => start, :end_time => end
     #
     # @example Source-limited listing
-    #   annotator.fetch :deployments, :sources => ['foo','bar','baz']
+    #   annotator.fetch :deployments, :sources => ['foo','bar','baz'],
+    #                   :start_time => start, :end_time => end
     #
     def fetch(stream, options={})
-      url = connection.build_url("annotations/#{stream}", options)
-      response = connection.get(url)
+      response = connection.get("annotations/#{stream}", options)
       SmartJSON.read(response.body)
     end
 

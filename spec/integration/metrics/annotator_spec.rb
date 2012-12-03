@@ -55,11 +55,35 @@ module Librato
       end
 
       describe "#fetch" do
-        it "should return stream properties" do
-          subject.add :backups, "backup 21"
-          properties = subject.fetch :backups
-          properties['name'].should == 'backups'
+        context "without a time frame" do
+          it "should return stream properties" do
+            subject.add :backups, "backup 21"
+            properties = subject.fetch :backups
+            properties['name'].should == 'backups'
+          end
         end
+
+        context "with a time frame" do
+          it "should return set of annotations" do
+            subject.add :backups, "backup 22"
+            subject.add :backups, "backup 23"
+            annos = subject.fetch :backups, :start_time => Time.now.to_i-60
+            events = annos['events']['unassigned']
+            events[0]['title'].should == 'backup 22'
+            events[1]['title'].should == 'backup 23'
+          end
+          it "should respect source limits" do
+            subject.add :backups, "backup 24", :source => 'server_1'
+            subject.add :backups, "backup 25", :source => 'server_2'
+            subject.add :backups, "backup 26", :source => 'server_3'
+            annos = subject.fetch :backups, :start_time => Time.now.to_i-60,
+                                  :sources => %w{server_1 server_3}
+            annos['events']['server_1'].should_not be_nil
+            annos['events']['server_2'].should be_nil
+            annos['events']['server_3'].should_not be_nil
+          end
+        end
+
         it "should return exception if annotation is missing" do
           lambda {
             subject.fetch :backups

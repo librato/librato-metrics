@@ -153,7 +153,7 @@ More fine-grained control of annotations is available via the `Annotator` object
     # delete an event
     annotator.delete_event 'deployments', 23
 
-See the documentation of `Annotator` for more details.
+See the documentation of `Annotator` for more details and examples of use.
 
 ## Auto-Submitting Metrics
 

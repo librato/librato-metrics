@@ -27,7 +27,7 @@ module Librato
       #
       # @return Boolean
       def submit
-        raise(NoMetricsQueued, "No metrics queued.") if self.queued.empty?
+        return true if self.queued.empty?
         options = {:per_request => @per_request}
         if persister.persist(self.client, self.queued, options)
           @last_submit_time = Time.now

@@ -2,6 +2,10 @@ module Librato
   module Metrics
 
     class Client
+      extend Forwardable
+
+      def_delegator :annotator, :add, :annotate
+
       attr_accessor :email, :api_key
 
       # Provide agent identifier for the developer program. See:
@@ -24,6 +28,10 @@ module Librato
           raise ArgumentError, 'invalid arguments, see method documentation'
         end
         @agent_identifier ||= ''
+      end
+
+      def annotator
+        @annotator ||= Annotator.new(:client => self)
       end
 
       # API endpoint to use for queries and direct
@@ -57,7 +65,7 @@ module Librato
       def connection
         # prevent successful creation if no credentials set
         raise CredentialsMissing unless (self.email and self.api_key)
-        @connection ||= Connection.new(:client => self, :api_endpoint => api_endpoint, 
+        @connection ||= Connection.new(:client => self, :api_endpoint => api_endpoint,
                                        :adapter => faraday_adapter)
       end
 
@@ -94,14 +102,14 @@ module Librato
         # otherwise.
         true
       end
-      
+
       # Return current adapter this client will use.
       # Defaults to Metrics.faraday_adapter if set, otherwise
       # Faraday.default_adapter
       def faraday_adapter
         @faraday_adapter ||= default_faraday_adapter
       end
-      
+
       # Set faraday adapter this client will use
       def faraday_adapter=(adapter)
         @faraday_adapter = adapter
@@ -234,7 +242,7 @@ module Librato
       end
 
     private
-    
+
       def default_faraday_adapter
         if Metrics.client == self
           Faraday.default_adapter

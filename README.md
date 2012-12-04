@@ -257,4 +257,4 @@ The `librato-metrics` gem currently does not do internal locking for thread safe
 
 ## Copyright
 
-Copyright (c) 2011-2012 [Librato Inc.](http://librato.com) See LICENSE for details.
+Copyright (c) 2011-2013 [Librato Inc.](http://librato.com) See LICENSE for details.

@@ -54,6 +54,23 @@ module Librato
         end
       end
 
+      describe "#delete_event" do
+        it "should remove an annotation event" do
+          subject.add :deployment, 'deployed v46'
+          subject.add :deployment, 'deployed v47'
+          events = subject.fetch(:deployment, :start_time => Time.now.to_i-60)
+          events = events['events']['unassigned']
+          ids = events.each_with_object({}) do |event, hash|
+            hash[event['title']] = event['id']
+          end
+          subject.delete_event :deployment, ids['deployed v47']
+          events = subject.fetch(:deployment, :start_time => Time.now.to_i-60)
+          events = events['events']['unassigned']
+          events.length.should == 1
+          events[0]['title'].should == 'deployed v46'
+        end
+      end
+
       describe "#fetch" do
         context "without a time frame" do
           it "should return stream properties" do

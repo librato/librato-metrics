@@ -39,7 +39,7 @@ module Librato::Metrics
       client.connection
     end
 
-    # Delete one or more annotation streams
+    # Delete an annotation streams
     #
     # @example Delete 'deployment' annotation stream
     #  annotator.delete :deployment
@@ -47,6 +47,19 @@ module Librato::Metrics
     def delete(stream)
       connection.delete do |request|
         request.url connection.build_url("annotations/#{stream}")
+      end
+      # expects 204, middleware will raise exception otherwise
+      true
+    end
+
+    # Delete an event from a given annotation stream
+    #
+    # @example Delete event with id 42 from 'deployment'
+    #   annotator.delete_event :deployment, 42
+    #
+    def delete_event(stream, id)
+      connection.delete do |request|
+        request.url connection.build_url("annotations/#{stream}/#{id}")
       end
       # expects 204, middleware will raise exception otherwise
       true

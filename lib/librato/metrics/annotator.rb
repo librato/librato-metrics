@@ -26,6 +26,12 @@ module Librato::Metrics
     #
     def add(stream, title, options={})
       options[:title] = title
+      if options[:start_time]
+        options[:start_time] = options[:start_time].to_i
+      end
+      if options[:end_time]
+        options[:end_time] = options[:end_time].to_i
+      end
       payload = SmartJSON.write(options)
       # expects 200
       connection.post("annotations/#{stream}", payload)

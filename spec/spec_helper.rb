@@ -21,6 +21,16 @@ RSpec.configure do |config|
     end
   end
 
+  # purge all annotations from test account
+  def delete_all_annotations
+    annotator = Librato::Metrics::Annotator.new
+    streams = annotator.list
+    if streams['annotations']
+      names = streams['annotations'].map{|s| s['name']}
+      names.each { |name| annotator.delete name}
+    end
+  end
+
   # set up test account credentials for integration tests
   def prep_integration_tests
     raise 'no TEST_API_USER specified in environment' unless ENV['TEST_API_USER']

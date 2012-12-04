@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.0.0
+* Add support for annotation submission, listing, management
+* Auto-convert Time objects anywhere a time is accepted
+* Don't raise exception anymore for empty queue submission
+
 ### Version 0.7.5
 * Catch a broader range of connection failures for retrying
 * Add Metrics.faraday_adapter config option (Mathieu Ravaux)

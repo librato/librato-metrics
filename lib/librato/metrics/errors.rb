@@ -5,7 +5,6 @@ module Librato
     class MetricsError < StandardError; end
 
     class CredentialsMissing < MetricsError; end
-    class NoMetricsQueued < MetricsError; end
     class NoMetricsProvided < MetricsError; end
     class NoClientProvided < MetricsError; end
     class InvalidMeasureTime < MetricsError; end

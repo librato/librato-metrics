@@ -14,13 +14,13 @@ In your shell:
 Then, in your application or script:
 
     require 'librato/metrics'
-    
+
 ### Optional steps
 
 For best performance we recommend installing [yajl-ruby](https://github.com/brianmario/yajl-ruby):
 
     gem install yajl-ruby
-    
+
 If you are using jruby, you need to ensure [jruby-openssl](https://github.com/jruby/jruby-ossl) is available:
 
     gem install jruby-openssl
@@ -52,18 +52,18 @@ Queue up a simple gauge metric named `temperature`:
 
     queue = Librato::Metrics::Queue.new
     queue.add :temperature => 32.2
-    
+
 While symbols are used by convention for metric names, strings will work just as well:
 
 	queue.add 'myapp.request_time' => 86.7
 
-If you are tracking measurements over several seconds/minutes, the queue will handle storing measurement time for you (otherwise all metrics will be recorded as measured when they are submitted). 
+If you are tracking measurements over several seconds/minutes, the queue will handle storing measurement time for you (otherwise all metrics will be recorded as measured when they are submitted).
 
 If you want to specify a time other than queuing time for the measurement:
 
 	# use a epoch integer
 	queue.add :humidity => {:measure_time => 1336508422, :value => 48.2}
-	
+
 	# use a Time object to correct for a 5 second delay
 	queue.add :humidity => {:measure_time => Time.now-5, :value => 37.6}
 
@@ -125,23 +125,23 @@ If you need extra attributes for a `Queue` timing measurement, simply add them o
     queue.time :my_measurement, :source => 'app1' do
       # do work...
     end
-    
+
 ## Auto-Submitting Metrics
 
 Both `Queue` and `Aggregator` support automatically submitting measurements on a given time interval:
 
 	# submit once per minute
 	timed_queue = Librato::Metrics::Queue.new(:autosubmit_interval => 60)
-	
+
 	# submit every 5 minutes
 	timed_aggregator = Librato::Metrics::Aggregator.new(:autosubmit_interval => 300)
-	
+
 `Queue` also supports auto-submission based on measurement volume:
 
 	# submit when the 400th measurement is queued
 	volume_queue = Librato::Metrics::Queue.new(:autosubmit_count => 400)
 
-These options can also be combined for more flexible behavior. 
+These options can also be combined for more flexible behavior.
 
 Both options are driven by the addition of measurements. Specifically for time-based autosubmission if you are adding measurements irregularly (less than once per second), submission may lag past your specified interval until the next measurement is added.
 
@@ -181,7 +181,7 @@ If you ever need to remove a metric and all of its measurements, doing so is eas
 
 	# Delete the metrics 'temperature' and 'humidity'
 	Librato::Metrics.delete :temperature, :humidity
-	
+
 Note that deleted metrics and their measurements are unrecoverable, so use with care.
 
 ## Using Multiple Accounts Simultaneously
@@ -190,7 +190,7 @@ If you need to use metrics with multiple sets of authentication credentials simu
 
     joe = Librato::Metrics::Client.new
     joe.authenticate 'email1', 'api_key1'
-    
+
     mike = Librato::Metrics::Client.new
     mike.authenticate 'email2', 'api_key2'
 
@@ -198,16 +198,16 @@ All of the same operations you can call directly from `Librato::Metrics` are ava
 
 	# list Joe's metrics
 	joe.list
-	
-	# fetch the last 20 data points for Mike's metric, humidity 
+
+	# fetch the last 20 data points for Mike's metric, humidity
 	mike.fetch :humidity, :count => 20
-	
+
 There are two ways to associate a new queue with a client:
 
 	# these are functionally equivalent
 	joe_queue = Librato::Metrics::Queue.new(:client => joe)
 	joe_queue = joe.new_queue
-    
+
 Once the queue is associated you can use it normally:
 
 	joe_queue.add :temperature => {:source => 'sf', :value => 65.2}

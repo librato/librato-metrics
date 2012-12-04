@@ -33,6 +33,7 @@ module Librato
           end
           type = ("#{type}s").to_sym
           if metric[:measure_time]
+            metric[:measure_time] = metric[:measure_time].to_i
             check_measure_time(metric)
           elsif !skip_measurement_times
             metric[:measure_time] = epoch_time
@@ -123,7 +124,7 @@ module Librato
     private
 
       def check_measure_time(data)
-        if data[:measure_time].to_i < Metrics::MIN_MEASURE_TIME
+        if data[:measure_time] < Metrics::MIN_MEASURE_TIME
           raise InvalidMeasureTime, "Measure time for submitted metric (#{data}) is invalid."
         end
       end

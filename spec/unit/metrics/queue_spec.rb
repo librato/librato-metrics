@@ -67,7 +67,7 @@ module Librato
               :description => 'current disk utilization', :measure_time => measure_time,
               :source => 'db2'}
             expected = {:gauges => [{:value => 35.4, :name => 'disk_use', :period => 2,
-              :description => 'current disk utilization', :measure_time => measure_time,
+              :description => 'current disk utilization', :measure_time => measure_time.to_i,
               :source => 'db2'}]}
             subject.queued.should equal_unordered(expected)
           end
@@ -116,7 +116,7 @@ module Librato
           it "should accept time objects" do
             time = Time.now-5
             subject.add :foo => {:measure_time => time, :value => 123}
-            subject.queued[:gauges][0][:measure_time].should == time
+            subject.queued[:gauges][0][:measure_time].should == time.to_i
           end
 
           it "should accept integers" do
@@ -128,7 +128,7 @@ module Librato
           it "should accept strings" do
             time = '1336574713'
             subject.add :foo => {:measure_time => time, :value => 123}
-            subject.queued[:gauges][0][:measure_time].should == time
+            subject.queued[:gauges][0][:measure_time].should == time.to_i
           end
 
           it "should raise exception in invalid time" do

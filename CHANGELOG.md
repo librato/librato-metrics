@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 1.0.1
+* Fix Forwardable dependency loading bug
+
 ### Version 1.0.0
 * Add support for annotation submission, listing, management
 * Auto-convert Time objects anywhere a time is accepted

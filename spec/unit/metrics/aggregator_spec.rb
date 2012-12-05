@@ -5,8 +5,8 @@ module Librato
     describe Aggregator do
 
       before(:all) do
-        @time = Time.now.to_i
-        Aggregator.stub(:epoch_time).and_return(@time)
+        @time = 1354720160 #Time.now.to_i
+        Aggregator.any_instance.stub(:epoch_time).and_return(@time)
       end
 
       describe "initialization" do

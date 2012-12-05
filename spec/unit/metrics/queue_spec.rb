@@ -6,8 +6,8 @@ module Librato
     describe Queue do
 
       before(:each) do
-        @time = Time.now.to_i
-        Processor.stub(:epoch_time).and_return(@time)
+        @time = 1354720160 #Time.now.to_i
+        Queue.any_instance.stub(:epoch_time).and_return(@time)
       end
 
       describe "initialization" do

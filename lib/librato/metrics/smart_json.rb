@@ -10,15 +10,17 @@ module Librato
           def read(json)
             MultiJson.load(json)
           end
-
-          def write(data)
-            MultiJson.dump(data)
-          end
         else
           def read(json)
             MultiJson.decode(json)
           end
+        end
 
+        if MultiJson.respond_to?(:dump)
+          def write(data)
+            MultiJson.dump(data)
+          end
+        else
           def write(data)
             MultiJson.encode(data)
           end

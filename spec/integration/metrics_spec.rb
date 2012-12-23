@@ -211,7 +211,7 @@ module Librato
           Metrics.submit :foo => 123
         end
 
-        it "should upate the metric" do
+        it "should update the metric" do
           Metrics.update :foo, :display_name => "Foo Metric",
                                :period => 15,
                                :attributes => {
@@ -220,7 +220,7 @@ module Librato
           foo = Metrics.fetch :foo
           foo['display_name'].should == 'Foo Metric'
           foo['period'].should == 15
-          foo['attributes'].should == {'display_max' => 1000}
+          foo['attributes']['display_max'].should == 1000
         end
       end
 
@@ -236,7 +236,7 @@ module Librato
           foo = Metrics.fetch :foo
           foo['display_name'].should == 'Foo Metric'
           foo['period'].should == 15
-          foo['attributes'].should == {'display_max' => 1000}
+          foo['attributes']['display_max'].should == 1000
         end
 
         it "should raise error if no type specified" do

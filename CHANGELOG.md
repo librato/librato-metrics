@@ -1,5 +1,10 @@
 ## Changelog
 
+### Version 1.0.2
+* Fix bug with some versions of MultiJson (Thomas Dippel)
+* Use delegation for JSON handling
+* Improve integration tests
+
 ### Version 1.0.1
 * Fix Forwardable dependency loading bug
 

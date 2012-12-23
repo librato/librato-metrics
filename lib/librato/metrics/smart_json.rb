@@ -1,31 +1,23 @@
-# wrap MultiJSON's implementation so we can use any version
+require 'multi_json'
+
 module Librato
   module Metrics
     class SmartJSON
-
-      class << self
-
-        # prefer modern syntax; def once at startup
-        if MultiJson.respond_to?(:load)
-          def read(json)
-            MultiJson.load(json)
-          end
-        else
-          def read(json)
-            MultiJson.decode(json)
-          end
-        end
-
-        if MultiJson.respond_to?(:dump)
-          def write(data)
-            MultiJson.dump(data)
-          end
-        else
-          def write(data)
-            MultiJson.encode(data)
-          end
-        end
-
+      JSON_HANDLER = MultiJson
+      extend SingleForwardable
+      
+      # wrap MultiJSON's implementation so we can use any version
+      # prefer modern syntax if available; def once at startup
+      if JSON_HANDLER.respond_to?(:load)
+        def_delegator JSON_HANDLER, :load, :read
+      else
+        def_delegator JSON_HANDLER, :decode, :read
+      end
+      
+      if JSON_HANDLER.respond_to?(:dump)
+        def_delegator JSON_HANDLER, :dump, :write
+      else
+        def_delegator JSON_HANDLER, :encode, :write
       end
 
     end

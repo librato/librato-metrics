@@ -3,7 +3,6 @@ $:.unshift(File.dirname(__FILE__)) unless
 
 require 'base64'
 require 'forwardable'
-require 'multi_json'
 
 require 'metrics/aggregator'
 require 'metrics/annotator'

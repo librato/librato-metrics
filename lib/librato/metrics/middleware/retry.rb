@@ -13,7 +13,6 @@ module Librato
           retries = @retries
           request_body = env[:body]
           begin
-            env[:retries_remaining] = retries
             env[:body] = request_body # after failure is set to response body
             @app.call(env)
           rescue Librato::Metrics::ServerError, Timeout::Error,

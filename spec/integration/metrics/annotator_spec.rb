@@ -60,8 +60,9 @@ module Librato
           subject.add :deployment, 'deployed v47'
           events = subject.fetch(:deployment, :start_time => Time.now.to_i-60)
           events = events['events']['unassigned']
-          ids = events.each_with_object({}) do |event, hash|
+          ids = events.reduce({}) do |hash, event|
             hash[event['title']] = event['id']
+            hash
           end
           subject.delete_event :deployment, ids['deployed v47']
           events = subject.fetch(:deployment, :start_time => Time.now.to_i-60)

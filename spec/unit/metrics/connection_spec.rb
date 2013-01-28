@@ -56,12 +56,16 @@ module Librato
           end
         end
 
+        let(:client) do
+          client = Client.new
+          client.api_endpoint = 'http://127.0.0.1:9296'
+          client.authenticate 'foo', 'bar'
+          client
+        end
+
         context "with 400 class errors" do
           it "should not retry" do
             Middleware::CountRequests.reset
-            client = Client.new
-            client.api_endpoint = 'http://127.0.0.1:9296'
-            client.authenticate 'foo', 'bar'
             with_rackup('status.ru') do
               lambda {
                 client.connection.transport.post 'not_found'
@@ -70,26 +74,41 @@ module Librato
                 client.connection.transport.post 'forbidden'
               }.should raise_error(ClientError)
             end
-            Middleware::CountRequests.total_requests.should == 2
+            Middleware::CountRequests.total_requests.should == 2 # no retries
           end
         end
 
         context "with 500 class errors" do
           it "should retry" do
             Middleware::CountRequests.reset
-            client = Client.new
-            client.api_endpoint = 'http://127.0.0.1:9296'
-            client.authenticate 'foo', 'bar'
             with_rackup('status.ru') do
               lambda {
                 client.connection.transport.post 'service_unavailable'
               }.should raise_error(ServerError)
             end
-            Middleware::CountRequests.total_requests.should == 4
+            Middleware::CountRequests.total_requests.should == 4 # did retries
+          end
+
+          it "should send consistent body with retries" do
+            Middleware::CountRequests.reset
+            status = 0
+            begin
+              with_rackup('status.ru') do
+                response = client.connection.transport.post do |req|
+                  req.url 'retry_body'
+                  req.body = '{"foo": "bar", "baz": "kaboom"}'
+                end
+              end
+            rescue Exception => error
+              # parse status out of exception dump, this is a bit ugly
+              status_index = error.message.index('status')
+              status = error.message[status_index+8..status_index+10].to_i
+            end
+            Middleware::CountRequests.total_requests.should == 4 # did retries
+            status.should be(502), 'body should be sent for retries'
           end
         end
       end
-
     end
 
   end

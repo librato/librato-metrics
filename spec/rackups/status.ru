@@ -16,6 +16,15 @@ class App < Sinatra::Base
   post('/v1/service_unavailable')  do
     status 503
   end
+
+  post('/v1/retry_body') do
+    body = request.env["rack.input"].read
+    if body.empty?
+      status 504 # body not sent
+    else
+      status 502 # body sent
+    end
+  end
 end
 
 run App

@@ -10,7 +10,14 @@ module Librato
     class InvalidMeasureTime < MetricsError; end
     class NotMergeable < MetricsError; end
 
-    class NetworkError < StandardError; end
+    class NetworkError < StandardError
+      attr_reader :response
+
+      def initialize(msg, response = nil)
+        super(msg)
+        @response = response
+      end
+    end
 
     class ClientError < NetworkError; end
     class Unauthorized < ClientError; end

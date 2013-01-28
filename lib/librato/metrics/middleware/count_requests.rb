@@ -19,6 +19,7 @@ module Librato
 
         def call(env)
           self.class.increment
+          env[:total_requests] = self.class.total_requests
           @app.call(env)
         end
       end

@@ -100,9 +100,7 @@ module Librato
                 end
               end
             rescue Exception => error
-              # parse status out of exception dump, this is a bit ugly
-              status_index = error.message.index('status')
-              status = error.message[status_index+8..status_index+10].to_i
+              status = error.response[:status].to_i
             end
             Middleware::CountRequests.total_requests.should == 4 # did retries
             status.should be(502)#, 'body should be sent for retries'

@@ -105,7 +105,7 @@ module Librato
               status = error.message[status_index+8..status_index+10].to_i
             end
             Middleware::CountRequests.total_requests.should == 4 # did retries
-            status.should be(502), 'body should be sent for retries'
+            status.should be(502)#, 'body should be sent for retries'
           end
         end
       end

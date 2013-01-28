@@ -30,13 +30,10 @@ module Librato
       def transport
         raise(NoClientProvided, "No client provided.") unless @client
         @transport ||= Faraday::Connection.new(:url => api_endpoint + "/v1/") do |f|
-          #f.use FaradayMiddleware::EncodeJson
           f.use Librato::Metrics::Middleware::RequestBody
           f.use Librato::Metrics::Middleware::Retry
           f.use Librato::Metrics::Middleware::CountRequests
-
           f.use Librato::Metrics::Middleware::ExpectsStatus
-          #f.use FaradayMiddleware::ParseJson, :content_type => /\bjson$/
 
           f.adapter @adapter || Metrics.faraday_adapter
         end.tap do |transport|

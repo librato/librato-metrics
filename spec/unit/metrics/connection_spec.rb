@@ -87,6 +87,28 @@ module Librato
             end
             Middleware::CountRequests.total_requests.should == 4
           end
+
+          it "should send body with retried requests" do
+            Middleware::CountRequests.reset
+            client = Client.new
+            client.api_endpoint = 'http://127.0.0.1:9296'
+            client.authenticate 'foo', 'bar'
+            status = false
+            begin
+              with_rackup('status.ru') do
+                response = client.connection.transport.post do |req|
+                  req.url 'retry_body'
+                  req.body = '{"foo": "bar", "baz": "kaboom"}'
+                end
+              end
+            rescue Exception => error
+              # parse status out of exception dump, this is a bit ugly
+              status_index = error.message.index('status')
+              status = error.message[status_index+8..status_index+10].to_i
+            end
+            Middleware::CountRequests.total_requests.should == 4 # did retries
+            status.should be(502), 'body should be sent for retries'
+          end
         end
       end
 

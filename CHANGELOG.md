@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.0.3
+* Fix bug where retries of POST requests could 400
+* Network related exceptions capture response state better
+
 ### Version 1.0.2
 * Fix bug with some versions of MultiJson (Thomas Dippel)
 * Use delegation for JSON handling

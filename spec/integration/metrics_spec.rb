@@ -228,7 +228,7 @@ module Librato
         it "should create the metric if type specified" do
           delete_all_metrics
           Metrics.update :foo, :display_name => "Foo Metric",
-                               :type => :gauge,
+                               :type => 'gauge',
                                :period => 15,
                                :attributes => {
                                  :display_max => 1000

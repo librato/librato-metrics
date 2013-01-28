@@ -56,12 +56,16 @@ module Librato
           end
         end
 
+        let(:client) do
+          client = Client.new
+          client.api_endpoint = 'http://127.0.0.1:9296'
+          client.authenticate 'foo', 'bar'
+          client
+        end
+
         context "with 400 class errors" do
           it "should not retry" do
             Middleware::CountRequests.reset
-            client = Client.new
-            client.api_endpoint = 'http://127.0.0.1:9296'
-            client.authenticate 'foo', 'bar'
             with_rackup('status.ru') do
               lambda {
                 client.connection.transport.post 'not_found'
@@ -70,30 +74,24 @@ module Librato
                 client.connection.transport.post 'forbidden'
               }.should raise_error(ClientError)
             end
-            Middleware::CountRequests.total_requests.should == 2
+            Middleware::CountRequests.total_requests.should == 2 # no retries
           end
         end
 
         context "with 500 class errors" do
           it "should retry" do
             Middleware::CountRequests.reset
-            client = Client.new
-            client.api_endpoint = 'http://127.0.0.1:9296'
-            client.authenticate 'foo', 'bar'
             with_rackup('status.ru') do
               lambda {
                 client.connection.transport.post 'service_unavailable'
               }.should raise_error(ServerError)
             end
-            Middleware::CountRequests.total_requests.should == 4
+            Middleware::CountRequests.total_requests.should == 4 # did retries
           end
 
-          it "should send body with retried requests" do
+          it "should send consistent body with retries" do
             Middleware::CountRequests.reset
-            client = Client.new
-            client.api_endpoint = 'http://127.0.0.1:9296'
-            client.authenticate 'foo', 'bar'
-            status = false
+            status = 0
             begin
               with_rackup('status.ru') do
                 response = client.connection.transport.post do |req|
@@ -111,7 +109,6 @@ module Librato
           end
         end
       end
-
     end
 
   end

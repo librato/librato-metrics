@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 1.0.4
+* Ensure sane default timeouts for all requests
+
 ### Version 1.0.3
 * Fix bug where retries of POST requests could 400
 * Network related exceptions capture response state better

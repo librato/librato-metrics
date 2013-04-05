@@ -137,8 +137,8 @@ At a minimum each annotation needs to be assigned to a stream and to have a titl
 There are a number of optional fields which can make annotations even more powerful:
 
     Librato::Metrics.annotate :deployments, 'deployed v46', :source => 'frontend',
-    						  :start_time => 1354662596, :end_time => 1354662608,
-    						  :description => 'Deployed 6f3bc6e67682: fix lotsa bugs…'
+        :start_time => 1354662596, :end_time => 1354662608,
+        :description => 'Deployed 6f3bc6e67682: fix lotsa bugs…'
 
 More fine-grained control of annotations is available via the `Annotator` object:
 

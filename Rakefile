@@ -38,6 +38,10 @@ YARD::Rake::YardocTask.new
 # IRB
 desc "Open an irb session preloaded with this library"
 task :console do
-  sh "irb -rubygems -r ./lib/librato/metrics.rb"
+  if !`which pry`.empty?
+    sh "pry -r ./lib/librato/metrics.rb"
+  else
+    sh "irb -rubygems -r ./lib/librato/metrics.rb"
+  end
 end
 

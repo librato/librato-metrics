@@ -205,52 +205,84 @@ module Librato
 
     describe "#update" do
 
-      context "with existing metric" do
-        before do
-          delete_all_metrics
-          Metrics.submit :foo => 123
-        end
+      context 'with a single metric' do
+        context "with an existing metric" do
+          before do
+            delete_all_metrics
+            Metrics.submit :foo => 123
+          end
 
-        it "should update the metric" do
-          Metrics.update :foo, :display_name => "Foo Metric",
-                               :period => 15,
-                               :attributes => {
-                                 :display_max => 1000
-                               }
-          foo = Metrics.fetch :foo
-          foo['display_name'].should == 'Foo Metric'
-          foo['period'].should == 15
-          foo['attributes']['display_max'].should == 1000
-        end
-      end
-
-      context "without an existing metric" do
-        it "should create the metric if type specified" do
-          delete_all_metrics
-          Metrics.update :foo, :display_name => "Foo Metric",
-                               :type => 'gauge',
-                               :period => 15,
-                               :attributes => {
-                                 :display_max => 1000
-                               }
-          foo = Metrics.fetch :foo
-          foo['display_name'].should == 'Foo Metric'
-          foo['period'].should == 15
-          foo['attributes']['display_max'].should == 1000
-        end
-
-        it "should raise error if no type specified" do
-          delete_all_metrics
-          lambda {
+          it "should update the metric" do
             Metrics.update :foo, :display_name => "Foo Metric",
                                  :period => 15,
                                  :attributes => {
                                    :display_max => 1000
                                  }
-          }.should raise_error
+            foo = Metrics.fetch :foo
+            foo['display_name'].should == 'Foo Metric'
+            foo['period'].should == 15
+            foo['attributes']['display_max'].should == 1000
+          end
         end
+
+        context "without an existing metric" do
+          it "should create the metric if type specified" do
+            delete_all_metrics
+            Metrics.update :foo, :display_name => "Foo Metric",
+                                 :type => 'gauge',
+                                 :period => 15,
+                                 :attributes => {
+                                   :display_max => 1000
+                                 }
+            foo = Metrics.fetch :foo
+            foo['display_name'].should == 'Foo Metric'
+            foo['period'].should == 15
+            foo['attributes']['display_max'].should == 1000
+          end
+
+          it "should raise error if no type specified" do
+            delete_all_metrics
+            lambda {
+              Metrics.update :foo, :display_name => "Foo Metric",
+                                   :period => 15,
+                                   :attributes => {
+                                     :display_max => 1000
+                                   }
+            }.should raise_error
+          end
+        end
+
       end
 
+      context 'with multiple metrics' do
+        before do
+          delete_all_metrics
+          Metrics.submit 'my.1' => 1, 'my.2' => 2, 'my.3' => 3, 'my.4' => 4
+        end
+
+        it "should support named list" do
+          names = ['my.1', 'my.3']
+          Metrics.update :names => names, :period => 60
+
+          names.each do |name|
+             metric = Metrics.fetch name
+             metric['period'].should == 60
+           end
+        end
+
+        it "should support patterns" do
+          Metrics.update :pattern => 'my.*', :exclude => ['my.3'],
+            :display_max => 100
+
+          %w{my.1 my.2 my.4}.each do |name|
+            metric = Metrics.fetch name
+            metric['attributes']['display_max'].should == 100
+          end
+
+          excluded = Metrics.fetch 'my.3'
+          excluded['attributes']['display_max'].should_not == 100
+        end
+      end
     end
 
   end

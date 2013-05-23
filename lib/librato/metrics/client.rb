@@ -234,9 +234,21 @@ module Librato
       # @example Update metric 'humidity', creating it if it doesn't exist
       #   Librato::Metrics.update 'humidity', :type => :gauge, :period => 60, :display_name => 'Humidity'
       #
+      # @example Update multiple metrics by name
+      #   Librato::Metrics.update :names => ["foo", "bar"], :period => 60
+      #
+      # @example Update multiple metrics by pattern
+      #   Librato::Metrics.update :pattern => 'foo*', :exclude => ['foobar'], :display_min => 0
+      #
       def update(metric, options = {})
+        if metric.respond_to?(:each)
+          url = "metrics" # update multiple metrics
+          options = metric
+        else
+          url = "metrics/#{metric}" # update single
+        end
         connection.put do |request|
-          request.url connection.build_url("metrics/#{metric}")
+          request.url connection.build_url(url)
           request.body = SmartJSON.write(options)
         end
       end

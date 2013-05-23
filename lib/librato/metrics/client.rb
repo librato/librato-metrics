@@ -90,16 +90,22 @@ module Librato
       #
       # @example Delete metrics 'foo' and 'bar'
       #   Librato::Metrics.delete :foo, :bar
+      #
+      # @example Delete metrics by pattern
+      #   Librato::Metrics.delete :pattern => 'foo*', :exclude => ['foobar']
+      #
       def delete(*metric_names)
         raise(NoMetricsProvided, 'Metric name missing.') if metric_names.empty?
-        metric_names.map!{|i| i.to_s}
-        params = {:names => metric_names }
+        if metric_names[0].respond_to?(:keys) # hash form
+          params = metric_names[0]
+        else
+          params = { :names => metric_names.map(&:to_s) }
+        end
         connection.delete do |request|
           request.url connection.build_url("metrics")
           request.body = SmartJSON.write(params)
         end
-        # expects 204, middleware will raise exception
-        # otherwise.
+        # expects 204, middleware will raise exception otherwise.
         true
       end
 

@@ -6,7 +6,7 @@ module Librato
     describe Queue do
 
       before(:each) do
-        @time = 1354720160 #Time.now.to_i
+        @time = (Time.now.to_i - 1*60)
         Queue.any_instance.stub(:epoch_time).and_return(@time)
       end
 
@@ -120,13 +120,13 @@ module Librato
           end
 
           it "should accept integers" do
-            time = 1336574713
+            time = @time.to_i
             subject.add :foo => {:measure_time => time, :value => 123}
             subject.queued[:gauges][0][:measure_time].should == time
           end
 
           it "should accept strings" do
-            time = '1336574713'
+            time = @time.to_s
             subject.add :foo => {:measure_time => time, :value => 123}
             subject.queued[:gauges][0][:measure_time].should == time.to_i
           end

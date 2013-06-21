@@ -1,7 +1,7 @@
 Librato Metrics
 =======
 
-[![Build Status](https://secure.travis-ci.org/librato/librato-metrics.png?branch=master)](http://travis-ci.org/librato/librato-metrics)
+[![Build Status](https://secure.travis-ci.org/librato/librato-metrics.png?branch=master)](http://travis-ci.org/librato/librato-metrics) [![Code Climate](https://codeclimate.com/github/librato/librato-metrics.png)](https://codeclimate.com/github/librato/librato-metrics)
 
 A convenient Ruby wrapper for the Librato Metrics API.
 

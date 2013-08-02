@@ -88,7 +88,7 @@ module Librato
       context 'by pattern' do
         it "should filter properly" do
           Metrics.submit :foo => 1, :foobar => 2, :foobaz => 3, :bar => 4
-          Metrics.delete :pattern => 'fo*', :exclude => ['foobar']
+          Metrics.delete :names => 'fo*', :exclude => ['foobar']
 
           %w{foo foobaz}.each do |name|
             lambda {
@@ -125,7 +125,8 @@ module Librato
 
       context "with a start_time" do
         it "should return entries since that time" do
-          data = Metrics.fetch :my_counter, :start_time => Time.now-3600 # 1 hr ago
+          # 1 hr ago
+          data = Metrics.fetch :my_counter, :start_time => Time.now-3600
           data['unassigned'].length.should == 3
           data['baz'].length.should == 2
         end
@@ -292,7 +293,7 @@ module Librato
         end
 
         it "should support patterns" do
-          Metrics.update :pattern => 'my.*', :exclude => ['my.3'],
+          Metrics.update :names => 'my.*', :exclude => ['my.3'],
             :display_max => 100
 
           %w{my.1 my.2 my.4}.each do |name|

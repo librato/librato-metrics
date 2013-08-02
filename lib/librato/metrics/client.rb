@@ -91,8 +91,8 @@ module Librato
       # @example Delete metrics 'foo' and 'bar'
       #   Librato::Metrics.delete :foo, :bar
       #
-      # @example Delete metrics by pattern
-      #   Librato::Metrics.delete :pattern => 'foo*', :exclude => ['foobar']
+      # @example Delete metrics that start with 'foo'
+      #   Librato::Metrics.delete :names => 'foo*', :exclude => ['foobar']
       #
       def delete(*metric_names)
         raise(NoMetricsProvided, 'Metric name missing.') if metric_names.empty?
@@ -243,8 +243,8 @@ module Librato
       # @example Update multiple metrics by name
       #   Librato::Metrics.update :names => ["foo", "bar"], :period => 60
       #
-      # @example Update multiple metrics by pattern
-      #   Librato::Metrics.update :pattern => 'foo*', :exclude => ['foobar'], :display_min => 0
+      # @example Update all metrics that start with 'foo'
+      #   Librato::Metrics.update :names => 'foo*', :exclude => ['foobar'], :display_min => 0
       #
       def update(metric, options = {})
         if metric.respond_to?(:each)

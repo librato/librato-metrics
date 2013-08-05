@@ -204,12 +204,26 @@ Get the 20 most recent 15 minute data point rollups for `temperature`:
 
 There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/gauges/:name) or the [fetch documentation](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics.fetch)  for more details.
 
+## Setting Metric Properties
+
+Setting custom [properties](http://dev.librato.com/v1/metrics#metric_properties) on your metrics is easy:
+
+    # assign a period and default color
+    Librato::Metrics.update :temperature, :period => 15, :attributes => { :color => 'F00' }
+
+It is also possible to update properties for multiple metrics at once, see the #update method documentation for more information.
+
 ## Deleting Metrics
 
 If you ever need to remove a metric and all of its measurements, doing so is easy:
 
-	# Delete the metrics 'temperature' and 'humidity'
+	# delete the metrics 'temperature' and 'humidity'
 	Librato::Metrics.delete :temperature, :humidity
+
+You can also delete using wildcards:
+
+    # delete metrics that start with cpu. except for cpu.free
+    Librato::Metrics.delete :names => 'cpu.*', :exclude => ['cpu.free']
 
 Note that deleted metrics and their measurements are unrecoverable, so use with care.
 

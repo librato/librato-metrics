@@ -232,7 +232,9 @@ module Librato
         @queue.submit
       end
 
-      # Update metric with the given name.
+      # Update one or more metrics. Note that attributes are specified in
+      # their own hash for updating a single metric but are included inline
+      # when updating multiple metrics.
       #
       # @example Update metric 'temperature'
       #   Librato::Metrics.update :temperature, :period => 15, :attributes => { :color => 'F00' }

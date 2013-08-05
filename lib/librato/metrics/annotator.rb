@@ -1,7 +1,6 @@
 module Librato::Metrics
 
-  # manages writing and reading annotation streams for a
-  # given client connection
+  # Read & write annotation streams for a given client connection.
   class Annotator
 
     # @option options [Client] :client Client instance used to connect to Metrics
@@ -16,7 +15,7 @@ module Librato::Metrics
     #
     # @example Annotation with start and end times
     #   annotator.add :deployments, 'deployed v56', :start_time => start,
-    #                 :end_time => end
+    #                 :end_time => end_time
     #
     # @example Annotation with a specific source
     #   annotator.add :deployments, 'deployed v60', :source => 'app12'
@@ -39,17 +38,14 @@ module Librato::Metrics
       SmartJSON.read(response.body)
     end
 
+    # client instance used by this object
     def client
       @client
     end
 
-    def connection
-      client.connection
-    end
-
-    # Delete an annotation streams
+    # Delete an annotation stream
     #
-    # @example Delete 'deployment' annotation stream
+    # @example Delete the 'deployment' annotation stream
     #  annotator.delete :deployment
     #
     def delete(stream)
@@ -79,11 +75,12 @@ module Librato::Metrics
     #   annotator.fetch :deployments
     #
     # @example Get events on 'deployments' between start and end times
-    #   annotator.fetch :deployments, :start_time => start, :end_time => end
+    #   annotator.fetch :deployments, :start_time => start,
+    #                   :end_time => end_time
     #
     # @example Source-limited listing
     #   annotator.fetch :deployments, :sources => ['foo','bar','baz'],
-    #                   :start_time => start, :end_time => end
+    #                   :start_time => start, :end_time => end_time
     #
     def fetch(stream, options={})
       response = connection.get("annotations/#{stream}", options)
@@ -125,6 +122,12 @@ module Librato::Metrics
         request.body = SmartJSON.write(options)
       end
       # expects 204 will raise exception otherwise
+    end
+
+    private
+
+    def connection
+      client.connection
     end
 
   end

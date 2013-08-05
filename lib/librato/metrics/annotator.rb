@@ -112,6 +112,20 @@ module Librato::Metrics
       SmartJSON.read(response.body)
     end
 
+    # Update an event's properties
+    #
+    # @example Set an end time for a previously submitted event
+    #   annotator.update_event 'deploys', 'v24', :end_time => end_time
+    #
+    def update_event(stream, id, options={})
+      url = "annotations/#{stream}/#{id}"
+      connection.put do |request|
+        request.url connection.build_url(url)
+        request.body = SmartJSON.write(options)
+      end
+      # expects 204 will raise exception otherwise
+    end
+
   end
 
 end

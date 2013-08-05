@@ -155,14 +155,23 @@ module Librato
         end
       end
 
-      # describe "#update_event" do
-      #   it "should update event" do
-      #     annotation = subject.add 'deploys', 'v24', :title => 'first'
-      #     subject.update_event 'deploys', annotation['id'], :title => 'second'
-      #     data = subject.fetch_event 'deploys', annotation['id']
-      #     data['title'].should == 'second'
-      #   end
-      # end
+      describe "#update_event" do
+        context "when event exists" do
+          it "should update event" do
+            end_time = (Time.now + 60).to_i
+            annotation = subject.add 'deploys', 'v24'
+            subject.update_event 'deploys', annotation['id'],
+              :end_time => end_time, :title => 'v28'
+            data = subject.fetch_event 'deploys', annotation['id']
+
+            data['title'].should == 'v28'
+            data['end_time'].should == end_time
+          end
+        end
+        context "when event does not exist" do
+
+        end
+      end
 
     end
 

@@ -46,38 +46,59 @@ module Librato
     describe "#delete" do
       before(:each) { delete_all_metrics }
 
-      context "with a single argument" do
-        it "should delete named metric" do
-          Metrics.submit :foo => 123
-          Metrics.list(:name => :foo).should_not be_empty
-          Metrics.delete :foo
-          Metrics.list(:name => :foo).should be_empty
+      context 'by names' do
+
+        context "with a single argument" do
+          it "should delete named metric" do
+            Metrics.submit :foo => 123
+            Metrics.list(:name => :foo).should_not be_empty
+            Metrics.delete :foo
+            Metrics.list(:name => :foo).should be_empty
+          end
         end
+
+        context "with multiple arguments" do
+          it "should delete named metrics" do
+            Metrics.submit :foo => 123, :bar => 345, :baz => 567
+            Metrics.delete :foo, :bar
+            Metrics.list(:name => :foo).should be_empty
+            Metrics.list(:name => :bar).should be_empty
+            Metrics.list(:name => :baz).should_not be_empty
+          end
+        end
+
+        context "with missing metric" do
+          it "should run cleanly" do
+            # the API currently returns success even if
+            # the metric has already been deleted or is absent.
+            Metrics.delete :missing
+          end
+        end
+
+        context "with no arguments" do
+          it "should not make request" do
+            lambda {
+              Metrics.delete
+            }.should raise_error(Metrics::NoMetricsProvided)
+          end
+        end
+
       end
 
-      context "with multiple arguments" do
-        it "should delete named metrics" do
-          Metrics.submit :foo => 123, :bar => 345, :baz => 567
-          Metrics.delete :foo, :bar
-          Metrics.list(:name => :foo).should be_empty
-          Metrics.list(:name => :bar).should be_empty
-          Metrics.list(:name => :baz).should_not be_empty
-        end
-      end
+      context 'by pattern' do
+        it "should filter properly" do
+          Metrics.submit :foo => 1, :foobar => 2, :foobaz => 3, :bar => 4
+          Metrics.delete :names => 'fo*', :exclude => ['foobar']
 
-      context "with missing metric" do
-        it "should run cleanly" do
-          # the API currently returns success even if
-          # the metric has already been deleted or is absent.
-          Metrics.delete :missing
-        end
-      end
+          %w{foo foobaz}.each do |name|
+            lambda {
+              Metrics.fetch name
+            }.should raise_error(Librato::Metrics::NotFound)
+          end
 
-      context "with no arguments" do
-        it "should not make request" do
-          lambda {
-            Metrics.delete
-          }.should raise_error(Metrics::NoMetricsProvided)
+          %w{foobar bar}.each do |name|
+            Metrics.fetch name # stil exist
+          end
         end
       end
     end
@@ -104,7 +125,8 @@ module Librato
 
       context "with a start_time" do
         it "should return entries since that time" do
-          data = Metrics.fetch :my_counter, :start_time => Time.now-3600 # 1 hr ago
+          # 1 hr ago
+          data = Metrics.fetch :my_counter, :start_time => Time.now-3600
           data['unassigned'].length.should == 3
           data['baz'].length.should == 2
         end
@@ -205,52 +227,84 @@ module Librato
 
     describe "#update" do
 
-      context "with existing metric" do
-        before do
-          delete_all_metrics
-          Metrics.submit :foo => 123
-        end
+      context 'with a single metric' do
+        context "with an existing metric" do
+          before do
+            delete_all_metrics
+            Metrics.submit :foo => 123
+          end
 
-        it "should update the metric" do
-          Metrics.update :foo, :display_name => "Foo Metric",
-                               :period => 15,
-                               :attributes => {
-                                 :display_max => 1000
-                               }
-          foo = Metrics.fetch :foo
-          foo['display_name'].should == 'Foo Metric'
-          foo['period'].should == 15
-          foo['attributes']['display_max'].should == 1000
-        end
-      end
-
-      context "without an existing metric" do
-        it "should create the metric if type specified" do
-          delete_all_metrics
-          Metrics.update :foo, :display_name => "Foo Metric",
-                               :type => 'gauge',
-                               :period => 15,
-                               :attributes => {
-                                 :display_max => 1000
-                               }
-          foo = Metrics.fetch :foo
-          foo['display_name'].should == 'Foo Metric'
-          foo['period'].should == 15
-          foo['attributes']['display_max'].should == 1000
-        end
-
-        it "should raise error if no type specified" do
-          delete_all_metrics
-          lambda {
+          it "should update the metric" do
             Metrics.update :foo, :display_name => "Foo Metric",
                                  :period => 15,
                                  :attributes => {
                                    :display_max => 1000
                                  }
-          }.should raise_error
+            foo = Metrics.fetch :foo
+            foo['display_name'].should == 'Foo Metric'
+            foo['period'].should == 15
+            foo['attributes']['display_max'].should == 1000
+          end
         end
+
+        context "without an existing metric" do
+          it "should create the metric if type specified" do
+            delete_all_metrics
+            Metrics.update :foo, :display_name => "Foo Metric",
+                                 :type => 'gauge',
+                                 :period => 15,
+                                 :attributes => {
+                                   :display_max => 1000
+                                 }
+            foo = Metrics.fetch :foo
+            foo['display_name'].should == 'Foo Metric'
+            foo['period'].should == 15
+            foo['attributes']['display_max'].should == 1000
+          end
+
+          it "should raise error if no type specified" do
+            delete_all_metrics
+            lambda {
+              Metrics.update :foo, :display_name => "Foo Metric",
+                                   :period => 15,
+                                   :attributes => {
+                                     :display_max => 1000
+                                   }
+            }.should raise_error
+          end
+        end
+
       end
 
+      context 'with multiple metrics' do
+        before do
+          delete_all_metrics
+          Metrics.submit 'my.1' => 1, 'my.2' => 2, 'my.3' => 3, 'my.4' => 4
+        end
+
+        it "should support named list" do
+          names = ['my.1', 'my.3']
+          Metrics.update :names => names, :period => 60
+
+          names.each do |name|
+             metric = Metrics.fetch name
+             metric['period'].should == 60
+           end
+        end
+
+        it "should support patterns" do
+          Metrics.update :names => 'my.*', :exclude => ['my.3'],
+            :display_max => 100
+
+          %w{my.1 my.2 my.4}.each do |name|
+            metric = Metrics.fetch name
+            metric['attributes']['display_max'].should == 100
+          end
+
+          excluded = Metrics.fetch 'my.3'
+          excluded['attributes']['display_max'].should_not == 100
+        end
+      end
     end
 
   end

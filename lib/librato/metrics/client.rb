@@ -90,16 +90,22 @@ module Librato
       #
       # @example Delete metrics 'foo' and 'bar'
       #   Librato::Metrics.delete :foo, :bar
+      #
+      # @example Delete metrics that start with 'foo' except 'foobar'
+      #   Librato::Metrics.delete :names => 'foo*', :exclude => ['foobar']
+      #
       def delete(*metric_names)
         raise(NoMetricsProvided, 'Metric name missing.') if metric_names.empty?
-        metric_names.map!{|i| i.to_s}
-        params = {:names => metric_names }
+        if metric_names[0].respond_to?(:keys) # hash form
+          params = metric_names[0]
+        else
+          params = { :names => metric_names.map(&:to_s) }
+        end
         connection.delete do |request|
           request.url connection.build_url("metrics")
           request.body = SmartJSON.write(params)
         end
-        # expects 204, middleware will raise exception
-        # otherwise.
+        # expects 204, middleware will raise exception otherwise.
         true
       end
 
@@ -226,7 +232,9 @@ module Librato
         @queue.submit
       end
 
-      # Update metric with the given name.
+      # Update one or more metrics. Note that attributes are specified in
+      # their own hash for updating a single metric but are included inline
+      # when updating multiple metrics.
       #
       # @example Update metric 'temperature'
       #   Librato::Metrics.update :temperature, :period => 15, :attributes => { :color => 'F00' }
@@ -234,9 +242,21 @@ module Librato
       # @example Update metric 'humidity', creating it if it doesn't exist
       #   Librato::Metrics.update 'humidity', :type => :gauge, :period => 60, :display_name => 'Humidity'
       #
+      # @example Update multiple metrics by name
+      #   Librato::Metrics.update :names => ["foo", "bar"], :period => 60
+      #
+      # @example Update all metrics that start with 'foo' that aren't 'foobar'
+      #   Librato::Metrics.update :names => 'foo*', :exclude => ['foobar'], :display_min => 0
+      #
       def update(metric, options = {})
+        if metric.respond_to?(:each)
+          url = "metrics" # update multiple metrics
+          options = metric
+        else
+          url = "metrics/#{metric}" # update single
+        end
         connection.put do |request|
-          request.url connection.build_url("metrics/#{metric}")
+          request.url connection.build_url(url)
           request.body = SmartJSON.write(options)
         end
       end

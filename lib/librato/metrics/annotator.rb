@@ -4,6 +4,7 @@ module Librato::Metrics
   # given client connection
   class Annotator
 
+    # @option options [Client] :client Client instance used to connect to Metrics
     def initialize(options={})
       @client = options[:client] || Librato::Metrics.client
     end

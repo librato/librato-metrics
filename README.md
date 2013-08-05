@@ -5,6 +5,8 @@ Librato Metrics
 
 A convenient Ruby wrapper for the Librato Metrics API.
 
+This gem provides granular control for scripting interactions with the Metrics core API. It is well suited for integrations, scripts, workers & background jobs. If you want to submit from a web app, take at look at [librato-rails](https://github.com/librato/librato-rails) and/or [librato-rack](https://github.com/librato/librato-rack).
+
 ## Installation
 
 In your shell:

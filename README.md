@@ -202,7 +202,7 @@ Get the 20 most recent 15 minute data point rollups for `temperature`:
 
     data = Librato::Metrics.fetch :temperature, :count => 20, :resolution => 900
 
-There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/gauges/:name) or the [fetch documentation](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics.fetch)  for more details.
+There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/gauges/:name) or the [fetch documentation](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics/Client#fetch-instance_method)  for more details.
 
 ## Setting Metric Properties
 
@@ -211,7 +211,7 @@ Setting custom [properties](http://dev.librato.com/v1/metrics#metric_properties)
     # assign a period and default color
     Librato::Metrics.update :temperature, :period => 15, :attributes => { :color => 'F00' }
 
-It is also possible to update properties for multiple metrics at once, see the #update method documentation for more information.
+It is also possible to update properties for multiple metrics at once, see the [#update method documentation](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics/Client#update-instance_method) for more information.
 
 ## Deleting Metrics
 

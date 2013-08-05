@@ -24,6 +24,11 @@ module Librato::Metrics
     #   annotator.add :deployments, 'deployed v61',
     #                 :description => '9b562b2: shipped new feature foo!'
     #
+    # @example Annotate with automatic start and end times
+    #   annotator.add(:deployments, 'deployed v62') do
+    #     # do work..
+    #   end
+    #
     def add(stream, title, options={})
       options[:title] = title
       if options[:start_time]
@@ -35,7 +40,14 @@ module Librato::Metrics
       payload = SmartJSON.write(options)
       response = connection.post("annotations/#{stream}", payload)
       # will raise exception if not 200 OK
-      SmartJSON.read(response.body)
+      event = SmartJSON.read(response.body)
+      if block_given?
+        yield
+        update_event stream, event['id'], :end_time => Time.now.to_i
+        # need to get updated representation
+        event = fetch_event stream, event['id']
+      end
+      event
     end
 
     # client instance used by this object

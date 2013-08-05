@@ -45,6 +45,17 @@ module Librato
           annotation = subject.add :deployment, "deployed v23"
           annotation['id'].should_not be_nil
         end
+
+        context "with a block" do
+          it "should set both start and end times" do
+            annotation = subject.add 'deploys', 'v345' do
+              sleep 1.0
+            end
+            data = subject.fetch_event 'deploys', annotation['id']
+            data['start_time'].should_not be_nil
+            data['end_time'].should_not be_nil
+          end
+        end
       end
 
       describe "#delete" do

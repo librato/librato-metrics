@@ -33,8 +33,9 @@ module Librato::Metrics
         options[:end_time] = options[:end_time].to_i
       end
       payload = SmartJSON.write(options)
-      # expects 200
-      connection.post("annotations/#{stream}", payload)
+      response = connection.post("annotations/#{stream}", payload)
+      # will raise exception if not 200 OK
+      SmartJSON.read(response.body)
     end
 
     def client

@@ -41,6 +41,10 @@ module Librato
           first['title'].should == 'deployed v71'
           first['description'].should == 'deployed foobar!'
         end
+        it "should have an id for further use" do
+          annotation = subject.add :deployment, "deployed v23"
+          annotation['id'].should match /\d+/
+        end
       end
 
       describe "#delete" do

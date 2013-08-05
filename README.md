@@ -262,6 +262,12 @@ Once the queue is associated you can use it normally:
 
 The `librato-metrics` gem currently does not do internal locking for thread safety. When used in multi-threaded applications, please add your own mutexes for sensitive operations.
 
+## More Information
+
+`librato-metrics` is sufficiently complex that not everything can be documented in the README. Additional options are documented regularly in the codebase. You are encouraged to take a quick look through the [docs](http://rubydoc.info/github/librato/librato-metrics/frames) and [source](https://github.com/librato/librato-metrics) for more.
+
+We also maintain a set of [examples of common uses](https://github.com/librato/librato-metrics/tree/master/examples) and appreciate contributions if you have them.
+
 ## Contribution
 
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.

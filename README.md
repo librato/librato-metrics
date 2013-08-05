@@ -260,7 +260,7 @@ Once the queue is associated you can use it normally:
 
 ## Thread Safety
 
-The `librato-metrics` gem currently does not do internal locking for thread safety. When used in multi-threaded applications, please add your own mutexes for sensitive operations.
+The `librato-metrics` gem currently does not do internal locking for thread safety. When used in multi-threaded applications, please add your own [mutexes](http://www.ruby-doc.org/core-2.0/Mutex.html) for sensitive operations.
 
 ## More Information
 

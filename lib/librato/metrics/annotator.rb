@@ -89,6 +89,16 @@ module Librato::Metrics
       SmartJSON.read(response.body)
     end
 
+    # Get properties for a given annotation stream event
+    #
+    # @example Get event
+    #   annotator.fetch :deployments, 23
+    #
+    def fetch_event(stream, id)
+      response = connection.get("annotations/#{stream}/#{id}")
+      SmartJSON.read(response.body)
+    end
+
     # List currently existing annotation streams
     #
     # @example List all annotation streams

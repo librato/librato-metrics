@@ -43,7 +43,7 @@ module Librato
         end
         it "should have an id for further use" do
           annotation = subject.add :deployment, "deployed v23"
-          annotation['id'].should match /\d+/
+          annotation['id'].should_not be_nil
         end
       end
 
@@ -113,6 +113,23 @@ module Librato
         end
       end
 
+      describe "#fetch_event" do
+        context "with existing event" do
+          it "should return event properties" do
+            annotation = subject.add 'deploys', 'v69'
+            data = subject.fetch_event 'deploys', annotation['id']
+            data['title'].should == 'v69'
+          end
+        end
+        context "when event doesn't exist" do
+          it "should raise NotFound" do
+            lambda {
+              data = subject.fetch_event 'deploys', 324
+            }.should raise_error(Metrics::NotFound)
+          end
+        end
+      end
+
       describe "#list" do
         before(:each) do
           subject.add :backups, 'backup 1'
@@ -137,6 +154,15 @@ module Librato
           end
         end
       end
+
+      # describe "#update_event" do
+      #   it "should update event" do
+      #     annotation = subject.add 'deploys', 'v24', :title => 'first'
+      #     subject.update_event 'deploys', annotation['id'], :title => 'second'
+      #     data = subject.fetch_event 'deploys', annotation['id']
+      #     data['title'].should == 'second'
+      #   end
+      # end
 
     end
 

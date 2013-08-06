@@ -132,7 +132,7 @@ If you need extra attributes for a `Queue` timing measurement, simply add them o
 
 Annotation streams are a great way to track events like deploys, backups or anything else that might affect your system. They can be overlaid on any other metric stream so you can easily see the impact of changes.
 
-At a minimum each annotation needs to be assigned to a stream and to have a title. Let's add an annotation for deploying v45 of our app to the `deployments` stream:
+At a minimum each annotation needs to be assigned to a stream and to have a title. Let's add an annotation for deploying `v45` of our app to the `deployments` stream:
 
     Librato::Metrics.annotate :deployments, 'deployed v45'
 
@@ -141,6 +141,12 @@ There are a number of optional fields which can make annotations even more power
     Librato::Metrics.annotate :deployments, 'deployed v46', :source => 'frontend',
         :start_time => 1354662596, :end_time => 1354662608,
         :description => 'Deployed 6f3bc6e67682: fix lotsa bugs…'
+
+You can also automatically annotate the start and end time of an action by using `annotate`'s block form:
+
+    Librato::Metrics.annotate :deployments, 'deployed v46' do
+      # do work..
+    end
 
 More fine-grained control of annotations is available via the `Annotator` object:
 

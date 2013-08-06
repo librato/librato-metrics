@@ -41,6 +41,21 @@ module Librato
           first['title'].should == 'deployed v71'
           first['description'].should == 'deployed foobar!'
         end
+        it "should have an id for further use" do
+          annotation = subject.add :deployment, "deployed v23"
+          annotation['id'].should_not be_nil
+        end
+
+        context "with a block" do
+          it "should set both start and end times" do
+            annotation = subject.add 'deploys', 'v345' do
+              sleep 1.0
+            end
+            data = subject.fetch_event 'deploys', annotation['id']
+            data['start_time'].should_not be_nil
+            data['end_time'].should_not be_nil
+          end
+        end
       end
 
       describe "#delete" do
@@ -109,6 +124,23 @@ module Librato
         end
       end
 
+      describe "#fetch_event" do
+        context "with existing event" do
+          it "should return event properties" do
+            annotation = subject.add 'deploys', 'v69'
+            data = subject.fetch_event 'deploys', annotation['id']
+            data['title'].should == 'v69'
+          end
+        end
+        context "when event doesn't exist" do
+          it "should raise NotFound" do
+            lambda {
+              data = subject.fetch_event 'deploys', 324
+            }.should raise_error(Metrics::NotFound)
+          end
+        end
+      end
+
       describe "#list" do
         before(:each) do
           subject.add :backups, 'backup 1'
@@ -131,6 +163,24 @@ module Librato
             streams = streams['annotations'].map{|i| i['name']}
             streams.should include('backups')
           end
+        end
+      end
+
+      describe "#update_event" do
+        context "when event exists" do
+          it "should update event" do
+            end_time = (Time.now + 60).to_i
+            annotation = subject.add 'deploys', 'v24'
+            subject.update_event 'deploys', annotation['id'],
+              :end_time => end_time, :title => 'v28'
+            data = subject.fetch_event 'deploys', annotation['id']
+
+            data['title'].should == 'v28'
+            data['end_time'].should == end_time
+          end
+        end
+        context "when event does not exist" do
+
         end
       end
 

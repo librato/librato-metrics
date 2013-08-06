@@ -1,9 +1,9 @@
 module Librato::Metrics
 
-  # manages writing and reading annotation streams for a
-  # given client connection
+  # Read & write annotation streams for a given client connection.
   class Annotator
 
+    # @option options [Client] :client Client instance used to connect to Metrics
     def initialize(options={})
       @client = options[:client] || Librato::Metrics.client
     end
@@ -15,7 +15,7 @@ module Librato::Metrics
     #
     # @example Annotation with start and end times
     #   annotator.add :deployments, 'deployed v56', :start_time => start,
-    #                 :end_time => end
+    #                 :end_time => end_time
     #
     # @example Annotation with a specific source
     #   annotator.add :deployments, 'deployed v60', :source => 'app12'
@@ -23,6 +23,11 @@ module Librato::Metrics
     # @example Annotation with a description
     #   annotator.add :deployments, 'deployed v61',
     #                 :description => '9b562b2: shipped new feature foo!'
+    #
+    # @example Annotate with automatic start and end times
+    #   annotator.add(:deployments, 'deployed v62') do
+    #     # do work..
+    #   end
     #
     def add(stream, title, options={})
       options[:title] = title
@@ -33,21 +38,26 @@ module Librato::Metrics
         options[:end_time] = options[:end_time].to_i
       end
       payload = SmartJSON.write(options)
-      # expects 200
-      connection.post("annotations/#{stream}", payload)
+      response = connection.post("annotations/#{stream}", payload)
+      # will raise exception if not 200 OK
+      event = SmartJSON.read(response.body)
+      if block_given?
+        yield
+        update_event stream, event['id'], :end_time => Time.now.to_i
+        # need to get updated representation
+        event = fetch_event stream, event['id']
+      end
+      event
     end
 
+    # client instance used by this object
     def client
       @client
     end
 
-    def connection
-      client.connection
-    end
-
-    # Delete an annotation streams
+    # Delete an annotation stream
     #
-    # @example Delete 'deployment' annotation stream
+    # @example Delete the 'deployment' annotation stream
     #  annotator.delete :deployment
     #
     def delete(stream)
@@ -77,14 +87,25 @@ module Librato::Metrics
     #   annotator.fetch :deployments
     #
     # @example Get events on 'deployments' between start and end times
-    #   annotator.fetch :deployments, :start_time => start, :end_time => end
+    #   annotator.fetch :deployments, :start_time => start,
+    #                   :end_time => end_time
     #
     # @example Source-limited listing
     #   annotator.fetch :deployments, :sources => ['foo','bar','baz'],
-    #                   :start_time => start, :end_time => end
+    #                   :start_time => start, :end_time => end_time
     #
     def fetch(stream, options={})
       response = connection.get("annotations/#{stream}", options)
+      SmartJSON.read(response.body)
+    end
+
+    # Get properties for a given annotation stream event
+    #
+    # @example Get event
+    #   annotator.fetch :deployments, 23
+    #
+    def fetch_event(stream, id)
+      response = connection.get("annotations/#{stream}/#{id}")
       SmartJSON.read(response.body)
     end
 
@@ -99,6 +120,26 @@ module Librato::Metrics
     def list(options={})
       response = connection.get("annotations", options)
       SmartJSON.read(response.body)
+    end
+
+    # Update an event's properties
+    #
+    # @example Set an end time for a previously submitted event
+    #   annotator.update_event 'deploys', 'v24', :end_time => end_time
+    #
+    def update_event(stream, id, options={})
+      url = "annotations/#{stream}/#{id}"
+      connection.put do |request|
+        request.url connection.build_url(url)
+        request.body = SmartJSON.write(options)
+      end
+      # expects 204 will raise exception otherwise
+    end
+
+    private
+
+    def connection
+      client.connection
     end
 
   end

@@ -11,7 +11,13 @@ module Librato
 
       attr_reader :source
 
-      def initialize(options={})
+      # @option opts [Integer] :autosubmit_interval If set the aggregator will auto-submit if the given number of seconds has passed when a new metric is added.
+      # @option opts [Boolean] :clear_failures Should the aggregator remove all stored data if it runs into problems with a request? (default: false)
+      # @option opts [Client] :client The client object to use to connect to Metrics. (default: Librato::Metrics.client)
+      # @option opts [Time|Integer] :measure_time A default measure_time to use for measurements added.
+      # @option opts [String] :prefix If set will apply the given prefix to all metric names of measurements added.
+      # @option opts [String] :source The default source to use for measurements added.
+      def initialize(opts={})
         @aggregated = {}
         setup_common_options(options)
       end
@@ -43,7 +49,7 @@ module Librato
 
       # Returns true if aggregate contains no measurements
       #
-      # @return Boolean
+      # @return [Boolean]
       def empty?
         @aggregated.empty?
       end
@@ -55,6 +61,8 @@ module Librato
       end
       alias :flush :clear
 
+      # Returns currently queued data
+      #
       def queued
         gauges = []
 

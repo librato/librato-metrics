@@ -17,9 +17,9 @@ module Librato
       # @option opts [String] :source The default source to use for measurements added.
       def initialize(opts={})
         @queued = {}
-        @autosubmit_count = options[:autosubmit_count]
-        @skip_measurement_times = options[:skip_measurement_times]
-        setup_common_options(options)
+        @autosubmit_count = opts[:autosubmit_count]
+        @skip_measurement_times = opts[:skip_measurement_times]
+        setup_common_options(opts)
       end
 
       # Add a metric entry to the metric set:

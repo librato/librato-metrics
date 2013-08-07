@@ -19,7 +19,7 @@ module Librato
       # @option opts [String] :source The default source to use for measurements added.
       def initialize(opts={})
         @aggregated = {}
-        setup_common_options(options)
+        setup_common_options(opts)
       end
 
       # Add a metric entry to the metric set:

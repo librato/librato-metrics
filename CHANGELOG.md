@@ -1,5 +1,15 @@
 ## Changelog
 
+### Version 1.1.0
+* Add ability to update annotation events
+* Add ability to fetch annotation events
+* Add block form of annotation
+* Add metric batch update support
+* Add support for pattern-based metric deletes
+* Add set of code examples
+* Sign gem when building
+* Documentation improvements
+
 ### Version 1.0.4
 * Ensure sane default timeouts for all requests
 

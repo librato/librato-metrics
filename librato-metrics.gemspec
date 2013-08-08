@@ -41,4 +41,7 @@ Gem::Specification.new do |s|
 
   s.files = `git ls-files`.split("\n")
   s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
+
+  s.signing_key = File.expand_path("~/.gem/librato-private_key.pem")
+  s.cert_chain = ["certs/librato-public.pem"]
 end

@@ -310,5 +310,50 @@ module Librato
       end
     end
 
+    describe "Sources API" do
+      before do
+        Metrics.update_source("sources_api_test", display_name: "Sources Api Test")
+      end
+
+      describe "#sources" do
+        it "should work" do
+          sources = Metrics.sources
+          sources.should be_an(Array)
+          test_source = sources.detect { |s| s["name"] == "sources_api_test" }
+          test_source["display_name"].should == "Sources Api Test"
+        end
+      end
+
+      describe "#get_source" do
+        it "should work" do
+          test_source = Metrics.get_source("sources_api_test")
+          test_source["display_name"].should == "Sources Api Test"
+        end
+      end
+
+      describe "#update_source" do
+        it "should update an existing source" do
+          Metrics.update_source("sources_api_test", display_name: "Updated Source Name")
+
+          test_source = Metrics.get_source("sources_api_test")
+          test_source["display_name"].should == "Updated Source Name"
+        end
+
+        it "should create new sources" do
+          source_name = "sources_api_test_#{Time.now.to_f}"
+          lambda {
+            no_source = Metrics.get_source(source_name)
+          }.should raise_error(Librato::Metrics::NotFound)
+
+          Metrics.update_source(source_name, display_name: "New Source")
+
+          test_source = Metrics.get_source(source_name)
+          test_source.should_not be_nil
+          test_source["display_name"].should == "New Source"
+        end
+      end
+
+    end
+
   end
 end

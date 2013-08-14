@@ -340,6 +340,26 @@ module Librato
         end
       end
 
+      def sources(filter = {})
+        query = filter[:name] if filter.has_key?(:name)
+        path = "sources"
+        Collection.paginated_collection("sources", connection, path, query)
+      end
+
+      def get_source(name)
+        url = connection.build_url("sources/#{name}")
+        response = connection.get(url)
+        parsed = SmartJSON.read(response.body)
+      end
+
+      def update_source(name, options = {})
+        url = "sources/#{name}"
+        connection.put do |request|
+          request.url connection.build_url(url)
+          request.body = SmartJSON.write(options)
+        end
+      end
+
     private
 
       def default_faraday_adapter

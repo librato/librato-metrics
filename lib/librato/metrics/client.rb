@@ -340,6 +340,13 @@ module Librato
         end
       end
 
+      # Update one or more metrics. Note that attributes are specified in
+      # their own hash for updating a single metric but are included inline
+      # when updating multiple metrics.
+      #
+      # @deprecated Use #update_metric instead
+      alias update update_metric
+
       def sources(filter = {})
         query = filter[:name] if filter.has_key?(:name)
         path = "sources"

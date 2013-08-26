@@ -42,9 +42,8 @@ Gem::Specification.new do |s|
   s.files = `git ls-files`.split("\n")
   s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
 
-  signing_key = File.expand_path("~/.gem/librato-private_key.pem")
-  if File.exists?(signing_key)
-    s.signing_key = signing_key
-    s.cert_chain = ["certs/librato-public.pem"]
+  s.cert_chain = ["certs/librato-public.pem"]
+  if ENV['GEM_SIGNING_KEY']
+    s.signing_key = ENV['GEM_SIGNING_KEY']
   end
 end

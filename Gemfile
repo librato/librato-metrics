@@ -10,3 +10,6 @@ platforms :ruby_19 do
 end
 
 gemspec
+
+# easily generate test data
+gem 'quixote'

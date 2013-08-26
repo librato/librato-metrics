@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 1.1.1
+* Move gem sign code to rake task, fixes bug bundling in some environments
+
 ### Version 1.1.0
 * Add ability to update annotation events
 * Add ability to fetch annotation events

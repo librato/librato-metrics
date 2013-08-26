@@ -1,8 +1,14 @@
-require 'bundler'
+#!/usr/bin/env rake
+begin
+  require 'bundler/setup'
+rescue LoadError
+  puts 'You must `gem install bundler` and `bundle install` to run rake tasks'
+end
 
 # Packaging
 Bundler::GemHelper.install_tasks
 
+# Gem signing
 task 'before_build' do
   signing_key = File.expand_path("~/.gem/librato-private_key.pem")
   if signing_key

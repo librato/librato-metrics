@@ -32,7 +32,7 @@ module Librato
   #   Librato::Metrics.submit :foo => 12712
   #
   #   # fetch the last 10 values of foo
-  #   Librato::Metrics.fetch :foo, :count => 10
+  #   Librato::Metrics.get_measurements :foo, :count => 10
   #
   # @example Queuing metrics for submission
   #   queue = Librato::Metrics::Queue.new
@@ -73,10 +73,14 @@ module Librato
     # Client.
     #
     def_delegators :client, :agent_identifier, :annotate, :api_endpoint,
-                   :api_endpoint=, :authenticate, :connection, :delete,
-                   :faraday_adapter, :faraday_adapter=, :fetch, :list,
-                   :persistence, :persistence=, :persister, :submit,
-                   :update
+                   :api_endpoint=, :authenticate, :connection,
+                   :faraday_adapter, :faraday_adapter=,
+                   :persistence, :persistence=, :persister,
+                   :get_metric, :get_measurements, :metrics,
+                   :delete_metrics, :update_metric,
+                   # Deprecated
+                   :fetch, :list, :delete, :update
+
 
     # The Librato::Metrics::Client being used by module-level
     # access.

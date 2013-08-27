@@ -86,13 +86,13 @@ module Librato
       # careful with this, this is instant and permanent.
       #
       # @example Delete metric 'temperature'
-      #   Librato::Metrics.delete :temperature
+      #   Librato::Metrics.delete_metrics :temperature
       #
       # @example Delete metrics 'foo' and 'bar'
-      #   Librato::Metrics.delete :foo, :bar
+      #   Librato::Metrics.delete_metrics :foo, :bar
       #
       # @example Delete metrics that start with 'foo' except 'foobar'
-      #   Librato::Metrics.delete :names => 'foo*', :exclude => ['foobar']
+      #   Librato::Metrics.delete_metrics :names => 'foo*', :exclude => ['foobar']
       #
       def delete_metrics(*metric_names)
         raise(NoMetricsProvided, 'Metric name missing.') if metric_names.empty?
@@ -223,7 +223,7 @@ module Librato
       # @param [Symbol|String] metric Metric name
       # @param [Hash] options Query options
       def get_measurements(metric_name, options = {})
-        fetch_metric(metric_name, options)["measurements"]
+        get_metric(metric_name, options)["measurements"]
       end
 
       # Purge current credentials and connection.
@@ -299,16 +299,16 @@ module Librato
       # when updating multiple metrics.
       #
       # @example Update metric 'temperature'
-      #   Librato::Metrics.update :temperature, :period => 15, :attributes => { :color => 'F00' }
+      #   Librato::Metrics.update_metric :temperature, :period => 15, :attributes => { :color => 'F00' }
       #
       # @example Update metric 'humidity', creating it if it doesn't exist
-      #   Librato::Metrics.update 'humidity', :type => :gauge, :period => 60, :display_name => 'Humidity'
+      #   Librato::Metrics.update_metric 'humidity', :type => :gauge, :period => 60, :display_name => 'Humidity'
       #
       # @example Update multiple metrics by name
-      #   Librato::Metrics.update :names => ["foo", "bar"], :period => 60
+      #   Librato::Metrics.update_metrics :names => ["foo", "bar"], :period => 60
       #
       # @example Update all metrics that start with 'foo' that aren't 'foobar'
-      #   Librato::Metrics.update :names => 'foo*', :exclude => ['foobar'], :display_min => 0
+      #   Librato::Metrics.update_metrics :names => 'foo*', :exclude => ['foobar'], :display_min => 0
       #
       def update_metric(metric, options = {})
         if metric.respond_to?(:each)
@@ -322,6 +322,7 @@ module Librato
           request.body = SmartJSON.write(options)
         end
       end
+      alias update_metrics update_metric
 
       # Update one or more metrics. Note that attributes are specified in
       # their own hash for updating a single metric but are included inline

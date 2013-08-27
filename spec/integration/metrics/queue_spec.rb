@@ -30,9 +30,9 @@ module Librato
 
           metrics = Metrics.list
           metrics.length.should == 8
-          counter = Metrics.fetch :counter_3, :count => 1
+          counter = Metrics.get_measurements :counter_3, :count => 1
           counter['unassigned'][0]['value'].should == 3
-          gauge = Metrics.fetch :gauge_5, :count => 1
+          gauge = Metrics.get_measurements :gauge_5, :count => 1
           gauge['unassigned'][0]['value'].should == 5
         end
       end
@@ -43,10 +43,10 @@ module Librato
         queue.add :bar => {:value => 456, :source => 'barsource'}
         queue.submit
 
-        foo = Metrics.fetch :foo, :count => 2
+        foo = Metrics.get_measurements :foo, :count => 2
         foo['default'][0]['value'].should == 123
 
-        bar = Metrics.fetch :bar, :count => 2
+        bar = Metrics.get_measurements :bar, :count => 2
         bar['barsource'][0]['value'].should == 456
       end
 

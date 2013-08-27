@@ -77,8 +77,9 @@ module Librato
                    :faraday_adapter, :faraday_adapter=,
                    :persistence, :persistence=, :persister,
                    :get_metric, :get_measurements, :metrics,
-                   :delete_metrics, :update_metric,
-                   # Deprecated
+                   :delete_metrics, :update_metric, :update_metrics,
+                   :submit,
+                   # Deprecated metrics methods
                    :fetch, :list, :delete, :update
 
 

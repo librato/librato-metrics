@@ -43,7 +43,7 @@ module Librato
       end
     end
 
-    describe "#delete" do
+    describe "#delete_metrics" do
       before(:each) { delete_all_metrics }
 
       context 'by names' do
@@ -51,19 +51,19 @@ module Librato
         context "with a single argument" do
           it "should delete named metric" do
             Metrics.submit :foo => 123
-            Metrics.list(:name => :foo).should_not be_empty
-            Metrics.delete :foo
-            Metrics.list(:name => :foo).should be_empty
+            Metrics.metrics(:name => :foo).should_not be_empty
+            Metrics.delete_metrics :foo
+            Metrics.metrics(:name => :foo).should be_empty
           end
         end
 
         context "with multiple arguments" do
           it "should delete named metrics" do
             Metrics.submit :foo => 123, :bar => 345, :baz => 567
-            Metrics.delete :foo, :bar
-            Metrics.list(:name => :foo).should be_empty
-            Metrics.list(:name => :bar).should be_empty
-            Metrics.list(:name => :baz).should_not be_empty
+            Metrics.delete_metrics :foo, :bar
+            Metrics.metrics(:name => :foo).should be_empty
+            Metrics.metrics(:name => :bar).should be_empty
+            Metrics.metrics(:name => :baz).should_not be_empty
           end
         end
 
@@ -71,14 +71,14 @@ module Librato
           it "should run cleanly" do
             # the API currently returns success even if
             # the metric has already been deleted or is absent.
-            Metrics.delete :missing
+            Metrics.delete_metrics :missing
           end
         end
 
         context "with no arguments" do
           it "should not make request" do
             lambda {
-              Metrics.delete
+              Metrics.delete_metrics
             }.should raise_error(Metrics::NoMetricsProvided)
           end
         end
@@ -88,22 +88,22 @@ module Librato
       context 'by pattern' do
         it "should filter properly" do
           Metrics.submit :foo => 1, :foobar => 2, :foobaz => 3, :bar => 4
-          Metrics.delete :names => 'fo*', :exclude => ['foobar']
+          Metrics.delete_metrics :names => 'fo*', :exclude => ['foobar']
 
           %w{foo foobaz}.each do |name|
             lambda {
-              Metrics.fetch name
+              Metrics.get_metric name
             }.should raise_error(Librato::Metrics::NotFound)
           end
 
           %w{foobar bar}.each do |name|
-            Metrics.fetch name # stil exist
+            Metrics.get_metric name # stil exist
           end
         end
       end
     end
 
-    describe "#fetch" do
+    describe "#get_metric" do
       before(:all) do
         delete_all_metrics
         Metrics.submit :my_counter => {:type => :counter, :value => 0, :measure_time => Time.now.to_i-60}
@@ -117,7 +117,7 @@ module Librato
 
       context "without arguments" do
         it "should get metric attributes" do
-          metric = Metrics.fetch :my_counter
+          metric = Metrics.get_metric :my_counter
           metric['name'].should == 'my_counter'
           metric['type'].should == 'counter'
         end
@@ -126,7 +126,8 @@ module Librato
       context "with a start_time" do
         it "should return entries since that time" do
           # 1 hr ago
-          data = Metrics.fetch :my_counter, :start_time => Time.now-3600
+          metric = Metrics.get_metric :my_counter, :start_time => Time.now-3600
+          data = metric['measurements']
           data['unassigned'].length.should == 3
           data['baz'].length.should == 2
         end
@@ -134,7 +135,8 @@ module Librato
 
       context "with a count limit" do
         it "should return that number of entries per source" do
-          data = Metrics.fetch :my_counter, :count => 2
+          metric = Metrics.get_metric :my_counter, :count => 2
+          data = metric['measurements']
           data['unassigned'].length.should == 2
           data['baz'].length.should == 2
         end
@@ -142,7 +144,8 @@ module Librato
 
       context "with a source limit" do
         it "should only return that source" do
-          data = Metrics.fetch :my_counter, :source => 'baz', :start_time => Time.now-3600
+          metric = Metrics.get_metric :my_counter, :source => 'baz', :start_time => Time.now-3600
+          data = metric['measurements']
           data['baz'].length.should == 2
           data['unassigned'].should be_nil
         end
@@ -150,7 +153,7 @@ module Librato
 
     end
 
-    describe "#list" do
+    describe "#metrics" do
       before(:all) do
         delete_all_metrics
         Metrics.submit :foo => 123, :bar => 345, :baz => 678, :foo_2 => 901
@@ -158,14 +161,14 @@ module Librato
 
       context "without arguments" do
         it "should list all metrics" do
-          metric_names = Metrics.list.map { |metric| metric['name'] }
+          metric_names = Metrics.metrics.map { |metric| metric['name'] }
           metric_names.sort.should == %w{foo bar baz foo_2}.sort
         end
       end
 
       context "with a name argument" do
         it "should list metrics that match" do
-          metric_names = Metrics.list(:name => 'foo').map { |metric| metric['name'] }
+          metric_names = Metrics.metrics(:name => 'foo').map { |metric| metric['name'] }
           metric_names.sort.should == %w{foo foo_2}.sort
         end
       end
@@ -181,13 +184,13 @@ module Librato
         end
 
         it "should create the metrics" do
-          metric = Metrics.list[0]
+          metric = Metrics.metrics[0]
           metric['name'].should == 'foo'
           metric['type'].should == 'gauge'
         end
 
         it "should store their data" do
-          data = Metrics.fetch :foo, :count => 1
+          data = Metrics.get_measurements :foo, :count => 1
           data.should_not be_empty
           data['unassigned'][0]['value'] == 123.0
         end
@@ -200,13 +203,13 @@ module Librato
         end
 
         it "should create the metrics" do
-          metric = Metrics.list[0]
+          metric = Metrics.metrics[0]
           metric['name'].should == 'bar'
           metric['type'].should == 'counter'
         end
 
         it "should store their data" do
-          data = Metrics.fetch :bar, :count => 1
+          data = Metrics.get_measurements :bar, :count => 1
           data.should_not be_empty
           data['baz'][0]['value'] == 456.0
         end
@@ -225,7 +228,7 @@ module Librato
 
     end
 
-    describe "#update" do
+    describe "#update_metric[s]" do
 
       context 'with a single metric' do
         context "with an existing metric" do
@@ -235,12 +238,12 @@ module Librato
           end
 
           it "should update the metric" do
-            Metrics.update :foo, :display_name => "Foo Metric",
-                                 :period => 15,
-                                 :attributes => {
-                                   :display_max => 1000
-                                 }
-            foo = Metrics.fetch :foo
+            Metrics.update_metric :foo, :display_name => "Foo Metric",
+                                        :period => 15,
+                                        :attributes => {
+                                          :display_max => 1000
+                                        }
+            foo = Metrics.get_metric :foo
             foo['display_name'].should == 'Foo Metric'
             foo['period'].should == 15
             foo['attributes']['display_max'].should == 1000
@@ -250,13 +253,13 @@ module Librato
         context "without an existing metric" do
           it "should create the metric if type specified" do
             delete_all_metrics
-            Metrics.update :foo, :display_name => "Foo Metric",
-                                 :type => 'gauge',
-                                 :period => 15,
-                                 :attributes => {
-                                   :display_max => 1000
-                                 }
-            foo = Metrics.fetch :foo
+            Metrics.update_metric :foo, :display_name => "Foo Metric",
+                                        :type => 'gauge',
+                                        :period => 15,
+                                        :attributes => {
+                                        :display_max => 1000
+                                      }
+            foo = Metrics.get_metric :foo
             foo['display_name'].should == 'Foo Metric'
             foo['period'].should == 15
             foo['attributes']['display_max'].should == 1000
@@ -265,11 +268,11 @@ module Librato
           it "should raise error if no type specified" do
             delete_all_metrics
             lambda {
-              Metrics.update :foo, :display_name => "Foo Metric",
-                                   :period => 15,
-                                   :attributes => {
-                                     :display_max => 1000
-                                   }
+              Metrics.update_metric :foo, :display_name => "Foo Metric",
+                                          :period => 15,
+                                          :attributes => {
+                                            :display_max => 1000
+                                          }
             }.should raise_error
           end
         end
@@ -284,24 +287,24 @@ module Librato
 
         it "should support named list" do
           names = ['my.1', 'my.3']
-          Metrics.update :names => names, :period => 60
+          Metrics.update_metrics :names => names, :period => 60
 
           names.each do |name|
-             metric = Metrics.fetch name
+             metric = Metrics.get_metric name
              metric['period'].should == 60
            end
         end
 
         it "should support patterns" do
-          Metrics.update :names => 'my.*', :exclude => ['my.3'],
+          Metrics.update_metrics :names => 'my.*', :exclude => ['my.3'],
             :display_max => 100
 
           %w{my.1 my.2 my.4}.each do |name|
-            metric = Metrics.fetch name
+            metric = Metrics.get_metric name
             metric['attributes']['display_max'].should == 100
           end
 
-          excluded = Metrics.fetch 'my.3'
+          excluded = Metrics.get_metric 'my.3'
           excluded['attributes']['display_max'].should_not == 100
         end
       end

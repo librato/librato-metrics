@@ -113,7 +113,7 @@ module Librato
       # careful with this, this is instant and permanent.
       #
       # @deprecated Use {#delete_metrics} instead
-      alias delete delete_metrics
+      def delete(*metric_names); delete_metrics(*metric_names); end
 
       # Return current adapter this client will use.
       # Defaults to Metrics.faraday_adapter if set, otherwise
@@ -175,7 +175,7 @@ module Librato
       # A full list of query parameters can be found in the API
       # documentation: {http://dev.librato.com/v1/get/metrics/:name}
       #
-      # @param [Symbol|String] metric Metric name
+      # @param [Symbol|String] name Metric name
       # @param [Hash] options Query options
       def get_metric(name, options = {})
         query = options.dup
@@ -220,7 +220,7 @@ module Librato
       # A full list of query parameters can be found in the API
       # documentation: {http://dev.librato.com/v1/get/metrics/:name}
       #
-      # @param [Symbol|String] metric Metric name
+      # @param [Symbol|String] metric_name Metric name
       # @param [Hash] options Query options
       def get_measurements(metric_name, options = {})
         get_metric(metric_name, options)["measurements"]
@@ -254,7 +254,7 @@ module Librato
       # List currently existing metrics
       #
       # @deprecated Use {#metrics} instead
-      alias list metrics
+      def list(options={}); metrics(options); end
 
       # Create a new queue which uses this client.
       #
@@ -329,7 +329,7 @@ module Librato
       # when updating multiple metrics.
       #
       # @deprecated Use {#update_metric} instead
-      alias update update_metric
+      def update(metric, options={}); update_metric(metric, options); end
 
     private
 

@@ -112,7 +112,7 @@ module Librato
       # Completely delete metrics with the given names. Be
       # careful with this, this is instant and permanent.
       #
-      # @deprecated Use #delete_metrics instead
+      # @deprecated Use {#delete_metrics} instead
       alias delete delete_metrics
 
       # Return current adapter this client will use.
@@ -129,7 +129,7 @@ module Librato
 
       # Query metric data
       #
-      # @deprecated Use #get_metric or #get_measurements instead.
+      # @deprecated Use {#get_metric} or {#get_measurements} instead.
       #
       # @example Get attributes for a metric
       #   attrs = Librato::Metrics.fetch :temperature
@@ -253,7 +253,7 @@ module Librato
 
       # List currently existing metrics
       #
-      # @deprecated Use #metrics instead
+      # @deprecated Use {#metrics} instead
       alias list metrics
 
       # Create a new queue which uses this client.
@@ -328,7 +328,7 @@ module Librato
       # their own hash for updating a single metric but are included inline
       # when updating multiple metrics.
       #
-      # @deprecated Use #update_metric instead
+      # @deprecated Use {#update_metric} instead
       alias update update_metric
 
     private

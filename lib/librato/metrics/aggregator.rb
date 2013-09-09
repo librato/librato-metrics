@@ -4,6 +4,24 @@ require 'metrics/processor'
 module Librato
   module Metrics
 
+    # If you are measuring something very frequently you can sample into
+    # an aggregator and it will track and submit a single aggregate
+    # measurement
+    #
+    # @example
+    #   aggregator = Libato::Metrics::Aggregator.new
+    #
+    #   40.times do
+    #     # do work...
+    #     aggregator.add 'work.time' => work_time
+    #   end
+    #
+    #   # send directly
+    #   aggregator.submit
+    #
+    #   # or merge into a queue for submission
+    #   queue.merge!(aggregator)
+    #
     class Aggregator
       SOURCE_SEPARATOR = '%%' # must not be in valid source name criteria
 
@@ -23,6 +41,12 @@ module Librato
       end
 
       # Add a metric entry to the metric set:
+      #
+      # @example Basic use
+      #   annotator.add 'request.time' => 30.24
+      #
+      # @example With a custom source
+      #   annotator.add 'request.time' => {value: 20.52, source: 'staging'}
       #
       # @param [Hash] measurements measurements to add
       # @return [Aggregator] returns self

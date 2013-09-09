@@ -1,5 +1,9 @@
 module Librato
   module Metrics
+
+    # An internal class used for extracting pagination logic
+    #
+    # @api private
     class Collection
 
       MAX_RESULTS = 100

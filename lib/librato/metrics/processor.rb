@@ -1,6 +1,8 @@
 module Librato
   module Metrics
 
+    # Mixin which provides common logic between {Queue} and {Aggregator}
+    # objects.
     module Processor
       MEASUREMENTS_PER_REQUEST = 500
 

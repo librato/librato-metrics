@@ -199,23 +199,23 @@ module Librato
       # Retrieve data points for a specific metric
       #
       # @example Get 20 most recent data points for metric
-      #   data = Librato::Metrics.fetch :temperature, :count => 20
+      #   data = Librato::Metrics.get_measurements :temperature, :count => 20
       #
       # @example Get 20 most recent data points for a specific source
-      #   data = Librato::Metrics.fetch :temperature, :count => 20,
-      #                                 :source => 'app1'
+      #   data = Librato::Metrics.get_measurements :temperature, :count => 20,
+      #                                            :source => 'app1'
       #
       # @example Get the 20 most recent 15 minute data point rollups
-      #   data = Librato::Metrics.fetch :temperature, :count => 20,
-      #                                 :resolution => 900
+      #   data = Librato::Metrics.get_measurements :temperature, :count => 20,
+      #                                            :resolution => 900
       #
       # @example Get data points for the last hour
-      #   data = Librato::Metrics.fetch :start_time => Time.now-3600
+      #   data = Librato::Metrics.get_measurements :start_time => Time.now-3600
       #
       # @example Get 15 min data points from two hours to an hour ago
-      #   data = Librato::Metrics.fetch :start_time => Time.now-7200,
-      #                                 :end_time => Time.now-3600,
-      #                                 :resolution => 900
+      #   data = Librato::Metrics.get_measurements :start_time => Time.now-7200,
+      #                                            :end_time => Time.now-3600,
+      #                                            :resolution => 900
       #
       # A full list of query parameters can be found in the API
       # documentation: {http://dev.librato.com/v1/get/metrics/:name}

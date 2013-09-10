@@ -294,9 +294,7 @@ module Librato
         @queue.submit
       end
 
-      # Update one or more metrics. Note that attributes are specified in
-      # their own hash for updating a single metric but are included inline
-      # when updating multiple metrics.
+      # Update a single metric with new attributes.
       #
       # @example Update metric 'temperature'
       #   Librato::Metrics.update_metric :temperature, :period => 15, :attributes => { :color => 'F00' }
@@ -304,32 +302,42 @@ module Librato
       # @example Update metric 'humidity', creating it if it doesn't exist
       #   Librato::Metrics.update_metric 'humidity', :type => :gauge, :period => 60, :display_name => 'Humidity'
       #
+      def update_metric(metric, options = {})
+        url = "metrics/#{metric}"
+        connection.put do |request|
+          request.url connection.build_url(url)
+          request.body = SmartJSON.write(options)
+        end
+      end
+
+      # Update multiple metrics.
+      #
       # @example Update multiple metrics by name
       #   Librato::Metrics.update_metrics :names => ["foo", "bar"], :period => 60
       #
       # @example Update all metrics that start with 'foo' that aren't 'foobar'
       #   Librato::Metrics.update_metrics :names => 'foo*', :exclude => ['foobar'], :display_min => 0
       #
-      def update_metric(metric, options = {})
-        if metric.respond_to?(:each)
-          url = "metrics" # update multiple metrics
-          options = metric
-        else
-          url = "metrics/#{metric}" # update single
-        end
+      def update_metrics(metrics)
+        url = "metrics" # update multiple metrics
         connection.put do |request|
           request.url connection.build_url(url)
-          request.body = SmartJSON.write(options)
+          request.body = SmartJSON.write(metrics)
         end
       end
-      alias update_metrics update_metric
 
       # Update one or more metrics. Note that attributes are specified in
       # their own hash for updating a single metric but are included inline
       # when updating multiple metrics.
       #
-      # @deprecated Use {#update_metric} instead
-      def update(metric, options={}); update_metric(metric, options); end
+      # @deprecated Use {#update_metric} or {#update_metrics} instead
+      def update(metric, options={})
+        if metric.respond_to?(:each)
+          update_metrics(metric)
+        else
+          update_metric(metric, options)
+        end
+      end
 
     private
 

@@ -223,6 +223,7 @@ module Librato
       # @param [Symbol|String] metric_name Metric name
       # @param [Hash] options Query options
       def get_measurements(metric_name, options = {})
+        raise ArgumentError, "you must provide at least a :start_time or :count" if options.empty?
         get_metric(metric_name, options)["measurements"]
       end
 

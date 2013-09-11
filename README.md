@@ -186,52 +186,52 @@ Both options are driven by the addition of measurements. Specifically for time-b
 
 Get name and properties for all metrics you have in the system:
 
-    metrics = Librato::Metrics.list
+    metrics = Librato::Metrics.metrics
 
 Get only metrics whose name includes `time`:
 
-    metrics = Librato::Metrics.list :name => 'time'
+    metrics = Librato::Metrics.metrics :name => 'time'
 
 ## Querying Metric Data
 
 Get attributes for metric `temperature`:
 
-    data = Librato::Metrics.fetch :temperature
+    data = Librato::Metrics.get_metric :temperature
 
 Get the 20 most recent data points for `temperature`:
 
-    data = Librato::Metrics.fetch :temperature, :count => 20
+    data = Librato::Metrics.get_measurements :temperature, :count => 20
 
 Get the 20 most recent data points for `temperature` from a specific source:
 
-    data = Librato::Metrics.fetch :temperature, :count => 20, :source => 'app1'
+    data = Librato::Metrics.get_measurements :temperature, :count => 20, :source => 'app1'
 
 Get the 20 most recent 15 minute data point rollups for `temperature`:
 
-    data = Librato::Metrics.fetch :temperature, :count => 20, :resolution => 900
+    data = Librato::Metrics.get_measurements :temperature, :count => 20, :resolution => 900
 
-There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/gauges/:name) or the [fetch documentation](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics/Client#fetch-instance_method)  for more details.
+There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/gauges/:name) or the [`get_metric`](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics/Client#get_metric-instance_method)/[`get_measurements`](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics/Client#get_measurements-instance_method) documentation for more details.
 
 ## Setting Metric Properties
 
 Setting custom [properties](http://dev.librato.com/v1/metrics#metric_properties) on your metrics is easy:
 
     # assign a period and default color
-    Librato::Metrics.update :temperature, :period => 15, :attributes => { :color => 'F00' }
+    Librato::Metrics.update_metric :temperature, :period => 15, :attributes => { :color => 'F00' }
 
-It is also possible to update properties for multiple metrics at once, see the [#update method documentation](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics/Client#update-instance_method) for more information.
+It is also possible to update properties for multiple metrics at once, see the [`#update_metric` method documentation](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics/Client#update_metric-instance_method) for more information.
 
 ## Deleting Metrics
 
 If you ever need to remove a metric and all of its measurements, doing so is easy:
 
 	# delete the metrics 'temperature' and 'humidity'
-	Librato::Metrics.delete :temperature, :humidity
+	Librato::Metrics.delete_metrics :temperature, :humidity
 
 You can also delete using wildcards:
 
     # delete metrics that start with cpu. except for cpu.free
-    Librato::Metrics.delete :names => 'cpu.*', :exclude => ['cpu.free']
+    Librato::Metrics.delete_metrics :names => 'cpu.*', :exclude => ['cpu.free']
 
 Note that deleted metrics and their measurements are unrecoverable, so use with care.
 
@@ -248,10 +248,10 @@ If you need to use metrics with multiple sets of authentication credentials simu
 All of the same operations you can call directly from `Librato::Metrics` are available per-client:
 
 	# list Joe's metrics
-	joe.list
+	joe.metrics
 
 	# fetch the last 20 data points for Mike's metric, humidity
-	mike.fetch :humidity, :count => 20
+	mike.get_measurements :humidity, :count => 20
 
 There are two ways to associate a new queue with a client:
 

@@ -186,11 +186,11 @@ Both options are driven by the addition of measurements. Specifically for time-b
 
 Get name and properties for all metrics you have in the system:
 
-    metrics = Librato::Metrics.metrics
+    metrics = Librato::Metrics.list
 
 Get only metrics whose name includes `time`:
 
-    metrics = Librato::Metrics.metrics :name => 'time'
+    metrics = Librato::Metrics.list :name => 'time'
 
 ## Querying Metric Data
 

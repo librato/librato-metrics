@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
 
   s.name        = 'librato-metrics'
   s.version     = Librato::Metrics::VERSION
+  s.license     = 'BSD 3-clause'
 
   s.summary     = "Ruby wrapper for Librato's Metrics API"
   s.description = "An easy to use ruby wrapper for Librato's Metrics API"

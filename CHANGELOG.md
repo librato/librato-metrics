@@ -1,5 +1,9 @@
 ## Changelog
 
+### Version 1.2.0
+* Give metric-facing methods more explicit names & deprecate priors
+* Documentation improvements
+
 ### Version 1.1.1
 * Move gem sign code to rake task, fixes bug bundling in some environments
 

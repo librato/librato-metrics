@@ -340,6 +340,53 @@ module Librato
         end
       end
 
+      # Update one or more metrics. Note that attributes are specified in
+      # their own hash for updating a single metric but are included inline
+      # when updating multiple metrics.
+      #
+      # @deprecated Use #update_metric instead
+      alias update update_metric
+
+      # List sources, optionally limited by a name. See http://dev.librato.com/v1/sources
+      # and http://dev.librato.com/v1/get/sources
+      #
+      # @example Get sources matching "production"
+      #   Librato::Metrics.sources name: "production"
+      #
+      # @param [Hash] filter
+      def sources(filter = {})
+        query = filter[:name] if filter.has_key?(:name)
+        path = "sources"
+        Collection.paginated_collection("sources", connection, path, query)
+      end
+
+      # Retrieve a single source by name. See http://dev.librato.com/v1/get/sources/:name
+      #
+      # @example Get the source for a particular EC2 instance from Cloudwatch
+      #   Librato::Metrics.source "us-east-1b.i-f1bc8c9c"
+      #
+      # @param String name
+      def get_source(name)
+        url = connection.build_url("sources/#{name}")
+        response = connection.get(url)
+        parsed = SmartJSON.read(response.body)
+      end
+
+      # Update a source by name. See http://dev.librato.com/v1/get/sources/:name
+      #
+      # @example Update the source display name for a particular EC2 instance from Cloudwatch
+      #   Librato::Metrics.source "us-east-1b.i-f1bc8c9c", display_name: "Production Web 1"
+      #
+      # @param String name
+      # @param Hash options
+      def update_source(name, options = {})
+        url = "sources/#{name}"
+        connection.put do |request|
+          request.url connection.build_url(url)
+          request.body = SmartJSON.write(options)
+        end
+      end
+
     private
 
       def default_faraday_adapter

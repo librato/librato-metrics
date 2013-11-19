@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 1.3.0
+* Add support for working with sources as a first-class entity
+
 ### Version 1.2.0
 * Give metric-facing methods more explicit names & deprecate priors
 * Documentation improvements

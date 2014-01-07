@@ -180,7 +180,9 @@ Both `Queue` and `Aggregator` support automatically submitting measurements on a
 
 These options can also be combined for more flexible behavior.
 
-Both options are driven by the addition of measurements. Specifically for time-based autosubmission if you are adding measurements irregularly (less than once per second), submission may lag past your specified interval until the next measurement is added.
+Both options are driven by the addition of measurements. *If you are adding measurements irregularly (less than once per second), time-based submission may lag past your specified interval until the next measurement is added.*
+
+If your goal is to collect metrics every _x_ seconds and submit them, [check out this code example](https://github.com/librato/librato-metrics/blob/master/examples/submit_every.rb).
 
 ## Querying Metrics
 

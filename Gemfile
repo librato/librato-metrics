@@ -9,6 +9,12 @@ platforms :ruby_19 do
   gem 'redcarpet'
 end
 
+platforms :rbx do
+   # rubinius stdlib
+  gem 'rubysl', '~> 2.0'
+  gem 'rubinius-developer_tools'
+end
+
 gemspec
 
 # easily generate test data

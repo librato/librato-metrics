@@ -5,6 +5,7 @@ module Librato
   module Metrics
     module Persistence
       class Direct
+        MEASUREMENT_TYPES = [:gauges, :counters]
 
         # Persist the queued metrics directly to the
         # Metrics web API.
@@ -28,19 +29,30 @@ module Librato
         def chunk_queued(queued, per_request)
           return [queued] if queue_count(queued) <= per_request
           reqs = []
-          queued.each do |metric_type, measurements|
-            if measurements.size <= per_request
-              # we can fit all of this metric type in a single
-              # request, so do so
-              reqs << {metric_type => measurements}
+          # separate metric-containing values from global values
+          globals = fetch_globals(queued)
+          MEASUREMENT_TYPES.each do |metric_type|
+            metrics = queued[metric_type]
+            next unless metrics
+            if metrics.size <= per_request
+              # we can fit all of this metric type in a single request
+              reqs << build_request(metric_type, metrics, globals)
             else
               # going to have to split things up
-              measurements.each_slice(per_request) do |elements|
-                reqs << {metric_type => elements}
+              metrics.each_slice(per_request) do |elements|
+                reqs << build_request(metric_type, elements, globals)
               end
             end
           end
           reqs
+        end
+
+        def build_request(type, metrics, globals)
+          {type => metrics}.merge(globals)
+        end
+
+        def fetch_globals(queued)
+          queued.reject {|k, v| MEASUREMENT_TYPES.include?(k)}
         end
 
         def queue_count(queued)

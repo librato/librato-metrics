@@ -35,6 +35,26 @@ module Librato
           gauge = Metrics.get_measurements :gauge_5, :count => 1
           gauge['unassigned'][0]['value'].should == 5
         end
+
+        it "should apply globals to each request" do
+          source = 'yogi'
+          measure_time = Time.now.to_i-3
+          queue = Queue.new(
+            :per_request => 3,
+            :source => source,
+            :measure_time => measure_time,
+            :skip_measurement_times => true
+          )
+          (1..5).each do |i|
+            queue.add "gauge_#{i}" => 1
+          end
+          queue.submit
+
+          # verify globals have persisted for all requests
+          gauge = Metrics.get_measurements :gauge_5, :count => 1
+          gauge[source][0]["value"].should eq(1.0)
+          gauge[source][0]["measure_time"].should eq(measure_time)
+        end
       end
 
       it "should respect default and individual sources" do

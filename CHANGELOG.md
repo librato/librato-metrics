@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 1.3.2
+* Fix queue autosubmission to fire if needed after #merge! calls
+
 ### Version 1.3.1
 * Fix auto-chunking for large measurements sets with a global source
 

@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 1.3.1
+* Fix auto-chunking for large measurements sets with a global source
+
 ### Version 1.3.0
 * Add support for working with sources as a first-class entity
 

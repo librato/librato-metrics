@@ -107,6 +107,7 @@ module Librato
             end
           end
         end
+        submit_check
         self
       end
 

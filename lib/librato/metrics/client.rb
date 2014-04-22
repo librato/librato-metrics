@@ -387,6 +387,26 @@ module Librato
         end
       end
 
+      # Create a snapshot of an instrument
+      #
+      # @example Take a snapshot of the instrument at https://metrics-api.librato.com/v1/instruments/42 using a
+      #   duration of 3 hours and ending at now.
+      #   Librato::Metrics.snapshot(subject: {instrument: {href: "https://metrics-api.librato.com/v1/instruments/42"}},
+      #                             duration: 3.hours, end_time: Time.now)
+      #
+      # @param Hash options Params for the snapshot
+      # @options options [Hash] :subject An object representing the subject of the snapshot. For now, only instruments are supported
+      # @options options [Numeric] :duration Time interval over which to take the snapshot, defaults to 1 hour
+      # @options options [Numeric, Time] :end_time Snapshot the time period of the duration, ending with end_time. Default is "now".
+      def create_snapshot(options = {})
+        url = "snapshots"
+        response = connection.post do |request|
+          request.url connection.build_url(url)
+          request.body = SmartJSON.write(options)
+        end
+        parsed = SmartJSON.read(response.body)
+      end
+
     private
 
       def default_faraday_adapter

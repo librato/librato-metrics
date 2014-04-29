@@ -407,6 +407,18 @@ module Librato
         parsed = SmartJSON.read(response.body)
       end
 
+      # Retrive a snapshot, to check its progress or find its image_href
+      #
+      # @example Get a snapshot identified by 42
+      #   Librato::Metrics.get_snapshot 42
+      #
+      # @param [Integer|String] id
+      def get_snapshot(id)
+        url = "snapshots/#{id}"
+        response = connection.get(url)
+        parsed = SmartJSON.read(response.body)
+      end
+
     private
 
       def default_faraday_adapter

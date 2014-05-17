@@ -80,7 +80,6 @@ module Librato
                    :delete_metrics, :update_metric, :update_metrics,
                    :submit,
                    :sources, :get_source, :update_source,
-                   :create_snapshot, :get_snapshot,
                    # Deprecated metrics methods
                    :fetch, :list, :delete, :update
 

@@ -355,5 +355,22 @@ module Librato
 
     end
 
+    describe "Snapshots API" do
+      it "should #create_snapshot" do
+        subject = {instrument: {href: "http://api.librato.dev/v1/instruments/1"}}
+        result = Metrics.create_snapshot(subject: subject)
+        result["href"].should =~ /snapshots\/\d+$/
+      end
+
+      it "should #get_snapshot" do
+        subject = {instrument: {href: "http://api.librato.dev/v1/instruments/1"}}
+        result = Metrics.create_snapshot(subject: subject)
+        snapshot_id = result["href"][/(\d+)$/]
+
+        result = Metrics.get_snapshot(snapshot_id)
+        result["href"].should =~ /snapshots\/\d+$/
+      end
+    end
+
   end
 end

@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 1.4.0
+* Add support for snapshots
+
 ### Version 1.3.2
 * Fix queue autosubmission to fire if needed after #merge! calls
 

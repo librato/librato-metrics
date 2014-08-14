@@ -169,7 +169,7 @@ module Librato
       #   metric = Librato::Metrics.get_metric :temperature
       #
       # @example Get a metric and its 20 most recent data points
-      #   metric = Librato::Metrics.fetch :temperature, :count => 20
+      #   metric = Librato::Metrics.get_metric :temperature, :count => 20
       #   metric['measurements'] # => {...}
       #
       # A full list of query parameters can be found in the API
@@ -238,10 +238,10 @@ module Librato
       # List currently existing metrics
       #
       # @example List all metrics
-      #   Librato::Metrics.list
+      #   Librato::Metrics.metrics
       #
       # @example List metrics with 'foo' in the name
-      #   Librato::Metrics.list :name => 'foo'
+      #   Librato::Metrics.metrics :name => 'foo'
       #
       # @param [Hash] options
       def metrics(options={})

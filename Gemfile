@@ -17,5 +17,19 @@ end
 
 gemspec
 
+gem 'rake'
+
+# docs
+gem 'yard'
+
+# debugging
+gem 'pry'
+
 # easily generate test data
 gem 'quixote'
+
+group :test do
+  gem 'rspec', '~> 2.6.0'
+  gem 'sinatra'
+  gem 'popen4'
+end

@@ -16,3 +16,8 @@ matrix:
 branches:
   except:
     - /^v[0-9]/
+
+notifications:
+  email:
+    on_failure: change
+    on_success: never

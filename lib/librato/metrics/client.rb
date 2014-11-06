@@ -163,6 +163,30 @@ module Librato
         options.empty? ? metric : metric["measurements"]
       end
 
+      # Retrieve measurements for a given composite metric definition.
+      # :start_time and :resolution are required options, :end_time is
+      # optional.
+      #
+      # @example Get 5m moving average of 'foo'
+      #   measurements = Librato::Metrics.get_composite
+      #     'moving_average(mean(series("foo", "*"), {size: "5"}))',
+      #     :start_time => Time.now.to_i - 60*60, :resolution => 300
+      #
+      # @param [String] definition Composite definition
+      # @param [hash] options Query options
+      def get_composite(definition, options={})
+        unless options[:start_time] && options[:resolution]
+          raise "You must provide a :start_time and :resolution"
+        end
+        query = options.dup
+        query[:compose] = definition
+        url = connection.build_url("metrics", query)
+        response = connection.get(url)
+        parsed = SmartJSON.read(response.body)
+        # TODO: pagination support
+        parsed
+      end
+
       # Retrieve a specific metric by name, optionally including data points
       #
       # @example Get attributes for a metric

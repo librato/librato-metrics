@@ -212,7 +212,11 @@ Get the 20 most recent 15 minute data point rollups for `temperature`:
 
     data = Librato::Metrics.get_measurements :temperature, :count => 20, :resolution => 900
 
-There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/metrics/:name) or the [`get_metric`](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics/Client#get_metric-instance_method)/[`get_measurements`](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics/Client#get_measurements-instance_method) documentation for more details.
+Get the 5 minute moving average for `temperature` for the last hour, assuming temperature is submitted once per minute:
+
+    data = Librato::Metrics.get_composite 'moving_average(mean(series("temperature", "*"), {size: "5"}))', :start_time => Time.now.to_i - 60*60, :resolution => 300
+
+There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/metrics/:name) or the individual method documentation for more details.
 
 ## Setting Metric Properties
 

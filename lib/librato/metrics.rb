@@ -76,7 +76,7 @@ module Librato
                    :api_endpoint=, :authenticate, :connection,
                    :faraday_adapter, :faraday_adapter=,
                    :persistence, :persistence=, :persister,
-                   :get_metric, :get_measurements, :metrics,
+                   :get_composite, :get_metric, :get_measurements, :metrics,
                    :delete_metrics, :update_metric, :update_metrics,
                    :submit,
                    :sources, :get_source, :update_source,

@@ -43,10 +43,10 @@ module Librato
       # Add a metric entry to the metric set:
       #
       # @example Basic use
-      #   annotator.add 'request.time' => 30.24
+      #   aggregator.add 'request.time' => 30.24
       #
       # @example With a custom source
-      #   annotator.add 'request.time' => {value: 20.52, source: 'staging'}
+      #   aggregator.add 'request.time' => {value: 20.52, source: 'staging'}
       #
       # @param [Hash] measurements measurements to add
       # @return [Aggregator] returns self

@@ -31,9 +31,7 @@ module Librato::Metrics
     #
     def add(stream, title, options={})
       options[:title] = title
-      if options[:start_time]
-        options[:start_time] = options[:start_time].to_i
-      end
+      options[:start_time] = (options[:start_time] || Time.now).to_i
       if options[:end_time]
         options[:end_time] = options[:end_time].to_i
       end

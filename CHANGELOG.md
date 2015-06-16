@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 1.5.1
+* Fix bug causing incompatible dates when annotating with block form (#109)
+
 ### Version 1.5.0
 * Add #get_composite for easier fetching of composite measurements
 

@@ -74,6 +74,7 @@ module Librato
     #
     def_delegators :client, :agent_identifier, :annotate, :api_endpoint,
                    :api_endpoint=, :authenticate, :connection,
+                   :proxy, :proxy=,
                    :faraday_adapter, :faraday_adapter=,
                    :persistence, :persistence=, :persister,
                    :get_composite, :get_metric, :get_measurements, :metrics,

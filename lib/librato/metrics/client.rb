@@ -6,7 +6,7 @@ module Librato
 
       def_delegator :annotator, :add, :annotate
 
-      attr_accessor :email, :api_key
+      attr_accessor :email, :api_key, :proxy
 
       # Provide agent identifier for the developer program. See:
       # http://support.metrics.librato.com/knowledgebase/articles/53548-developer-program
@@ -66,7 +66,7 @@ module Librato
         # prevent successful creation if no credentials set
         raise CredentialsMissing unless (self.email and self.api_key)
         @connection ||= Connection.new(:client => self, :api_endpoint => api_endpoint,
-                                       :adapter => faraday_adapter)
+                                       :adapter => faraday_adapter, :proxy => self.proxy)
       end
 
       # Overrride user agent for this client's connections. If you

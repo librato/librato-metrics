@@ -19,6 +19,7 @@ module Librato
         @client = options[:client]
         @api_endpoint = options[:api_endpoint]
         @adapter = options[:adapter]
+        @proxy = options[:proxy]
       end
 
       # API endpoint that will be used for requests.
@@ -39,6 +40,7 @@ module Librato
           f.use Librato::Metrics::Middleware::ExpectsStatus
 
           f.adapter @adapter || Metrics.faraday_adapter
+          f.proxy @proxy if @proxy
         end.tap do |transport|
           transport.headers[:user_agent] = user_agent
           transport.headers[:content_type] = 'application/json'

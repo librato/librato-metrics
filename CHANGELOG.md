@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 1.6.0
+* Add HTTP proxy support (#112) (Genki Sugawara)
+
 ### Version 1.5.1
 * Fix bug causing incompatible dates when annotating with block form (#109)
 

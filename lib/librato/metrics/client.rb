@@ -387,7 +387,7 @@ module Librato
       # Retrieve a single source by name. See http://dev.librato.com/v1/get/sources/:name
       #
       # @example Get the source for a particular EC2 instance from Cloudwatch
-      #   Librato::Metrics.source "us-east-1b.i-f1bc8c9c"
+      #   Librato::Metrics.get_source "us-east-1b.i-f1bc8c9c"
       #
       # @param String name
       def get_source(name)
@@ -399,7 +399,7 @@ module Librato
       # Update a source by name. See http://dev.librato.com/v1/get/sources/:name
       #
       # @example Update the source display name for a particular EC2 instance from Cloudwatch
-      #   Librato::Metrics.source "us-east-1b.i-f1bc8c9c", display_name: "Production Web 1"
+      #   Librato::Metrics.update_source "us-east-1b.i-f1bc8c9c", display_name: "Production Web 1"
       #
       # @param String name
       # @param Hash options

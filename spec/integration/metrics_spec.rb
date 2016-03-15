@@ -322,6 +322,11 @@ module Librato
           test_source = sources.detect { |s| s["name"] == "sources_api_test" }
           test_source["display_name"].should == "Sources Api Test"
         end
+
+        it "should allow filtering by name" do
+          sources = Metrics.sources name: 'sources_api_test'
+          sources.all? {|s| s['name'] =~ /sources_api_test/}.should be_true
+        end
       end
 
       describe "#get_source" do

@@ -379,7 +379,8 @@ module Librato
       #
       # @param [Hash] filter
       def sources(filter = {})
-        query = filter[:name] if filter.has_key?(:name)
+        query = {}
+        query[:name] = filter[:name] if filter.has_key?(:name)
         path = "sources"
         Collection.paginated_collection("sources", connection, path, query)
       end

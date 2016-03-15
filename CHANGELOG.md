@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 1.6.1
+* Fix bugs with listing sources (#116)
+
 ### Version 1.6.0
 * Add HTTP proxy support (#112) (Genki Sugawara)
 

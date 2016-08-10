@@ -309,7 +309,7 @@ module Librato
 
       describe "#size" do
         it "should return empty if gauges and counters are emtpy" do
-          expect(subject.size).to eq(0)
+          expect(subject.size).to be_zero
         end
         it "should return count of gauges and counters if added" do
           subject.add :transactions => {:type => :counter, :value => 12345},

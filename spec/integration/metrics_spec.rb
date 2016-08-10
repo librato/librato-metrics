@@ -46,7 +46,7 @@ module Librato
     describe "#delete_metrics" do
       before(:each) { delete_all_metrics }
 
-      context 'by names' do
+      context 'with names' do
 
         context "with a single argument" do
           it "deletes named metric" do
@@ -85,7 +85,7 @@ module Librato
 
       end
 
-      context 'by pattern' do
+      context 'with patterns' do
         it "filters properly" do
           Metrics.submit :foo => 1, :foobar => 2, :foobaz => 3, :bar => 4
           Metrics.delete_metrics :names => 'fo*', :exclude => ['foobar']

@@ -7,7 +7,7 @@ module Librato
 
       before(:each) do
         @time = (Time.now.to_i - 1*60)
-        Queue.any_instance.stub(:epoch_time).and_return(@time)
+        allow_any_instance_of(Queue).to receive(:epoch_time).and_return(@time)
       end
 
       describe "initialization" do

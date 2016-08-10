@@ -6,7 +6,7 @@ module Librato
 
       before(:all) do
         @time = 1354720160 #Time.now.to_i
-        Aggregator.any_instance.stub(:epoch_time).and_return(@time)
+        allow_any_instance_of(Aggregator).to receive(:epoch_time).and_return(@time)
       end
 
       describe "initialization" do

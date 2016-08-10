@@ -11,14 +11,14 @@ module Librato
           CountRequests.reset
           Metrics.submit :foo => 123
           Metrics.submit :foo => 135
-          CountRequests.total_requests.should == 2
+          expect(CountRequests.total_requests).to eq(2)
         end
 
         it "should be resettable" do
           Metrics.submit :foo => 123
-          CountRequests.total_requests.should > 0
+          expect(CountRequests.total_requests).to be > 0
           CountRequests.reset
-          CountRequests.total_requests.should == 0
+          expect(CountRequests.total_requests).to eq(0)
         end
 
       end

@@ -15,7 +15,7 @@ module Librato
             queue.add "gauge_#{i}" => 1
           end
           queue.submit
-          Middleware::CountRequests.total_requests.should == 4
+          expect(Middleware::CountRequests.total_requests).to eq(4)
         end
 
         it "should persist all metrics" do
@@ -29,11 +29,11 @@ module Librato
           queue.submit
 
           metrics = Metrics.list
-          metrics.length.should == 8
+          expect(metrics.length).to eq(8)
           counter = Metrics.get_measurements :counter_3, :count => 1
-          counter['unassigned'][0]['value'].should == 3
+          expect(counter['unassigned'][0]['value']).to eq(3)
           gauge = Metrics.get_measurements :gauge_5, :count => 1
-          gauge['unassigned'][0]['value'].should == 5
+          expect(gauge['unassigned'][0]['value']).to eq(5)
         end
 
         it "should apply globals to each request" do
@@ -52,8 +52,8 @@ module Librato
 
           # verify globals have persisted for all requests
           gauge = Metrics.get_measurements :gauge_5, :count => 1
-          gauge[source][0]["value"].should eq(1.0)
-          gauge[source][0]["measure_time"].should eq(measure_time)
+          expect(gauge[source][0]["value"]).to eq(1.0)
+          expect(gauge[source][0]["measure_time"]).to eq(measure_time)
         end
       end
 
@@ -64,10 +64,10 @@ module Librato
         queue.submit
 
         foo = Metrics.get_measurements :foo, :count => 2
-        foo['default'][0]['value'].should == 123
+        expect(foo['default'][0]['value']).to eq(123)
 
         bar = Metrics.get_measurements :bar, :count => 2
-        bar['barsource'][0]['value'].should == 456
+        expect(bar['barsource'][0]['value']).to eq(456)
       end
 
     end

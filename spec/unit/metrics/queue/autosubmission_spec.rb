@@ -12,14 +12,14 @@ module Librato
           vol_queue = Queue.new(:client => client, :autosubmit_count => 2)
           vol_queue.add :foo => 1
           vol_queue.add :bar => 2
-          vol_queue.persister.persisted.should_not be_nil # sent
+          expect(vol_queue.persister.persisted).to_not be_nil # sent
         end
 
         it "should not submit if the max has not been reached" do
           vol_queue = Queue.new(:client => client, :autosubmit_count => 5)
           vol_queue.add :foo => 1
           vol_queue.add :bar => 2
-          vol_queue.persister.persisted.should be_nil # nothing sent
+          expect(vol_queue.persister.persisted).to be_nil # nothing sent
         end
 
         it 'should submit when merging' do
@@ -31,8 +31,8 @@ module Librato
 
           queue.merge!(to_merge)
 
-          queue.persister.persisted[:gauges].length.should == 8
-          queue.queued.should be_empty
+          expect(queue.persister.persisted[:gauges].length).to eq(8)
+          expect(queue.queued).to be_empty
         end
       end
 
@@ -40,7 +40,7 @@ module Librato
         it "should not submit immediately" do
           vol_queue = Queue.new(:client => client, :autosubmit_interval => 1)
           vol_queue.add :foo => 1
-          vol_queue.persister.persisted.should be_nil # nothing sent
+          expect(vol_queue.persister.persisted).to be_nil # nothing sent
         end
 
         it "should submit after interval" do
@@ -48,7 +48,7 @@ module Librato
           vol_queue.add :foo => 1
           sleep 1
           vol_queue.add :foo => 2
-          vol_queue.persister.persisted.should_not be_nil # sent
+          expect(vol_queue.persister.persisted).to_not be_nil # sent
         end
       end
 

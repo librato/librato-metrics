@@ -132,7 +132,7 @@ module Librato
           end
 
           it "should raise exception in invalid time" do
-            expect{
+            expect {
               subject.add :foo => {:measure_time => '12', :value => 123}
             }.to raise_error(InvalidMeasureTime)
           end

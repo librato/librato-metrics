@@ -52,7 +52,7 @@ module Librato
       describe "network operations" do
         context "when missing client" do
           it "should raise exception" do
-            expect{ subject.get 'metrics' }.to raise_error(NoClientProvided)
+            expect { subject.get 'metrics' }.to raise_error(NoClientProvided)
           end
         end
 
@@ -67,10 +67,10 @@ module Librato
           it "should not retry" do
             Middleware::CountRequests.reset
             with_rackup('status.ru') do
-              expect{
+              expect {
                 client.connection.transport.post 'not_found'
               }.to raise_error(NotFound)
-              expect{
+              expect {
                 client.connection.transport.post 'forbidden'
               }.to raise_error(ClientError)
             end
@@ -82,7 +82,7 @@ module Librato
           it "should retry" do
             Middleware::CountRequests.reset
             with_rackup('status.ru') do
-              expect{
+              expect {
                 client.connection.transport.post 'service_unavailable'
               }.to raise_error(ServerError)
             end

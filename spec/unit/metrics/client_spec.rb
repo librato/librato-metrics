@@ -29,7 +29,7 @@ module Librato
 
         context "when given two arguments" do
           it "should raise error" do
-            expect{ subject.agent_identifier('test_app', '0.5') }.to raise_error(ArgumentError)
+            expect { subject.agent_identifier('test_app', '0.5') }.to raise_error(ArgumentError)
           end
         end
       end
@@ -64,7 +64,7 @@ module Librato
       describe "#connection" do
         it "should raise exception without authentication" do
           subject.flush_authentication
-          expect{ subject.connection }.to raise_error(Librato::Metrics::CredentialsMissing)
+          expect { subject.connection }.to raise_error(Librato::Metrics::CredentialsMissing)
         end
       end
 
@@ -115,7 +115,7 @@ module Librato
         it "should tolerate muliple metrics" do
           subject.authenticate 'me@librato.com', 'foo'
           subject.persistence = :test
-          expect{ subject.submit :foo => 123, :bar => 456 }.not_to raise_error
+          expect { subject.submit :foo => 123, :bar => 456 }.not_to raise_error
           expected = {:gauges => [{:name => 'foo', :value => 123}, {:name => 'bar', :value => 456}]}
           expect(subject.persister.persisted).to equal_unordered(expected)
         end

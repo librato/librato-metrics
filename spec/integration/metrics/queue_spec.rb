@@ -8,7 +8,7 @@ module Librato
       before(:each) { delete_all_metrics }
 
       context "with a large number of metrics" do
-        it "should submit them in multiple requests" do
+        it "submits them in multiple requests" do
           Middleware::CountRequests.reset
           queue = Queue.new(:per_request => 3)
           (1..10).each do |i|
@@ -18,7 +18,7 @@ module Librato
           expect(Middleware::CountRequests.total_requests).to eq(4)
         end
 
-        it "should persist all metrics" do
+        it "persists all metrics" do
           queue = Queue.new(:per_request => 2)
           (1..5).each do |i|
             queue.add "gauge_#{i}" => i
@@ -36,7 +36,7 @@ module Librato
           expect(gauge['unassigned'][0]['value']).to eq(5)
         end
 
-        it "should apply globals to each request" do
+        it "applies globals to each request" do
           source = 'yogi'
           measure_time = Time.now.to_i-3
           queue = Queue.new(
@@ -57,7 +57,7 @@ module Librato
         end
       end
 
-      it "should respect default and individual sources" do
+      it "respects default and individual sources" do
         queue = Queue.new(:source => 'default')
         queue.add :foo => 123
         queue.add :bar => {:value => 456, :source => 'barsource'}

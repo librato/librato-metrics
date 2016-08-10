@@ -7,20 +7,20 @@ module Librato
 
       describe "#agent_identifier" do
         context "when given a single string argument" do
-          it "should set agent_identifier" do
+          it "sets agent_identifier" do
             subject.agent_identifier 'mycollector/0.1 (dev_id:foo)'
             expect(subject.agent_identifier).to eq('mycollector/0.1 (dev_id:foo)')
           end
         end
 
         context "when given three arguments" do
-          it "should compose an agent string" do
+          it "composes an agent string" do
             subject.agent_identifier('test_app', '0.5', 'foobar')
             expect(subject.agent_identifier).to eq('test_app/0.5 (dev_id:foobar)')
           end
 
           context "when given an empty string" do
-            it "should set to empty" do
+            it "sets to empty" do
               subject.agent_identifier ''
               expect(subject.agent_identifier).to be_empty
             end
@@ -28,20 +28,20 @@ module Librato
         end
 
         context "when given two arguments" do
-          it "should raise error" do
+          it "raises error" do
             expect { subject.agent_identifier('test_app', '0.5') }.to raise_error(ArgumentError)
           end
         end
       end
 
       describe "#api_endpoint" do
-        it "should default to metrics" do
+        it "defaults to metrics" do
           expect(subject.api_endpoint).to eq('https://metrics-api.librato.com')
         end
       end
 
       describe "#api_endpoint=" do
-        it "should set api_endpoint" do
+        it "sets api_endpoint" do
           subject.api_endpoint = 'http://test.com/'
           expect(subject.api_endpoint).to eq('http://test.com/')
         end
@@ -53,7 +53,7 @@ module Librato
 
       describe "#authenticate" do
         context "when given two arguments" do
-          it "should store them as email and api_key" do
+          it "stores them as email and api_key" do
             subject.authenticate 'test@librato.com', 'api_key'
             expect(subject.email).to eq('test@librato.com')
             expect(subject.api_key).to eq('api_key')
@@ -62,14 +62,14 @@ module Librato
       end
 
       describe "#connection" do
-        it "should raise exception without authentication" do
+        it "raises exception without authentication" do
           subject.flush_authentication
           expect { subject.connection }.to raise_error(Librato::Metrics::CredentialsMissing)
         end
       end
 
       describe "#faraday_adapter" do
-        it "should default to Metrics default adapter" do
+        it "defaults to Metrics default adapter" do
           Metrics.faraday_adapter = :typhoeus
           expect(Client.new.faraday_adapter).to eq(Metrics.faraday_adapter)
           Metrics.faraday_adapter = nil
@@ -77,7 +77,7 @@ module Librato
       end
 
       describe "#faraday_adapter=" do
-        it "should allow setting of faraday adapter" do
+        it "allows setting of faraday adapter" do
           subject.faraday_adapter = :excon
           expect(subject.faraday_adapter).to eq(:excon)
           subject.faraday_adapter = :patron
@@ -86,33 +86,33 @@ module Librato
       end
 
       describe "#new_queue" do
-        it "should return a new queue with client set" do
+        it "returns a new queue with client set" do
           queue = subject.new_queue
           expect(queue.client).to eq(subject)
         end
       end
 
       describe "#persistence" do
-        it "should default to direct" do
+        it "defaults to direct" do
           subject.send(:flush_persistence)
           expect(subject.persistence).to eq(:direct)
         end
 
-        it "should allow configuration of persistence method" do
+        it "allows configuration of persistence method" do
           subject.persistence = :fake
           expect(subject.persistence).to eq(:fake)
         end
       end
 
       describe "#submit" do
-        it "should persist metrics immediately" do
+        it "persists metrics immediately" do
           subject.authenticate 'me@librato.com', 'foo'
           subject.persistence = :test
           expect(subject.submit(:foo => 123)).to be true
           expect(subject.persister.persisted).to eq({:gauges => [{:name => 'foo', :value => 123}]})
         end
 
-        it "should tolerate muliple metrics" do
+        it "tolerates muliple metrics" do
           subject.authenticate 'me@librato.com', 'foo'
           subject.persistence = :test
           expect { subject.submit :foo => 123, :bar => 456 }.not_to raise_error

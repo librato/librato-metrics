@@ -8,20 +8,20 @@ module Librato
       before(:each) { delete_all_annotations }
 
       describe "#add" do
-        it "should create new annotation" do
+        it "creates new annotation" do
           subject.add :deployment, "deployed v68"
           annos = subject.fetch(:deployment, :start_time => Time.now.to_i-60)
           expect(annos["events"]["unassigned"].length).to eq(1)
           expect(annos["events"]["unassigned"][0]["title"]).to eq('deployed v68')
         end
-        it "should support sources" do
+        it "supports sources" do
           subject.add :deployment, 'deployed v69', :source => 'box1'
           annos = subject.fetch(:deployment, :start_time => Time.now.to_i-60)
           expect(annos["events"]["box1"].length).to eq(1)
           first = annos["events"]["box1"][0]
           expect(first['title']).to eq('deployed v69')
         end
-        it "should support start and end times" do
+        it "supports start and end times" do
           start_time = Time.now.to_i-120
           end_time = Time.now.to_i-30
           subject.add :deployment, 'deployed v70', :start_time => start_time,
@@ -33,7 +33,7 @@ module Librato
           expect(first['start_time']).to eq(start_time)
           expect(first['end_time']).to eq(end_time)
         end
-        it "should support description" do
+        it "supports description" do
           subject.add :deployment, 'deployed v71', :description => 'deployed foobar!'
           annos = subject.fetch(:deployment, :start_time => Time.now.to_i-180)
           expect(annos["events"]["unassigned"].length).to eq(1)
@@ -41,13 +41,13 @@ module Librato
           expect(first['title']).to eq('deployed v71')
           expect(first['description']).to eq('deployed foobar!')
         end
-        it "should have an id for further use" do
+        it "has an id for further use" do
           annotation = subject.add :deployment, "deployed v23"
           expect(annotation['id']).not_to be_nil
         end
 
         context "with a block" do
-          it "should set both start and end times" do
+          it "sets both start and end times" do
             annotation = subject.add 'deploys', 'v345' do
               sleep 1.0
             end
@@ -59,7 +59,7 @@ module Librato
       end
 
       describe "#delete" do
-        it "should remove annotation streams" do
+        it "removes annotation streams" do
           subject.add :deployment, "deployed v45"
           subject.fetch :deployment # should exist
           subject.delete :deployment
@@ -70,7 +70,7 @@ module Librato
       end
 
       describe "#delete_event" do
-        it "should remove an annotation event" do
+        it "removes an annotation event" do
           subject.add :deployment, 'deployed v46'
           subject.add :deployment, 'deployed v47'
           events = subject.fetch(:deployment, :start_time => Time.now.to_i-60)
@@ -89,7 +89,7 @@ module Librato
 
       describe "#fetch" do
         context "without a time frame" do
-          it "should return stream properties" do
+          it "returns stream properties" do
             subject.add :backups, "backup 21"
             properties = subject.fetch :backups
             expect(properties['name']).to eq('backups')
@@ -97,7 +97,7 @@ module Librato
         end
 
         context "with a time frame" do
-          it "should return set of annotations" do
+          it "returns set of annotations" do
             subject.add :backups, "backup 22"
             subject.add :backups, "backup 23"
             annos = subject.fetch :backups, :start_time => Time.now.to_i-60
@@ -105,7 +105,7 @@ module Librato
             expect(events[0]['title']).to eq('backup 22')
             expect(events[1]['title']).to eq('backup 23')
           end
-          it "should respect source limits" do
+          it "respects source limits" do
             subject.add :backups, "backup 24", :source => 'server_1'
             subject.add :backups, "backup 25", :source => 'server_2'
             subject.add :backups, "backup 26", :source => 'server_3'
@@ -117,7 +117,7 @@ module Librato
           end
         end
 
-        it "should return exception if annotation is missing" do
+        it "returns exception if annotation is missing" do
           expect {
             subject.fetch :backups
           }.to raise_error(Metrics::NotFound)
@@ -126,14 +126,14 @@ module Librato
 
       describe "#fetch_event" do
         context "with existing event" do
-          it "should return event properties" do
+          it "returns event properties" do
             annotation = subject.add 'deploys', 'v69'
             data = subject.fetch_event 'deploys', annotation['id']
             expect(data['title']).to eq('v69')
           end
         end
         context "when event doesn't exist" do
-          it "should raise NotFound" do
+          it "raises NotFound" do
             expect {
               data = subject.fetch_event 'deploys', 324
             }.to raise_error(Metrics::NotFound)
@@ -148,7 +148,7 @@ module Librato
         end
 
         context "without arguments" do
-          it "should list annotation streams" do
+          it "lists annotation streams" do
             streams = subject.list
             expect(streams['annotations'].length).to eq(2)
             streams = streams['annotations'].map{|i| i['name']}
@@ -157,7 +157,7 @@ module Librato
           end
         end
         context "with an argument" do
-          it "should list annotation streams which match" do
+          it "lists annotation streams which match" do
             streams = subject.list :name => 'back'
             expect(streams['annotations'].length).to eq(1)
             streams = streams['annotations'].map{|i| i['name']}
@@ -168,7 +168,7 @@ module Librato
 
       describe "#update_event" do
         context "when event exists" do
-          it "should update event" do
+          it "updates event" do
             end_time = (Time.now + 60).to_i
             annotation = subject.add 'deploys', 'v24'
             subject.update_event 'deploys', annotation['id'],

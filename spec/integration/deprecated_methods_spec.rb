@@ -28,7 +28,7 @@ describe Librato::Metrics do
 
         it { is_expected.not_to be_nil }
 
-        it "should return a metric" do
+        it "returns a metric" do
           expect(metric["name"]).to eq("test_metric")
         end
       end
@@ -40,7 +40,7 @@ describe Librato::Metrics do
         it { is_expected.not_to be_nil }
         it { is_expected.not_to be_empty }
 
-        it "should return the measurements" do
+        it "returns the measurements" do
           expect(measurements).to have_key("unassigned")
           expect(measurements["unassigned"]).to be_an(Array)
           expect(measurements["unassigned"].first["value"]).to eq(123.0)
@@ -55,7 +55,7 @@ describe Librato::Metrics do
       it { is_expected.not_to be_nil }
       it { is_expected.not_to be_empty }
 
-      it "should return the list of metrics" do
+      it "returns the list of metrics" do
         metric = metrics.find { |m| m["name"] == "test_metric" }
         expect(metric).not_to be_nil
       end
@@ -68,13 +68,13 @@ describe Librato::Metrics do
 
       let(:updated_metric) { client.get_metric("test_metric") }
 
-      it "should update the metric" do
+      it "updates the metric" do
         expect(updated_metric["display_name"]).to eq("Test Deprecated Update")
       end
     end
 
     describe "#delete" do
-      it "should delete the metric" do
+      it "deletes the metric" do
         expect(client.metrics(:name => "test_metric")).not_to be_empty
         client.delete("test_metric")
         expect(client.metrics(:name => "test_metric")).to be_empty

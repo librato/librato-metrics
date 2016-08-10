@@ -7,14 +7,14 @@ module Librato
       describe CountRequests do
         before(:all) { prep_integration_tests }
 
-        it "should count requests" do
+        it "counts requests" do
           CountRequests.reset
           Metrics.submit :foo => 123
           Metrics.submit :foo => 135
           expect(CountRequests.total_requests).to eq(2)
         end
 
-        it "should be resettable" do
+        it "is resettable" do
           Metrics.submit :foo => 123
           expect(CountRequests.total_requests).to be > 0
           CountRequests.reset

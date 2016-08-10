@@ -12,7 +12,7 @@ module Librato
           vol_queue = Queue.new(:client => client, :autosubmit_count => 2)
           vol_queue.add :foo => 1
           vol_queue.add :bar => 2
-          expect(vol_queue.persister.persisted).to_not be_nil # sent
+          expect(vol_queue.persister.persisted).not_to be_nil # sent
         end
 
         it "should not submit if the max has not been reached" do
@@ -48,7 +48,7 @@ module Librato
           vol_queue.add :foo => 1
           sleep 1
           vol_queue.add :foo => 2
-          expect(vol_queue.persister.persisted).to_not be_nil # sent
+          expect(vol_queue.persister.persisted).not_to be_nil # sent
         end
       end
 

@@ -16,7 +16,7 @@ module Librato
 
    describe "#faraday_adapter" do
      it "should return current default adapter" do
-       expect(Metrics.faraday_adapter).to_not be_nil
+       expect(Metrics.faraday_adapter).not_to be_nil
      end
    end
 
@@ -53,7 +53,7 @@ module Librato
      end
 
      it "should tolerate multiple metrics" do
-       expect{ Librato::Metrics.submit :foo => 123, :bar => 456 }.to_not raise_error
+       expect{ Librato::Metrics.submit :foo => 123, :bar => 456 }.not_to raise_error
        expected = {:gauges => [{:name => 'foo', :value => 123}, {:name => 'bar', :value => 456}]}
        expect(Librato::Metrics.persister.persisted).to equal_unordered(expected)
      end

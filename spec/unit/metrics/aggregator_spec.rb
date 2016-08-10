@@ -244,7 +244,7 @@ module Librato
           timed_agg.add :foo => 1
           sleep 1
           timed_agg.add :foo => 2
-          expect(timed_agg.persister.persisted).to_not be_nil # sent
+          expect(timed_agg.persister.persisted).not_to be_nil # sent
         end
       end
 

@@ -339,7 +339,7 @@ module Librato
             subject.add :steps => 2042, :distance => 1234
             subject.persister.return_value(false)
             expect(subject.submit).to be false
-            expect(subject.queued).to_not be_empty
+            expect(subject.queued).not_to be_empty
           end
         end
       end

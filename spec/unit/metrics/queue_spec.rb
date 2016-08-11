@@ -54,7 +54,7 @@ module Librato
           end
 
           it "accepts type key as string or a symbol" do
-            subject.add total_visits: {"type" => "counter", value: 4000}
+            subject.add total_visits: {type: "counter", value: 4000}
             expected = {counters: [{name: 'total_visits', value: 4000, measure_time: @time}]}
             expect(subject.queued).to equal_unordered(expected)
           end

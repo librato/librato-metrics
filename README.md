@@ -32,11 +32,11 @@ If you are using jruby, you need to ensure [jruby-openssl](https://github.com/jr
 If you are looking for the quickest possible route to getting a data into Metrics, you only need two lines:
 
     Librato::Metrics.authenticate 'email', 'api_key'
-    Librato::Metrics.submit :my_metric => 42, :my_other_metric => 1002
+    Librato::Metrics.submit my_metric: 42, my_other_metric: 1002
 
 Unspecified metrics will send a *gauge*, but if you need to send a different metric type or include additional properties, simply use a hash:
 
-    Librato::Metrics.submit :my_metric => {:type => :counter, :value => 1002, :source => 'myapp'}
+    Librato::Metrics.submit my_metric: {type: :counter, value: 1002, source: 'myapp'}
 
 While this is all you need to get started, if you are sending a number of metrics regularly a queue may be easier/more performant so read on...
 
@@ -53,7 +53,7 @@ If you are sending very many measurements or sending them very often, it will be
 Queue up a simple gauge metric named `temperature`:
 
     queue = Librato::Metrics::Queue.new
-    queue.add :temperature => 32.2
+    queue.add temperature: 32.2
 
 While symbols are used by convention for metric names, strings will work just as well:
 
@@ -64,18 +64,18 @@ If you are tracking measurements over several seconds/minutes, the queue will ha
 If you want to specify a time other than queuing time for the measurement:
 
 	# use a epoch integer
-	queue.add :humidity => {:measure_time => 1336508422, :value => 48.2}
+	queue.add humidity: {measure_time: 1336508422, value: 48.2}
 
 	# use a Time object to correct for a 5 second delay
-	queue.add :humidity => {:measure_time => Time.now-5, :value => 37.6}
+	queue.add humidity: {measure_time: Time.now-5, value: 37.6}
 
 You can queue multiple metrics at once. Here's a gauge (`load`) and a counter (`visits`):
 
-    queue.add :load => 2.2, :visits => {:type => :counter, :value => 400}
+    queue.add load: 2.2, visits: {type: :counter, value: 400}
 
 Queue up a metric with a specified source:
 
-    queue.add :cpu => {:source => 'app1', :value => 92.6}
+    queue.add cpu: {source: 'app1', value: 92.6}
 
 A complete [list of metric attributes](http://dev.librato.com/v1/metrics) is available in the [API documentation](http://dev.librato.com/v1).
 
@@ -90,23 +90,23 @@ If you are measuring something very frequently e.g. per-request in a web applica
 Aggregate a simple gauge metric named `response_latency`:
 
     aggregator = Librato::Metrics::Aggregator.new
-    aggregator.add :response_latency => 85.0
-    aggregator.add :response_latency => 100.5
-    aggregator.add :response_latency => 150.2
-    aggregator.add :response_latency => 90.1
-    aggregator.add :response_latency => 92.0
+    aggregator.add response_latency: 85.0
+    aggregator.add response_latency: 100.5
+    aggregator.add response_latency: 150.2
+    aggregator.add response_latency: 90.1
+    aggregator.add response_latency: 92.0
 
 Which would result in a gauge measurement like:
 
-    {:name => "response_latency", :count => 5, :sum => 517.8, :min => 85.0, :max => 150.2}
+    {name: "response_latency", count: 5, sum: 517.8, min: 85.0, max: 150.2}
 
 You can specify a source during aggregate construction:
 
-    aggregator = Librato::Metrics::Aggregator.new(:source => 'foobar')
+    aggregator = Librato::Metrics::Aggregator.new(source: 'foobar')
 
 You can aggregate multiple metrics at once:
 
-    aggregator.add :app_latency => 35.2, :db_latency => 120.7
+    aggregator.add app_latency: 35.2, db_latency: 120.7
 
 Send the currently aggregated metrics to Metrics:
 
@@ -124,7 +124,7 @@ The difference between the two is that `Queue` submits each timing measurement i
 
 If you need extra attributes for a `Queue` timing measurement, simply add them on:
 
-    queue.time :my_measurement, :source => 'app1' do
+    queue.time :my_measurement, source: 'app1' do
       # do work...
     end
 
@@ -138,9 +138,9 @@ At a minimum each annotation needs to be assigned to a stream and to have a titl
 
 There are a number of optional fields which can make annotations even more powerful:
 
-    Librato::Metrics.annotate :deployments, 'deployed v46', :source => 'frontend',
-        :start_time => 1354662596, :end_time => 1354662608,
-        :description => 'Deployed 6f3bc6e67682: fix lotsa bugs…'
+    Librato::Metrics.annotate :deployments, 'deployed v46', source: 'frontend',
+        start_time: 1354662596, end_time: 1354662608,
+        description: 'Deployed 6f3bc6e67682: fix lotsa bugs…'
 
 You can also automatically annotate the start and end time of an action by using `annotate`'s block form:
 
@@ -156,7 +156,7 @@ More fine-grained control of annotations is available via the `Annotator` object
     streams = annotator.list
 
     # fetch a list of events in the last hour from a stream
-    annotator.fetch :deployments, :start_time => (Time.now.to_i-3600)
+    annotator.fetch :deployments, start_time: (Time.now.to_i-3600)
 
     # delete an event
     annotator.delete_event 'deployments', 23
@@ -168,15 +168,15 @@ See the documentation of `Annotator` for more details and examples of use.
 Both `Queue` and `Aggregator` support automatically submitting measurements on a given time interval:
 
 	# submit once per minute
-	timed_queue = Librato::Metrics::Queue.new(:autosubmit_interval => 60)
+	timed_queue = Librato::Metrics::Queue.new(autosubmit_interval: 60)
 
 	# submit every 5 minutes
-	timed_aggregator = Librato::Metrics::Aggregator.new(:autosubmit_interval => 300)
+	timed_aggregator = Librato::Metrics::Aggregator.new(autosubmit_interval: 300)
 
 `Queue` also supports auto-submission based on measurement volume:
 
 	# submit when the 400th measurement is queued
-	volume_queue = Librato::Metrics::Queue.new(:autosubmit_count => 400)
+	volume_queue = Librato::Metrics::Queue.new(autosubmit_count: 400)
 
 These options can also be combined for more flexible behavior.
 
@@ -192,7 +192,7 @@ Get name and properties for all metrics you have in the system:
 
 Get only metrics whose name includes `time`:
 
-    metrics = Librato::Metrics.metrics :name => 'time'
+    metrics = Librato::Metrics.metrics name: 'time'
 
 ## Querying Metric Data
 
@@ -202,19 +202,19 @@ Get attributes for metric `temperature`:
 
 Get the 20 most recent data points for `temperature`:
 
-    data = Librato::Metrics.get_measurements :temperature, :count => 20
+    data = Librato::Metrics.get_measurements :temperature, count: 20
 
 Get the 20 most recent data points for `temperature` from a specific source:
 
-    data = Librato::Metrics.get_measurements :temperature, :count => 20, :source => 'app1'
+    data = Librato::Metrics.get_measurements :temperature, count: 20, source: 'app1'
 
 Get the 20 most recent 15 minute data point rollups for `temperature`:
 
-    data = Librato::Metrics.get_measurements :temperature, :count => 20, :resolution => 900
+    data = Librato::Metrics.get_measurements :temperature, count: 20, resolution: 900
 
 Get the 5 minute moving average for `temperature` for the last hour, assuming temperature is submitted once per minute:
 
-    data = Librato::Metrics.get_composite 'moving_average(mean(series("temperature", "*"), {size: "5"}))', :start_time => Time.now.to_i - 60*60, :resolution => 300
+    data = Librato::Metrics.get_composite 'moving_average(mean(series("temperature", "*"), {size: "5"}))', start_time: Time.now.to_i - 60*60, resolution: 300
 
 There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/metrics/:name) or the individual method documentation for more details.
 
@@ -223,7 +223,7 @@ There are many more options supported for querying, take a look at the [REST API
 Setting custom [properties](http://dev.librato.com/v1/metrics#metric_properties) on your metrics is easy:
 
     # assign a period and default color
-    Librato::Metrics.update_metric :temperature, :period => 15, :attributes => { :color => 'F00' }
+    Librato::Metrics.update_metric :temperature, period: 15, attributes: { color: 'F00' }
 
 It is also possible to update properties for multiple metrics at once, see the [`#update_metric` method documentation](http://rubydoc.info/github/librato/librato-metrics/master/Librato/Metrics/Client#update_metric-instance_method) for more information.
 
@@ -237,7 +237,7 @@ If you ever need to remove a metric and all of its measurements, doing so is eas
 You can also delete using wildcards:
 
     # delete metrics that start with cpu. except for cpu.free
-    Librato::Metrics.delete_metrics :names => 'cpu.*', :exclude => ['cpu.free']
+    Librato::Metrics.delete_metrics names: 'cpu.*', exclude: ['cpu.free']
 
 Note that deleted metrics and their measurements are unrecoverable, so use with care.
 
@@ -257,17 +257,17 @@ All of the same operations you can call directly from `Librato::Metrics` are ava
 	joe.metrics
 
 	# fetch the last 20 data points for Mike's metric, humidity
-	mike.get_measurements :humidity, :count => 20
+	mike.get_measurements :humidity, count: 20
 
 There are two ways to associate a new queue with a client:
 
 	# these are functionally equivalent
-	joe_queue = Librato::Metrics::Queue.new(:client => joe)
+	joe_queue = Librato::Metrics::Queue.new(client: joe)
 	joe_queue = joe.new_queue
 
 Once the queue is associated you can use it normally:
 
-	joe_queue.add :temperature => {:source => 'sf', :value => 65.2}
+	joe_queue.add temperature: {source: 'sf', value: 65.2}
 	joe_queue.submit
 
 ## Thread Safety

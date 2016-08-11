@@ -10,13 +10,13 @@ module Librato
 
       it "creates new annotation" do
         Metrics.annotate :deployment, "deployed v68"
-        annos = @annotator.fetch(:deployment, :start_time => Time.now.to_i-60)
+        annos = @annotator.fetch(:deployment, start_time: Time.now.to_i-60)
         expect(annos["events"]["unassigned"].length).to eq(1)
         expect(annos["events"]["unassigned"][0]["title"]).to eq('deployed v68')
       end
       it "supports sources" do
-        Metrics.annotate :deployment, 'deployed v69', :source => 'box1'
-        annos = @annotator.fetch(:deployment, :start_time => Time.now.to_i-60)
+        Metrics.annotate :deployment, 'deployed v69', source: 'box1'
+        annos = @annotator.fetch(:deployment, start_time: Time.now.to_i-60)
         expect(annos["events"]["box1"].length).to eq(1)
         first = annos["events"]["box1"][0]
         expect(first['title']).to eq('deployed v69')
@@ -24,9 +24,9 @@ module Librato
       it "supports start and end times" do
         start_time = Time.now.to_i-120
         end_time = Time.now.to_i-30
-        Metrics.annotate :deployment, 'deployed v70', :start_time => start_time,
-                    :end_time => end_time
-        annos = @annotator.fetch(:deployment, :start_time => Time.now.to_i-180)
+        Metrics.annotate :deployment, 'deployed v70', start_time: start_time,
+                    end_time: end_time
+        annos = @annotator.fetch(:deployment, start_time: Time.now.to_i-180)
         expect(annos["events"]["unassigned"].length).to eq(1)
         first = annos["events"]["unassigned"][0]
         expect(first['title']).to eq('deployed v70')
@@ -34,8 +34,8 @@ module Librato
         expect(first['end_time']).to eq(end_time)
       end
       it "supports description" do
-        Metrics.annotate :deployment, 'deployed v71', :description => 'deployed foobar!'
-        annos = @annotator.fetch(:deployment, :start_time => Time.now.to_i-180)
+        Metrics.annotate :deployment, 'deployed v71', description: 'deployed foobar!'
+        annos = @annotator.fetch(:deployment, start_time: Time.now.to_i-180)
         expect(annos["events"]["unassigned"].length).to eq(1)
         first = annos["events"]["unassigned"][0]
         expect(first['title']).to eq('deployed v71')
@@ -50,20 +50,20 @@ module Librato
 
         context "with a single argument" do
           it "deletes named metric" do
-            Metrics.submit :foo => 123
-            expect(Metrics.metrics(:name => :foo)).not_to be_empty
+            Metrics.submit foo: 123
+            expect(Metrics.metrics(name: :foo)).not_to be_empty
             Metrics.delete_metrics :foo
-            expect(Metrics.metrics(:name => :foo)).to be_empty
+            expect(Metrics.metrics(name: :foo)).to be_empty
           end
         end
 
         context "with multiple arguments" do
           it "deletes named metrics" do
-            Metrics.submit :foo => 123, :bar => 345, :baz => 567
+            Metrics.submit foo: 123, bar: 345, baz: 567
             Metrics.delete_metrics :foo, :bar
-            expect(Metrics.metrics(:name => :foo)).to be_empty
-            expect(Metrics.metrics(:name => :bar)).to be_empty
-            expect(Metrics.metrics(:name => :baz)).not_to be_empty
+            expect(Metrics.metrics(name: :foo)).to be_empty
+            expect(Metrics.metrics(name: :bar)).to be_empty
+            expect(Metrics.metrics(name: :baz)).not_to be_empty
           end
         end
 
@@ -87,8 +87,8 @@ module Librato
 
       context 'with patterns' do
         it "filters properly" do
-          Metrics.submit :foo => 1, :foobar => 2, :foobaz => 3, :bar => 4
-          Metrics.delete_metrics :names => 'fo*', :exclude => ['foobar']
+          Metrics.submit foo: 1, foobar: 2, foobaz: 3, bar: 4
+          Metrics.delete_metrics names: 'fo*', exclude: ['foobar']
 
           %w{foo foobaz}.each do |name|
             expect {
@@ -106,12 +106,12 @@ module Librato
     describe "#get_metric" do
       before(:all) do
         delete_all_metrics
-        Metrics.submit :my_counter => {:type => :counter, :value => 0, :measure_time => Time.now.to_i-60}
+        Metrics.submit my_counter: {type: :counter, value: 0, measure_time: Time.now.to_i-60}
         1.upto(2).each do |i|
           measure_time = Time.now.to_i - (5+i)
-          opts = {:measure_time => measure_time, :type => :counter}
-          Metrics.submit :my_counter => opts.merge(:value => i)
-          Metrics.submit :my_counter => opts.merge(:source => 'baz', :value => i+1)
+          opts = {measure_time: measure_time, type: :counter}
+          Metrics.submit my_counter: opts.merge(value: i)
+          Metrics.submit my_counter: opts.merge(source: 'baz', value: i+1)
         end
       end
 
@@ -126,7 +126,7 @@ module Librato
       context "with a start_time" do
         it "returns entries since that time" do
           # 1 hr ago
-          metric = Metrics.get_metric :my_counter, :start_time => Time.now-3600
+          metric = Metrics.get_metric :my_counter, start_time: Time.now-3600
           data = metric['measurements']
           expect(data['unassigned'].length).to eq(3)
           expect(data['baz'].length).to eq(2)
@@ -135,7 +135,7 @@ module Librato
 
       context "with a count limit" do
         it "returns that number of entries per source" do
-          metric = Metrics.get_metric :my_counter, :count => 2
+          metric = Metrics.get_metric :my_counter, count: 2
           data = metric['measurements']
           expect(data['unassigned'].length).to eq(2)
           expect(data['baz'].length).to eq(2)
@@ -144,7 +144,7 @@ module Librato
 
       context "with a source limit" do
         it "only returns that source" do
-          metric = Metrics.get_metric :my_counter, :source => 'baz', :start_time => Time.now-3600
+          metric = Metrics.get_metric :my_counter, source: 'baz', start_time: Time.now-3600
           data = metric['measurements']
           expect(data['baz'].length).to eq(2)
           expect(data['unassigned']).to be_nil
@@ -156,7 +156,7 @@ module Librato
     describe "#metrics" do
       before(:all) do
         delete_all_metrics
-        Metrics.submit :foo => 123, :bar => 345, :baz => 678, :foo_2 => 901
+        Metrics.submit foo: 123, bar: 345, baz: 678, foo_2: 901
       end
 
       context "without arguments" do
@@ -168,7 +168,7 @@ module Librato
 
       context "with a name argument" do
         it "lists metrics that match" do
-          metric_names = Metrics.metrics(:name => 'foo').map { |metric| metric['name'] }
+          metric_names = Metrics.metrics(name: 'foo').map { |metric| metric['name'] }
           expect(metric_names.sort).to eq(%w{foo foo_2}.sort)
         end
       end
@@ -180,7 +180,7 @@ module Librato
       context "with a gauge" do
         before(:all) do
           delete_all_metrics
-          Metrics.submit :foo => 123
+          Metrics.submit foo: 123
         end
 
         it "creates the metrics" do
@@ -190,7 +190,7 @@ module Librato
         end
 
         it "stores their data" do
-          data = Metrics.get_measurements :foo, :count => 1
+          data = Metrics.get_measurements :foo, count: 1
           expect(data).not_to be_empty
           data['unassigned'][0]['value'] == 123.0
         end
@@ -199,7 +199,7 @@ module Librato
       context "with a counter" do
         before(:all) do
           delete_all_metrics
-          Metrics.submit :bar => {:type => :counter, :source => 'baz', :value => 456}
+          Metrics.submit bar: {type: :counter, source: 'baz', value: 456}
         end
 
         it "creates the metrics" do
@@ -209,7 +209,7 @@ module Librato
         end
 
         it "stores their data" do
-          data = Metrics.get_measurements :bar, :count => 1
+          data = Metrics.get_measurements :bar, count: 1
           expect(data).not_to be_empty
           data['baz'][0]['value'] == 456.0
         end
@@ -217,12 +217,12 @@ module Librato
 
       it "does not retain errors" do
         delete_all_metrics
-        Metrics.submit :foo => {:type => :counter, :value => 12}
+        Metrics.submit foo: {type: :counter, value: 12}
         expect {
-          Metrics.submit :foo => 15 # submitting as gauge
+          Metrics.submit foo: 15 # submitting as gauge
         }.to raise_error
         expect {
-          Metrics.submit :foo => {:type => :counter, :value => 17}
+          Metrics.submit foo: {type: :counter, value: 17}
         }.not_to raise_error
       end
 
@@ -234,14 +234,14 @@ module Librato
         context "with an existing metric" do
           before do
             delete_all_metrics
-            Metrics.submit :foo => 123
+            Metrics.submit foo: 123
           end
 
           it "updates the metric" do
-            Metrics.update_metric :foo, :display_name => "Foo Metric",
-                                        :period => 15,
-                                        :attributes => {
-                                          :display_max => 1000
+            Metrics.update_metric :foo, display_name: "Foo Metric",
+                                        period: 15,
+                                        attributes: {
+                                          display_max: 1000
                                         }
             foo = Metrics.get_metric :foo
             expect(foo['display_name']).to eq('Foo Metric')
@@ -253,11 +253,11 @@ module Librato
         context "without an existing metric" do
           it "creates the metric if type specified" do
             delete_all_metrics
-            Metrics.update_metric :foo, :display_name => "Foo Metric",
-                                        :type => 'gauge',
-                                        :period => 15,
-                                        :attributes => {
-                                        :display_max => 1000
+            Metrics.update_metric :foo, display_name: "Foo Metric",
+                                        type: 'gauge',
+                                        period: 15,
+                                        attributes: {
+                                        display_max: 1000
                                       }
             foo = Metrics.get_metric :foo
             expect(foo['display_name']).to eq('Foo Metric')
@@ -268,10 +268,10 @@ module Librato
           it "raises error if no type specified" do
             delete_all_metrics
             expect {
-              Metrics.update_metric :foo, :display_name => "Foo Metric",
-                                          :period => 15,
-                                          :attributes => {
-                                            :display_max => 1000
+              Metrics.update_metric :foo, display_name: "Foo Metric",
+                                          period: 15,
+                                          attributes: {
+                                            display_max: 1000
                                           }
             }.to raise_error
           end
@@ -287,7 +287,7 @@ module Librato
 
         it "supports named list" do
           names = ['my.1', 'my.3']
-          Metrics.update_metrics :names => names, :period => 60
+          Metrics.update_metrics names: names, period: 60
 
           names.each do |name|
              metric = Metrics.get_metric name
@@ -296,8 +296,8 @@ module Librato
         end
 
         it "supports patterns" do
-          Metrics.update_metrics :names => 'my.*', :exclude => ['my.3'],
-            :display_max => 100
+          Metrics.update_metrics names: 'my.*', exclude: ['my.3'],
+            display_max: 100
 
           %w{my.1 my.2 my.4}.each do |name|
             metric = Metrics.get_metric name

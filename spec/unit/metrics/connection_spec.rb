@@ -14,7 +14,7 @@ module Librato
 
         context "when provided" do
           it "uses provided endpoint" do
-            connection = Connection.new(:api_endpoint => 'http://test.com/')
+            connection = Connection.new(api_endpoint: 'http://test.com/')
             expect(connection.api_endpoint).to eq('http://test.com/')
           end
         end
@@ -23,7 +23,7 @@ module Librato
       describe "#user_agent" do
         context "without an agent_identifier" do
           it "renders standard string" do
-            connection = Connection.new(:client => Client.new)
+            connection = Connection.new(client: Client.new)
             expect(connection.user_agent).to start_with('librato-metrics')
           end
         end
@@ -32,7 +32,7 @@ module Librato
           it "renders agent_identifier first" do
             client = Client.new
             client.agent_identifier('foo', '0.5', 'bar')
-            connection = Connection.new(:client => client)
+            connection = Connection.new(client: client)
             expect(connection.user_agent).to start_with('foo/0.5')
           end
         end
@@ -41,7 +41,7 @@ module Librato
           it "uses custom user agent" do
             client = Client.new
             client.custom_user_agent = 'foo agent'
-            connection = Connection.new(:client => client)
+            connection = Connection.new(client: client)
             expect(connection.user_agent).to eq('foo agent')
           end
         end

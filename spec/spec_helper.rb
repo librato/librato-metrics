@@ -74,7 +74,7 @@ end
 # sets before comparision
 #
 # @example
-#   {:foo => [1,3,2]}.should equal_unordered({:foo => [1,2,3]})
+#   {foo: [1,3,2]}.should equal_unordered({foo: [1,2,3]})
 RSpec::Matchers.define :equal_unordered do |result|
   result.each do |key, value|
     result[key] = value.to_set if value.respond_to?(:to_set)

@@ -97,20 +97,20 @@ module Librato
             metric, source = metric.split(SOURCE_SEPARATOR)
           end
           entry = {
-            :name => metric,
-            :count => data.count,
-            :sum => data.sum,
+            name: metric,
+            count: data.count,
+            sum: data.sum,
 
             # TODO: make float/non-float consistent in the gem
-            :min => data.min.to_f,
-            :max => data.max.to_f
+            min: data.min.to_f,
+            max: data.max.to_f
             # TODO: expose v.sum2 and include
           }
           entry[:source] = source if source
           gauges << entry
         end
 
-        req = { :gauges => gauges }
+        req = { gauges: gauges }
         req[:source] = @source if @source
         req[:measure_time] = @measure_time if @measure_time
 

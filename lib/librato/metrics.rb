@@ -26,7 +26,7 @@ module Librato
   #   Librato::Metrics.authenticate 'email', 'api_key'
   #
   #   # list current metrics
-  #   Librato::Metrics.list
+  #   Librato::Metrics.metrics
   #
   #   # submit a metric immediately
   #   Librato::Metrics.submit :foo => 12712
@@ -49,7 +49,7 @@ module Librato
   #   client.authenticate 'email', 'api_key'
   #
   #   # list client's metrics
-  #   client.list
+  #   client.metrics
   #
   #   # create an associated queue
   #   queue = client.new_queue
@@ -81,10 +81,7 @@ module Librato
                    :delete_metrics, :update_metric, :update_metrics,
                    :submit,
                    :sources, :get_source, :update_source,
-                   :create_snapshot, :get_snapshot,
-                   # Deprecated metrics methods
-                   :fetch, :list, :delete, :update
-
+                   :create_snapshot, :get_snapshot
 
     # The Librato::Metrics::Client being used by module-level
     # access.

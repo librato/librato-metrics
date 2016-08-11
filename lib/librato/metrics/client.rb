@@ -109,12 +109,6 @@ module Librato
         true
       end
 
-      # Completely delete metrics with the given names. Be
-      # careful with this, this is instant and permanent.
-      #
-      # @deprecated Use {#delete_metrics} instead
-      def delete(*metric_names); delete_metrics(*metric_names); end
-
       # Return current adapter this client will use.
       # Defaults to Metrics.faraday_adapter if set, otherwise
       # Faraday.default_adapter
@@ -125,42 +119,6 @@ module Librato
       # Set faraday adapter this client will use
       def faraday_adapter=(adapter)
         @faraday_adapter = adapter
-      end
-
-      # Query metric data
-      #
-      # @deprecated Use {#get_metric} or {#get_measurements} instead.
-      #
-      # @example Get attributes for a metric
-      #   attrs = Librato::Metrics.fetch :temperature
-      #
-      # @example Get 20 most recent data points for metric
-      #   data = Librato::Metrics.fetch :temperature, :count => 20
-      #
-      # @example Get 20 most recent data points for a specific source
-      #   data = Librato::Metrics.fetch :temperature, :count => 20,
-      #                                 :source => 'app1'
-      #
-      # @example Get the 20 most recent 15 minute data point rollups
-      #   data = Librato::Metrics.fetch :temperature, :count => 20,
-      #                                 :resolution => 900
-      #
-      # @example Get data points for the last hour
-      #   data = Librato::Metrics.fetch :start_time => Time.now-3600
-      #
-      # @example Get 15 min data points from two hours to an hour ago
-      #   data = Librato::Metrics.fetch :start_time => Time.now-7200,
-      #                                 :end_time => Time.now-3600,
-      #                                 :resolution => 900
-      #
-      # A full list of query parameters can be found in the API
-      # documentation: {http://dev.librato.com/v1/get/metrics/:name}
-      #
-      # @param [Symbol|String] metric Metric name
-      # @param [Hash] options Query options
-      def fetch(metric, options={})
-        metric = get_metric(metric, options)
-        options.empty? ? metric : metric["measurements"]
       end
 
       # Retrieve measurements for a given composite metric definition.
@@ -276,11 +234,6 @@ module Librato
         Collection.paginated_metrics(connection, path, query)
       end
 
-      # List currently existing metrics
-      #
-      # @deprecated Use {#metrics} instead
-      def list(options={}); metrics(options); end
-
       # Create a new queue which uses this client.
       #
       # @return [Queue]
@@ -350,26 +303,6 @@ module Librato
           request.body = SmartJSON.write(metrics)
         end
       end
-
-      # Update one or more metrics. Note that attributes are specified in
-      # their own hash for updating a single metric but are included inline
-      # when updating multiple metrics.
-      #
-      # @deprecated Use {#update_metric} or {#update_metrics} instead
-      def update(metric, options={})
-        if metric.respond_to?(:each)
-          update_metrics(metric)
-        else
-          update_metric(metric, options)
-        end
-      end
-
-      # Update one or more metrics. Note that attributes are specified in
-      # their own hash for updating a single metric but are included inline
-      # when updating multiple metrics.
-      #
-      # @deprecated Use #update_metric instead
-      alias update update_metric
 
       # List sources, optionally limited by a name. See http://dev.librato.com/v1/sources
       # and http://dev.librato.com/v1/get/sources

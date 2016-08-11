@@ -1,11 +1,19 @@
-require 'multi_json'
+USE_MULTI_JSON = defined?(MultiJson)
+
+require 'json' unless USE_MULTI_JSON
+require 'multi_json' if USE_MULTI_JSON
 
 module Librato
   module Metrics
     class SmartJSON
-      JSON_HANDLER = MultiJson
+      JSON_HANDLER =
+        if USE_MULTI_JSON
+          MultiJson
+        else
+          JSON # ships with 1.9
+        end
       extend SingleForwardable
-      
+
       # wrap MultiJSON's implementation so we can use any version
       # prefer modern syntax if available; def once at startup
       if JSON_HANDLER.respond_to?(:load)
@@ -13,7 +21,7 @@ module Librato
       else
         def_delegator JSON_HANDLER, :decode, :read
       end
-      
+
       if JSON_HANDLER.respond_to?(:dump)
         def_delegator JSON_HANDLER, :dump, :write
       else

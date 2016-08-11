@@ -26,7 +26,6 @@ Gem::Specification.new do |s|
 
   ## runtime dependencies
   s.add_dependency 'faraday'
-  s.add_dependency 'multi_json'
   s.add_dependency 'aggregate', '~> 0.2.2'
 
   # omitting for now because jruby-19mode can't handle

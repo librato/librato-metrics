@@ -28,7 +28,7 @@ module Librato
           end
           queue.submit
 
-          metrics = Metrics.list
+          metrics = Metrics.metrics
           expect(metrics.length).to eq(8)
           counter = Metrics.get_measurements :counter_3, :count => 1
           expect(counter['unassigned'][0]['value']).to eq(3)

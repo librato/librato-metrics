@@ -6,47 +6,47 @@ module Librato
 
       before(:all) do
         @time = 1354720160 #Time.now.to_i
-        Aggregator.any_instance.stub(:epoch_time).and_return(@time)
+        allow_any_instance_of(Aggregator).to receive(:epoch_time).and_return(@time)
       end
 
       describe "initialization" do
         context "with specified client" do
-          it "should set to client" do
+          it "sets to client" do
             barney = Client.new
             a = Aggregator.new(:client => barney)
-            a.client.should be barney
+            expect(a.client).to eq(barney)
           end
         end
 
         context "without specified client" do
-          it "should use Librato::Metrics client" do
+          it "uses Librato::Metrics client" do
             a = Aggregator.new
-            a.client.should be Librato::Metrics.client
+            expect(a.client).to eq(Librato::Metrics.client)
           end
         end
 
         context "with specified source" do
-          it "should set to source" do
+          it "sets to source" do
             a = Aggregator.new(:source => 'rubble')
-            a.source.should == 'rubble'
+            expect(a.source).to eq('rubble')
           end
         end
 
         context "without specified source" do
-          it "should not have a source" do
+          it "does not have a source" do
             a = Aggregator.new
-            a.source.should be_nil
+            expect(a.source).to be_nil
           end
         end
       end
 
       describe "#add" do
-        it "should allow chaining" do
-          subject.add(:foo => 1234).should == subject
+        it "allows chaining" do
+          expect(subject.add(:foo => 1234)).to eq(subject)
         end
 
         context "with single hash argument" do
-          it "should record a single aggregate" do
+          it "records a single aggregate" do
             subject.add :foo => 3000
             expected = { #:measure_time => @time, TODO: support specific time
                 :gauges => [
@@ -57,10 +57,10 @@ module Librato
                   :max => 3000.0}
                 ]
             }
-            subject.queued.should equal_unordered(expected)
+            expect(subject.queued).to equal_unordered(expected)
           end
 
-          it "should aggregate multiple measurements" do
+          it "aggregates multiple measurements" do
             subject.add :foo => 1
             subject.add :foo => 2
             subject.add :foo => 3
@@ -74,10 +74,10 @@ module Librato
                   :max => 5.0}
                 ]
             }
-            subject.queued.should equal_unordered(expected)
+            expect(subject.queued).to equal_unordered(expected)
           end
 
-          it "should respect source argument" do
+          it "respects source argument" do
             subject.add :foo => {:source => 'alpha', :value => 1}
             subject.add :foo => 5
             subject.add :foo => {:source => :alpha, :value => 6}
@@ -88,11 +88,11 @@ module Librato
               { :name => 'foo', :count => 2,
                 :sum => 15.0, :min => 5.0, :max => 10.0 }
             ]}
-            subject.queued.should equal_unordered(expected)
+            expect(subject.queued).to equal_unordered(expected)
           end
 
           context "with a prefix set" do
-            it "should auto-prepend names" do
+            it "auto-prepends names" do
               subject = Aggregator.new(:prefix => 'foo')
               subject.add :bar => 1
               subject.add :bar => 12
@@ -105,13 +105,13 @@ module Librato
                   }
                 ]
               }
-              subject.queued.should equal_unordered(expected)
+              expect(subject.queued).to equal_unordered(expected)
             end
           end
         end
 
         context "with multiple hash arguments" do
-          it "should record a single aggregate" do
+          it "records a single aggregate" do
             subject.add :foo => 3000
             subject.add :bar => 30
             expected = {
@@ -129,10 +129,10 @@ module Librato
                   :max => 30.0},
                 ]
             }
-            subject.queued.should equal_unordered(expected)
+            expect(subject.queued).to equal_unordered(expected)
           end
 
-          it "should aggregate multiple measurements" do
+          it "aggregates multiple measurements" do
             subject.add :foo => 1
             subject.add :foo => 2
             subject.add :foo => 3
@@ -157,23 +157,23 @@ module Librato
                   :max => 10.0}
                 ]
             }
-            subject.queued.should equal_unordered(expected)
+            expect(subject.queued).to equal_unordered(expected)
           end
         end
       end
 
       describe "#queued" do
-        it "should include global source if set" do
+        it "includes global source if set" do
           a = Aggregator.new(:source => 'blah')
           a.add :foo => 12
-          a.queued[:source].should == 'blah'
+          expect(a.queued[:source]).to eq('blah')
         end
 
-        it "should include global measure_time if set" do
+        it "includes global measure_time if set" do
           measure_time = (Time.now-1000).to_i
           a = Aggregator.new(:measure_time => measure_time)
           a.add :foo => 12
-          a.queued[:measure_time].should == measure_time
+          expect(a.queued[:measure_time]).to eq(measure_time)
         end
       end
 
@@ -184,44 +184,44 @@ module Librato
         end
 
         context "when successful" do
-          it "should flush queued metrics and return true" do
+          it "flushes queued metrics and return true" do
             subject.add :steps => 2042, :distance => 1234
-            subject.submit.should be_true
-            subject.empty?.should be_true
+            expect(subject.submit).to be true
+            expect(subject.empty?).to be true
           end
         end
 
         context "when failed" do
-          it "should preserve queue and return false" do
+          it "preserves queue and return false" do
             subject.add :steps => 2042, :distance => 1234
             subject.persister.return_value(false)
-            subject.submit.should be_false
-            subject.empty?.should be_false
+            expect(subject.submit).to be false
+            expect(subject.empty?).to be false
           end
         end
       end
 
       describe "#time" do
         context "with metric name only" do
-          it "should queue metric with timed value" do
+          it "queues metric with timed value" do
             1.upto(5) do
               subject.time :sleeping do
                 sleep 0.1
               end
             end
             queued = subject.queued[:gauges][0]
-            queued[:name].should == 'sleeping'
-            queued[:count].should be 5
-            queued[:sum].should be >= 500.0
-            queued[:sum].should be_within(150).of(500)
+            expect(queued[:name]).to eq('sleeping')
+            expect(queued[:count]).to eq(5)
+            expect(queued[:sum]).to be >= 500.0
+            expect(queued[:sum]).to be_within(150).of(500)
           end
 
-          it "should return the result of the block" do
+          it "returns the result of the block" do
             result = subject.time :returning do
               :hi_there
             end
 
-            result.should == :hi_there
+            expect(result).to eq(:hi_there)
           end
         end
       end
@@ -233,18 +233,18 @@ module Librato
           client
         end
 
-        it "should not submit immediately" do
+        it "does not submit immediately" do
           timed_agg = Aggregator.new(:client => client, :autosubmit_interval => 1)
           timed_agg.add :foo => 1
-          timed_agg.persister.persisted.should be_nil # nothing sent
+          expect(timed_agg.persister.persisted).to be_nil # nothing sent
         end
 
-        it "should submit after interval" do
+        it "submits after interval" do
           timed_agg = Aggregator.new(:client => client, :autosubmit_interval => 1)
           timed_agg.add :foo => 1
           sleep 1
           timed_agg.add :foo => 2
-          timed_agg.persister.persisted.should_not be_nil # sent
+          expect(timed_agg.persister.persisted).not_to be_nil # sent
         end
       end
 

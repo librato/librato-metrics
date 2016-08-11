@@ -4,7 +4,7 @@ DEPRECATED_METHODS = %w[fetch list update delete]
 describe Librato::Metrics do
 
   DEPRECATED_METHODS.each do |deprecated_method|
-    it { should respond_to(deprecated_method) }
+    it { is_expected.to respond_to(deprecated_method) }
   end
 
   describe "Client" do
@@ -18,7 +18,7 @@ describe Librato::Metrics do
     end
 
     DEPRECATED_METHODS.each do |deprecated_method|
-      it { should respond_to(deprecated_method) }
+      it { is_expected.to respond_to(deprecated_method) }
     end
 
     describe "#fetch" do
@@ -26,10 +26,10 @@ describe Librato::Metrics do
         let(:metric) { client.fetch(:test_metric) }
         subject { metric }
 
-        it { should_not be_nil }
+        it { is_expected.not_to be_nil }
 
-        it "should return a metric" do
-          metric["name"].should == "test_metric"
+        it "returns a metric" do
+          expect(metric["name"]).to eq("test_metric")
         end
       end
 
@@ -37,13 +37,13 @@ describe Librato::Metrics do
         let(:measurements) { client.fetch(:test_metric, :count => 1) }
         subject { measurements }
 
-        it { should_not be_nil }
-        it { should_not be_empty }
+        it { is_expected.not_to be_nil }
+        it { is_expected.not_to be_empty }
 
-        it "should return the measurements" do
-          measurements.should have_key("unassigned")
-          measurements["unassigned"].should be_an(Array)
-          measurements["unassigned"].first["value"].should == 123.0
+        it "returns the measurements" do
+          expect(measurements).to have_key("unassigned")
+          expect(measurements["unassigned"]).to be_an(Array)
+          expect(measurements["unassigned"].first["value"]).to eq(123.0)
         end
       end
     end
@@ -52,12 +52,12 @@ describe Librato::Metrics do
       let(:metrics) { client.list }
       subject { metrics }
 
-      it { should_not be_nil }
-      it { should_not be_empty }
+      it { is_expected.not_to be_nil }
+      it { is_expected.not_to be_empty }
 
-      it "should return the list of metrics" do
+      it "returns the list of metrics" do
         metric = metrics.find { |m| m["name"] == "test_metric" }
-        metric.should_not be_nil
+        expect(metric).not_to be_nil
       end
     end
 
@@ -68,16 +68,16 @@ describe Librato::Metrics do
 
       let(:updated_metric) { client.get_metric("test_metric") }
 
-      it "should update the metric" do
-        updated_metric["display_name"].should == "Test Deprecated Update"
+      it "updates the metric" do
+        expect(updated_metric["display_name"]).to eq("Test Deprecated Update")
       end
     end
 
     describe "#delete" do
-      it "should delete the metric" do
-        client.metrics(:name => "test_metric").should_not be_empty
+      it "deletes the metric" do
+        expect(client.metrics(:name => "test_metric")).not_to be_empty
         client.delete("test_metric")
-        client.metrics(:name => "test_metric").should be_empty
+        expect(client.metrics(:name => "test_metric")).to be_empty
       end
     end
 

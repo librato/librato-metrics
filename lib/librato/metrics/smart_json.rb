@@ -1,7 +1,10 @@
 USE_MULTI_JSON = defined?(MultiJson)
 
-require 'json' unless USE_MULTI_JSON
-require 'multi_json' if USE_MULTI_JSON
+if USE_MULTI_JSON
+  require 'multi_json'
+else
+  require 'json'
+end
 
 module Librato
   module Metrics

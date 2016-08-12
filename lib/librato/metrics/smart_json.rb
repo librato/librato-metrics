@@ -10,7 +10,7 @@ module Librato
         if USE_MULTI_JSON
           MultiJson
         else
-          JSON # ships with 1.9
+          JSON
         end
       extend SingleForwardable
 

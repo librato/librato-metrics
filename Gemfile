@@ -32,4 +32,5 @@ group :test do
   gem 'rspec', '~> 3.5.0'
   gem 'sinatra'
   gem 'popen4'
+  gem 'multi_json'
 end

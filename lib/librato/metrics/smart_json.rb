@@ -1,32 +1,35 @@
-USE_MULTI_JSON = defined?(MultiJson)
-
-require 'json' unless USE_MULTI_JSON
-
 module Librato
   module Metrics
     class SmartJSON
-      JSON_HANDLER =
-        if USE_MULTI_JSON
-          MultiJson
-        else
-          JSON
-        end
       extend SingleForwardable
 
-      # wrap MultiJSON's implementation so we can use any version
-      # prefer modern syntax if available; def once at startup
-      if JSON_HANDLER.respond_to?(:load)
-        def_delegator JSON_HANDLER, :load, :read
-      else
-        def_delegator JSON_HANDLER, :decode, :read
-      end
+      @handler =
+        if defined?(::MultiJson)
+          # MultiJSON >= 1.3.0
+          if MultiJson.respond_to?(:load)
+            def_delegator MultiJson, :load, :read
+          else
+            def_delegator MultiJson, :decode, :read
+          end
 
-      if JSON_HANDLER.respond_to?(:dump)
-        def_delegator JSON_HANDLER, :dump, :write
-      else
-        def_delegator JSON_HANDLER, :encode, :write
-      end
+          # MultiJSON <= 1.2.0
+          if MultiJson.respond_to?(:dump)
+            def_delegator MultiJson, :dump, :write
+          else
+            def_delegator MultiJson, :encode, :write
+          end
 
+          :multi_json
+        else
+          require "json/ext"
+
+          def_delegator JSON, :parse, :read
+          def_delegator JSON, :generate, :write
+
+          :json
+        end
+
+      define_singleton_method(:handler) { @handler }
     end
   end
 end

@@ -63,7 +63,7 @@ module Librato
         end
 
         context "with JSON" do
-          it "uses .parse" do
+          it "uses .generate" do
             actual = SmartJSON.write({abc: 'def'})
 
             expect(SmartJSON.handler).to eq(:json)

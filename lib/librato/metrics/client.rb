@@ -8,6 +8,15 @@ module Librato
 
       attr_accessor :email, :api_key, :proxy
 
+      def tags
+        @tags ||= {}
+      end
+
+      def tags=(tags)
+        raise ArgumentError, "tags must be a Hash" unless tags.is_a?(Hash)
+        @tags = tags
+      end
+
       # Provide agent identifier for the developer program. See:
       # http://support.metrics.librato.com/knowledgebase/articles/53548-developer-program
       #

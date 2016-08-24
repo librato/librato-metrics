@@ -5,6 +5,39 @@ module Librato
 
     describe Client do
 
+      describe "#tags" do
+        context "when set" do
+          before { subject.tags = { instance: "i-1234567a" } }
+          it "gets @tags" do
+            expect(subject.tags).to be_a(Hash)
+            expect(subject.tags.keys).to include(:instance)
+            expect(subject.tags[:instance]).to eq("i-1234567a")
+          end
+        end
+
+        context "when not set" do
+          it "defaults to empty hash" do
+            expect(subject.tags).to be_empty
+          end
+        end
+      end
+
+      describe "#tags=" do
+        it "sets @tags" do
+          expected_tags = { instance: "i-1234567b" }
+          expect{subject.tags = expected_tags}.to change{subject.tags}.from({}).to(expected_tags)
+          expect(subject.tags).to be_a(Hash)
+          expect(subject.tags.keys).to eq(expected_tags.keys)
+          expect(subject.tags[:instance]).to eq(expected_tags[:instance])
+        end
+
+        context "when invalid argument" do
+          it "raises exception" do
+            expect { subject.tags = "invalid arg" }.to raise_error(ArgumentError)
+          end
+        end
+      end
+
       describe "#agent_identifier" do
         context "when given a single string argument" do
           it "sets agent_identifier" do

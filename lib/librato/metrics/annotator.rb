@@ -14,15 +14,15 @@ module Librato::Metrics
     #   annotator.add :deployments, 'deployed v45'
     #
     # @example Annotation with start and end times
-    #   annotator.add :deployments, 'deployed v56', :start_time => start,
-    #                 :end_time => end_time
+    #   annotator.add :deployments, 'deployed v56', start_time: start,
+    #                 end_time: end_time
     #
     # @example Annotation with a specific source
-    #   annotator.add :deployments, 'deployed v60', :source => 'app12'
+    #   annotator.add :deployments, 'deployed v60', source: 'app12'
     #
     # @example Annotation with a description
     #   annotator.add :deployments, 'deployed v61',
-    #                 :description => '9b562b2: shipped new feature foo!'
+    #                 description: '9b562b2: shipped new feature foo!'
     #
     # @example Annotate with automatic start and end times
     #   annotator.add(:deployments, 'deployed v62') do
@@ -41,7 +41,7 @@ module Librato::Metrics
       event = SmartJSON.read(response.body)
       if block_given?
         yield
-        update_event stream, event['id'], :end_time => Time.now.to_i
+        update_event stream, event['id'], end_time: Time.now.to_i
         # need to get updated representation
         event = fetch_event stream, event['id']
       end
@@ -85,12 +85,12 @@ module Librato::Metrics
     #   annotator.fetch :deployments
     #
     # @example Get events on 'deployments' between start and end times
-    #   annotator.fetch :deployments, :start_time => start,
-    #                   :end_time => end_time
+    #   annotator.fetch :deployments, start_time: start,
+    #                   end_time: end_time
     #
     # @example Source-limited listing
-    #   annotator.fetch :deployments, :sources => ['foo','bar','baz'],
-    #                   :start_time => start, :end_time => end_time
+    #   annotator.fetch :deployments, sources: ['foo','bar','baz'],
+    #                   start_time: start, end_time: end_time
     #
     def fetch(stream, options={})
       response = connection.get("annotations/#{stream}", options)
@@ -113,7 +113,7 @@ module Librato::Metrics
     #   streams = annotator.list
     #
     # @example List annotator streams with 'deploy' in the name
-    #   deploy_streams = annotator.list :name => 'deploy'
+    #   deploy_streams = annotator.list name: 'deploy'
     #
     def list(options={})
       response = connection.get("annotations", options)
@@ -123,7 +123,7 @@ module Librato::Metrics
     # Update an event's properties
     #
     # @example Set an end time for a previously submitted event
-    #   annotator.update_event 'deploys', 'v24', :end_time => end_time
+    #   annotator.update_event 'deploys', 'v24', end_time: end_time
     #
     def update_event(stream, id, options={})
       url = "annotations/#{stream}/#{id}"

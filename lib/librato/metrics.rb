@@ -26,20 +26,20 @@ module Librato
   #   Librato::Metrics.authenticate 'email', 'api_key'
   #
   #   # list current metrics
-  #   Librato::Metrics.list
+  #   Librato::Metrics.metrics
   #
   #   # submit a metric immediately
-  #   Librato::Metrics.submit :foo => 12712
+  #   Librato::Metrics.submit foo: 12712
   #
   #   # fetch the last 10 values of foo
-  #   Librato::Metrics.get_measurements :foo, :count => 10
+  #   Librato::Metrics.get_measurements :foo, count: 10
   #
   # @example Queuing metrics for submission
   #   queue = Librato::Metrics::Queue.new
   #
   #   # queue some metrics
-  #   queue.add :foo => 12312
-  #   queue.add :bar => 45678
+  #   queue.add foo: 12312
+  #   queue.add bar: 45678
   #
   #   # send the metrics
   #   queue.submit
@@ -49,14 +49,14 @@ module Librato
   #   client.authenticate 'email', 'api_key'
   #
   #   # list client's metrics
-  #   client.list
+  #   client.metrics
   #
   #   # create an associated queue
   #   queue = client.new_queue
   #
   #   # queue up some metrics and submit
-  #   queue.add :foo => 12345
-  #   queue.add :bar => 45678
+  #   queue.add foo: 12345
+  #   queue.add bar: 45678
   #   queue.submit
   #
   # @note Most of the methods you can call directly on Librato::Metrics are
@@ -81,10 +81,7 @@ module Librato
                    :delete_metrics, :update_metric, :update_metrics,
                    :submit,
                    :sources, :get_source, :update_source,
-                   :create_snapshot, :get_snapshot,
-                   # Deprecated metrics methods
-                   :fetch, :list, :delete, :update
-
+                   :create_snapshot, :get_snapshot
 
     # The Librato::Metrics::Client being used by module-level
     # access.

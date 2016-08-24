@@ -33,7 +33,7 @@ module Librato
             metric[:name] = key.to_s
             type = metric.delete(:type) || metric.delete('type') || 'gauge'
           else
-            metric = {:name => key.to_s, :value => value}
+            metric = {name: key.to_s, value: value}
             type = :gauge
           end
           if @prefix

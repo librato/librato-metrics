@@ -29,7 +29,8 @@ gem 'pry'
 gem 'quixote'
 
 group :test do
-  gem 'rspec', '~> 2.6.0'
+  gem 'rspec', '~> 3.5.0'
   gem 'sinatra'
   gem 'popen4'
+  gem 'multi_json'
 end

@@ -11,6 +11,11 @@ require 'librato/metrics'
 
 RSpec.configure do |config|
 
+  # only accept expect syntax instead of should
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
+  end
+
   # purge all metrics from test account
   def delete_all_metrics
     connection = Librato::Metrics.client.connection
@@ -65,20 +70,11 @@ RSpec.configure do |config|
 
 end
 
-# Ex: 'foobar'.should start_with('foo') #=> true
-#
-RSpec::Matchers.define :start_with do |start_string|
-  match do |string|
-    start_length = start_string.length
-    string[0..start_length-1] == start_string
-  end
-end
-
 # Compares hashes of arrays by converting the arrays to
 # sets before comparision
 #
 # @example
-#   {:foo => [1,3,2]}.should equal_unordered({:foo => [1,2,3]})
+#   {foo: [1,3,2]}.should equal_unordered({foo: [1,2,3]})
 RSpec::Matchers.define :equal_unordered do |result|
   result.each do |key, value|
     result[key] = value.to_set if value.respond_to?(:to_set)

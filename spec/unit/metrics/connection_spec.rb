@@ -7,42 +7,42 @@ module Librato
 
       describe "#api_endpoint" do
         context "when not provided" do
-          it "should be default" do
-            subject.api_endpoint.should == 'https://metrics-api.librato.com'
+          it "uses default" do
+            expect(subject.api_endpoint).to eq('https://metrics-api.librato.com')
           end
         end
 
         context "when provided" do
-          it "should be respected" do
-            connection = Connection.new(:api_endpoint => 'http://test.com/')
-            connection.api_endpoint.should == 'http://test.com/'
+          it "uses provided endpoint" do
+            connection = Connection.new(api_endpoint: 'http://test.com/')
+            expect(connection.api_endpoint).to eq('http://test.com/')
           end
         end
       end
 
       describe "#user_agent" do
         context "without an agent_identifier" do
-          it "should render standard string" do
-            connection = Connection.new(:client => Client.new)
-            connection.user_agent.should start_with('librato-metrics')
+          it "renders standard string" do
+            connection = Connection.new(client: Client.new)
+            expect(connection.user_agent).to start_with('librato-metrics')
           end
         end
 
         context "with an agent_identifier" do
-          it "should render agent_identifier first" do
+          it "renders agent_identifier first" do
             client = Client.new
             client.agent_identifier('foo', '0.5', 'bar')
-            connection = Connection.new(:client => client)
-            connection.user_agent.should start_with('foo/0.5')
+            connection = Connection.new(client: client)
+            expect(connection.user_agent).to start_with('foo/0.5')
           end
         end
 
         context "with a custom user agent set" do
-          it "should use custom user agent" do
+          it "uses custom user agent" do
             client = Client.new
             client.custom_user_agent = 'foo agent'
-            connection = Connection.new(:client => client)
-            connection.user_agent.should == 'foo agent'
+            connection = Connection.new(client: client)
+            expect(connection.user_agent).to eq('foo agent')
           end
         end
 
@@ -51,8 +51,8 @@ module Librato
 
       describe "network operations" do
         context "when missing client" do
-          it "should raise exception" do
-            lambda { subject.get 'metrics' }.should raise_error(NoClientProvided)
+          it "raises exception" do
+            expect { subject.get 'metrics' }.to raise_error(NoClientProvided)
           end
         end
 
@@ -64,32 +64,32 @@ module Librato
         end
 
         context "with 400 class errors" do
-          it "should not retry" do
+          it "does not retry" do
             Middleware::CountRequests.reset
             with_rackup('status.ru') do
-              lambda {
+              expect {
                 client.connection.transport.post 'not_found'
-              }.should raise_error(NotFound)
-              lambda {
+              }.to raise_error(NotFound)
+              expect {
                 client.connection.transport.post 'forbidden'
-              }.should raise_error(ClientError)
+              }.to raise_error(ClientError)
             end
-            Middleware::CountRequests.total_requests.should == 2 # no retries
+            expect(Middleware::CountRequests.total_requests).to eq(2) # no retries
           end
         end
 
         context "with 500 class errors" do
-          it "should retry" do
+          it "retries" do
             Middleware::CountRequests.reset
             with_rackup('status.ru') do
-              lambda {
+              expect {
                 client.connection.transport.post 'service_unavailable'
-              }.should raise_error(ServerError)
+              }.to raise_error(ServerError)
             end
-            Middleware::CountRequests.total_requests.should == 4 # did retries
+            expect(Middleware::CountRequests.total_requests).to eq(4) # did retries
           end
 
-          it "should send consistent body with retries" do
+          it "sends consistent body with retries" do
             Middleware::CountRequests.reset
             status = 0
             begin
@@ -102,8 +102,8 @@ module Librato
             rescue Exception => error
               status = error.response[:status].to_i
             end
-            Middleware::CountRequests.total_requests.should == 4 # did retries
-            status.should be(502)#, 'body should be sent for retries'
+            expect(Middleware::CountRequests.total_requests).to eq(4) # did retries
+            expect(status).to eq(502) # body is sent for retries
           end
         end
       end

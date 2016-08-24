@@ -1,5 +1,12 @@
 ## Changelog
 
+### master
+* Remove support for deprecated methods (#117)
+* Upgrade rspec from 2.6 to 3.5 (#118)
+* Remove support for ruby 1.8 (#119)
+* Remove `MultiJson` runtime dependency (#119)
+* Relax `Faraday` runtime dependency (#119)
+
 ### Version 1.6.1
 * Fix bugs with listing sources (#116)
 

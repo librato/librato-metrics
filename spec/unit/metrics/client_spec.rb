@@ -58,8 +58,7 @@ module Librato
           expected_tags = { instance: "i-1234567b" }
           expect{subject.tags = expected_tags}.to change{subject.tags}.from({}).to(expected_tags)
           expect(subject.tags).to be_a(Hash)
-          expect(subject.tags.keys).to eq(expected_tags.keys)
-          expect(subject.tags[:instance]).to eq(expected_tags[:instance])
+          expect(subject.tags).to eq(expected_tags)
         end
 
         context "when invalid argument" do
@@ -78,8 +77,7 @@ module Librato
             subject.add_tags expected_tags
 
             expect(subject.tags).to be_a(Hash)
-            expect(subject.tags.keys).to eq(expected_tags.keys)
-            expect(subject.tags[:instance]).to eq(expected_tags[:instance])
+            expect(subject.tags).to eq(expected_tags)
           end
         end
 
@@ -93,10 +91,7 @@ module Librato
             subject.add_tags tmp2
 
             expect(subject.tags).to be_a(Hash)
-            expect(subject.tags.keys).to eq(expected_tags.keys)
-            expect(subject.tags[:instance]).to eq(expected_tags[:instance])
-            expect(subject.tags[:region]).to eq(expected_tags[:region])
-            expect(subject.tags[:elb]).to eq(expected_tags[:elb])
+            expect(subject.tags).to eq(expected_tags)
           end
         end
 

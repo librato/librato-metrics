@@ -17,6 +17,11 @@ module Librato
         @tags = tags
       end
 
+      def add_tags(tags)
+        raise ArgumentError, "tags must be a Hash" unless tags.is_a?(Hash)
+        self.tags.merge!(tags)
+      end
+
       # Provide agent identifier for the developer program. See:
       # http://support.metrics.librato.com/knowledgebase/articles/53548-developer-program
       #

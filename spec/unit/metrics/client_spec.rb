@@ -8,6 +8,7 @@ module Librato
       describe "#tags" do
         context "when set" do
           before { subject.tags = { instance: "i-1234567a" } }
+          after { Librato::Metrics.client.tags.clear }
           it "gets @tags" do
             expect(subject.tags).to be_a(Hash)
             expect(subject.tags.keys).to include(:instance)
@@ -23,6 +24,7 @@ module Librato
       end
 
       describe "#tags=" do
+        after { Librato::Metrics.client.tags.clear }
         it "sets @tags" do
           expected_tags = { instance: "i-1234567b" }
           expect{subject.tags = expected_tags}.to change{subject.tags}.from({}).to(expected_tags)
@@ -34,6 +36,44 @@ module Librato
         context "when invalid argument" do
           it "raises exception" do
             expect { subject.tags = "invalid arg" }.to raise_error(ArgumentError)
+          end
+        end
+      end
+
+      describe "#add_tags" do
+        after { Librato::Metrics.client.tags.clear }
+
+        context "when no existing tags" do
+          it "adds top-level tags" do
+            expected_tags = { instance: "i-1234567c" }
+            subject.add_tags expected_tags
+
+            expect(subject.tags).to be_a(Hash)
+            expect(subject.tags.keys).to eq(expected_tags.keys)
+            expect(subject.tags[:instance]).to eq(expected_tags[:instance])
+          end
+        end
+
+        context "when existing tags" do
+          it "merges tags" do
+            tmp1 = { instance: "i-1234567d" }
+            tmp2 = { region: "us-east-1", elb: "metrics-stg" }
+            expected_tags = tmp1.merge(tmp2)
+
+            subject.add_tags tmp1
+            subject.add_tags tmp2
+
+            expect(subject.tags).to be_a(Hash)
+            expect(subject.tags.keys).to eq(expected_tags.keys)
+            expect(subject.tags[:instance]).to eq(expected_tags[:instance])
+            expect(subject.tags[:region]).to eq(expected_tags[:region])
+            expect(subject.tags[:elb]).to eq(expected_tags[:elb])
+          end
+        end
+
+        context "when invalid argument" do
+          it "raises exception" do
+            expect { subject.add_tags "invalid arg" }.to raise_error(ArgumentError)
           end
         end
       end

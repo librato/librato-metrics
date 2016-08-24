@@ -10,6 +10,11 @@ module Librato
 
       attr_accessor :email, :api_key, :proxy
 
+      def initialize(options={})
+        raise ArgumentError, ":tags must be a Hash" if options[:tags] && !options[:tags].is_a?(Hash)
+        self.tags = options.fetch(:tags, {})
+      end
+
       def tags
         @tags ||= {}
       end

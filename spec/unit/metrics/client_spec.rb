@@ -5,6 +5,35 @@ module Librato
 
     describe Client do
 
+      describe "#initialize" do
+        context "when :tags are present" do
+          after { Librato::Metrics.client.tags.clear }
+          context "when :tags are valid" do
+            it "sets @tags" do
+              expected_tags = { environment: "staging" }
+              client = Client.new(tags: expected_tags)
+
+              expect(client.tags).not_to be_empty
+              expect(client.tags).to eq(expected_tags)
+            end
+          end
+
+          context "when :tags are invalid" do
+            it "raises exception" do
+              expect { Client.new(tags: "invalid arg") }.to raise_error(ArgumentError)
+            end
+          end
+        end
+
+        context "when :tags are not present" do
+          it "does not set @tags" do
+            client = Client.new
+
+            expect(client.tags).to be_empty
+          end
+        end
+      end
+
       describe "#tags" do
         context "when set" do
           before { subject.tags = { instance: "i-1234567a" } }

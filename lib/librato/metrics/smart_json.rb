@@ -3,33 +3,34 @@ module Librato
     class SmartJSON
       extend SingleForwardable
 
-      @handler =
-        if defined?(::MultiJson)
-          # MultiJSON >= 1.3.0
-          if MultiJson.respond_to?(:load)
-            def_delegator MultiJson, :load, :read
-          else
-            def_delegator MultiJson, :decode, :read
-          end
-
-          # MultiJSON <= 1.2.0
-          if MultiJson.respond_to?(:dump)
-            def_delegator MultiJson, :dump, :write
-          else
-            def_delegator MultiJson, :encode, :write
-          end
-
-          :multi_json
+      if defined?(::MultiJson)
+        # MultiJSON >= 1.3.0
+        if MultiJson.respond_to?(:load)
+          def_delegator MultiJson, :load, :read
         else
-          require "json/ext"
-
-          def_delegator JSON, :parse, :read
-          def_delegator JSON, :generate, :write
-
-          :json
+          def_delegator MultiJson, :decode, :read
         end
 
-      define_singleton_method(:handler) { @handler }
+        # MultiJSON <= 1.2.0
+        if MultiJson.respond_to?(:dump)
+          def_delegator MultiJson, :dump, :write
+        else
+          def_delegator MultiJson, :encode, :write
+        end
+
+        def self.handler
+          :multi_json
+        end
+      else
+        require "json"
+
+        def_delegator JSON, :parse, :read
+        def_delegator JSON, :generate, :write
+
+        def self.handler
+          :json
+        end
+      end
     end
   end
 end

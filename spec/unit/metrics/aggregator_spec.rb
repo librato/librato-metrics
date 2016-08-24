@@ -38,6 +38,33 @@ module Librato
             expect(a.source).to be_nil
           end
         end
+
+        context "with valid arguments" do
+          it "initializes Aggregator" do
+            expect { Aggregator.new }.not_to raise_error
+            expect { Aggregator.new(source: "metrics-web-stg-1") }.not_to raise_error
+            expect { Aggregator.new(tags: { hostname: "metrics-web-stg-1" }) }.not_to raise_error
+          end
+        end
+
+        context "with invalid arguments" do
+          it "raises exception" do
+            expect {
+              Aggregator.new(
+                source: "metrics-web-stg-1",
+                tags: { hostname: "metrics-web-stg-1" }
+              )
+            }.to raise_error(ArgumentError)
+            expect { Aggregator.new(measure_time: Time.now, time: Time.now) }.to raise_error(ArgumentError)
+            expect { Aggregator.new(source: "metrics-web-stg-1", time: Time.now) }.to raise_error(ArgumentError)
+            expect {
+              Aggregator.new(
+                measure_time: Time.now,
+                tags: { hostname: "metrics-web-stg-1" }
+              )
+            }.to raise_error(ArgumentError)
+          end
+        end
       end
 
       describe "#add" do

@@ -1,3 +1,5 @@
+require "set"
+
 module Librato
   module Metrics
 
@@ -82,11 +84,14 @@ module Librato
       end
 
       def setup_common_options(options)
+        validate_options(options)
         @autosubmit_interval = options[:autosubmit_interval]
         @client = options[:client] || Librato::Metrics.client
         @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
         @source = options[:source]
+        @tags = options[:tags]
         @measure_time = options[:measure_time] && options[:measure_time].to_i
+        @time = options[:time] && options[:time].to_i
         @create_time = Time.now
         @clear_on_failure = options[:clear_failures] || false
         @prefix = options[:prefix]
@@ -96,6 +101,20 @@ module Librato
         if @autosubmit_interval
           last = @last_submit_time || @create_time
           self.submit if (Time.now - last).to_i >= @autosubmit_interval
+        end
+      end
+
+      def validate_options(options)
+        raise ArgumentError, ":options must be a Hash" unless options.is_a?(Hash)
+        check_compatibility(options, [:source, :tags])
+        check_compatibility(options, [:measure_time, :time])
+        check_compatibility(options, [:source, :time])
+        check_compatibility(options, [:measure_time, :tags])
+      end
+
+      def check_compatibility(options, incompatible_options)
+        if incompatible_options.to_set.subset?(options.keys.to_set)
+          raise ArgumentError, "#{incompatible_options} cannot be simultaneously set"
         end
       end
 

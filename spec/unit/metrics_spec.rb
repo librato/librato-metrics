@@ -48,13 +48,13 @@ module Librato
 
      it "persists metrics immediately" do
        Metrics.persistence = :test
-       expect(Metrics.submit(:foo => 123)).to be true
-       expect(Metrics.persister.persisted).to eq({:gauges => [{:name => 'foo', :value => 123}]})
+       expect(Metrics.submit(foo: 123)).to be true
+       expect(Metrics.persister.persisted).to eq({gauges: [{name: 'foo', value: 123}]})
      end
 
      it "tolerates multiple metrics" do
-       expect { Librato::Metrics.submit :foo => 123, :bar => 456 }.not_to raise_error
-       expected = {:gauges => [{:name => 'foo', :value => 123}, {:name => 'bar', :value => 456}]}
+       expect { Librato::Metrics.submit foo: 123, bar: 456 }.not_to raise_error
+       expected = {gauges: [{name: 'foo', value: 123}, {name: 'bar', value: 456}]}
        expect(Librato::Metrics.persister.persisted).to equal_unordered(expected)
      end
    end

@@ -10,13 +10,13 @@ module Librato
       describe "#add" do
         it "creates new annotation" do
           subject.add :deployment, "deployed v68"
-          annos = subject.fetch(:deployment, :start_time => Time.now.to_i-60)
+          annos = subject.fetch(:deployment, start_time: Time.now.to_i-60)
           expect(annos["events"]["unassigned"].length).to eq(1)
           expect(annos["events"]["unassigned"][0]["title"]).to eq('deployed v68')
         end
         it "supports sources" do
-          subject.add :deployment, 'deployed v69', :source => 'box1'
-          annos = subject.fetch(:deployment, :start_time => Time.now.to_i-60)
+          subject.add :deployment, 'deployed v69', source: 'box1'
+          annos = subject.fetch(:deployment, start_time: Time.now.to_i-60)
           expect(annos["events"]["box1"].length).to eq(1)
           first = annos["events"]["box1"][0]
           expect(first['title']).to eq('deployed v69')
@@ -24,9 +24,9 @@ module Librato
         it "supports start and end times" do
           start_time = Time.now.to_i-120
           end_time = Time.now.to_i-30
-          subject.add :deployment, 'deployed v70', :start_time => start_time,
-                      :end_time => end_time
-          annos = subject.fetch(:deployment, :start_time => Time.now.to_i-180)
+          subject.add :deployment, 'deployed v70', start_time: start_time,
+                      end_time: end_time
+          annos = subject.fetch(:deployment, start_time: Time.now.to_i-180)
           expect(annos["events"]["unassigned"].length).to eq(1)
           first = annos["events"]["unassigned"][0]
           expect(first['title']).to eq('deployed v70')
@@ -34,8 +34,8 @@ module Librato
           expect(first['end_time']).to eq(end_time)
         end
         it "supports description" do
-          subject.add :deployment, 'deployed v71', :description => 'deployed foobar!'
-          annos = subject.fetch(:deployment, :start_time => Time.now.to_i-180)
+          subject.add :deployment, 'deployed v71', description: 'deployed foobar!'
+          annos = subject.fetch(:deployment, start_time: Time.now.to_i-180)
           expect(annos["events"]["unassigned"].length).to eq(1)
           first = annos["events"]["unassigned"][0]
           expect(first['title']).to eq('deployed v71')
@@ -73,14 +73,14 @@ module Librato
         it "removes an annotation event" do
           subject.add :deployment, 'deployed v46'
           subject.add :deployment, 'deployed v47'
-          events = subject.fetch(:deployment, :start_time => Time.now.to_i-60)
+          events = subject.fetch(:deployment, start_time: Time.now.to_i-60)
           events = events['events']['unassigned']
           ids = events.reduce({}) do |hash, event|
             hash[event['title']] = event['id']
             hash
           end
           subject.delete_event :deployment, ids['deployed v47']
-          events = subject.fetch(:deployment, :start_time => Time.now.to_i-60)
+          events = subject.fetch(:deployment, start_time: Time.now.to_i-60)
           events = events['events']['unassigned']
           expect(events.length).to eq(1)
           expect(events[0]['title']).to eq('deployed v46')
@@ -100,17 +100,17 @@ module Librato
           it "returns set of annotations" do
             subject.add :backups, "backup 22"
             subject.add :backups, "backup 23"
-            annos = subject.fetch :backups, :start_time => Time.now.to_i-60
+            annos = subject.fetch :backups, start_time: Time.now.to_i-60
             events = annos['events']['unassigned']
             expect(events[0]['title']).to eq('backup 22')
             expect(events[1]['title']).to eq('backup 23')
           end
           it "respects source limits" do
-            subject.add :backups, "backup 24", :source => 'server_1'
-            subject.add :backups, "backup 25", :source => 'server_2'
-            subject.add :backups, "backup 26", :source => 'server_3'
-            annos = subject.fetch :backups, :start_time => Time.now.to_i-60,
-                                  :sources => %w{server_1 server_3}
+            subject.add :backups, "backup 24", source: 'server_1'
+            subject.add :backups, "backup 25", source: 'server_2'
+            subject.add :backups, "backup 26", source: 'server_3'
+            annos = subject.fetch :backups, start_time: Time.now.to_i-60,
+                                  sources: %w{server_1 server_3}
             expect(annos['events']['server_1']).not_to be_nil
             expect(annos['events']['server_2']).to be_nil
             expect(annos['events']['server_3']).not_to be_nil
@@ -158,7 +158,7 @@ module Librato
         end
         context "with an argument" do
           it "lists annotation streams which match" do
-            streams = subject.list :name => 'back'
+            streams = subject.list name: 'back'
             expect(streams['annotations'].length).to eq(1)
             streams = streams['annotations'].map{|i| i['name']}
             expect(streams).to include('backups')
@@ -172,7 +172,7 @@ module Librato
             end_time = (Time.now + 60).to_i
             annotation = subject.add 'deploys', 'v24'
             subject.update_event 'deploys', annotation['id'],
-              :end_time => end_time, :title => 'v28'
+              end_time: end_time, title: 'v28'
             data = subject.fetch_event 'deploys', annotation['id']
 
             expect(data['title']).to eq('v28')

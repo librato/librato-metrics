@@ -45,8 +45,8 @@ namespace :spec do
   end
 end
 
-task :default => :spec
-task :test => :spec
+task default: :spec
+task test: :spec
 
 # Docs
 require 'yard'
@@ -61,4 +61,3 @@ task :console do
     sh "irb -rubygems -r ./lib/librato/metrics.rb"
   end
 end
-

@@ -30,7 +30,7 @@ module Librato
       # @return Boolean
       def submit
         return true if self.queued.empty?
-        options = {:per_request => @per_request}
+        options = {per_request: @per_request}
         if persister.persist(self.client, self.queued, options)
           @last_submit_time = Time.now
           clear and return true
@@ -54,7 +54,7 @@ module Librato
       #   end
       #
       # @example Queue API request response time w/ source
-      #   queue.time :api_request_time, :source => 'app1' do
+      #   queue.time :api_request_time, source: 'app1' do
       #     # API request..
       #   end
       #
@@ -64,7 +64,7 @@ module Librato
         start = Time.now
         yield.tap do
           duration = (Time.now - start) * 1000.0 # milliseconds
-          metric = {name => options.merge({:value => duration})}
+          metric = {name => options.merge({value: duration})}
           add metric
         end
       end

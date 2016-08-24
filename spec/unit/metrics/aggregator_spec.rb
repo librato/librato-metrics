@@ -13,7 +13,7 @@ module Librato
         context "with specified client" do
           it "sets to client" do
             barney = Client.new
-            a = Aggregator.new(:client => barney)
+            a = Aggregator.new(client: barney)
             expect(a.client).to eq(barney)
           end
         end
@@ -27,7 +27,7 @@ module Librato
 
         context "with specified source" do
           it "sets to source" do
-            a = Aggregator.new(:source => 'rubble')
+            a = Aggregator.new(source: 'rubble')
             expect(a.source).to eq('rubble')
           end
         end
@@ -42,66 +42,66 @@ module Librato
 
       describe "#add" do
         it "allows chaining" do
-          expect(subject.add(:foo => 1234)).to eq(subject)
+          expect(subject.add(foo: 1234)).to eq(subject)
         end
 
         context "with single hash argument" do
           it "records a single aggregate" do
-            subject.add :foo => 3000
-            expected = { #:measure_time => @time, TODO: support specific time
-                :gauges => [
-                { :name => 'foo',
-                  :count => 1,
-                  :sum => 3000.0,
-                  :min => 3000.0,
-                  :max => 3000.0}
+            subject.add foo: 3000
+            expected = { #measure_time: @time, TODO: support specific time
+                gauges: [
+                { name: 'foo',
+                  count: 1,
+                  sum: 3000.0,
+                  min: 3000.0,
+                  max: 3000.0}
                 ]
             }
             expect(subject.queued).to equal_unordered(expected)
           end
 
           it "aggregates multiple measurements" do
-            subject.add :foo => 1
-            subject.add :foo => 2
-            subject.add :foo => 3
-            subject.add :foo => 4
-            subject.add :foo => 5
-            expected = { :gauges => [
-                { :name => 'foo',
-                  :count => 5,
-                  :sum => 15.0,
-                  :min => 1.0,
-                  :max => 5.0}
+            subject.add foo: 1
+            subject.add foo: 2
+            subject.add foo: 3
+            subject.add foo: 4
+            subject.add foo: 5
+            expected = { gauges: [
+                { name: 'foo',
+                  count: 5,
+                  sum: 15.0,
+                  min: 1.0,
+                  max: 5.0}
                 ]
             }
             expect(subject.queued).to equal_unordered(expected)
           end
 
           it "respects source argument" do
-            subject.add :foo => {:source => 'alpha', :value => 1}
-            subject.add :foo => 5
-            subject.add :foo => {:source => :alpha, :value => 6}
-            subject.add :foo => 10
-            expected = { :gauges => [
-              { :name => 'foo', :source => 'alpha', :count => 2,
-                :sum => 7.0, :min => 1.0, :max => 6.0 },
-              { :name => 'foo', :count => 2,
-                :sum => 15.0, :min => 5.0, :max => 10.0 }
+            subject.add foo: {source: 'alpha', value: 1}
+            subject.add foo: 5
+            subject.add foo: {source: :alpha, value: 6}
+            subject.add foo: 10
+            expected = { gauges: [
+              { name: 'foo', source: 'alpha', count: 2,
+                sum: 7.0, min: 1.0, max: 6.0 },
+              { name: 'foo', count: 2,
+                sum: 15.0, min: 5.0, max: 10.0 }
             ]}
             expect(subject.queued).to equal_unordered(expected)
           end
 
           context "with a prefix set" do
             it "auto-prepends names" do
-              subject = Aggregator.new(:prefix => 'foo')
-              subject.add :bar => 1
-              subject.add :bar => 12
-              expected = {:gauges => [
-                { :name =>'foo.bar',
-                  :count => 2,
-                  :sum => 13.0,
-                  :min => 1.0,
-                  :max => 12.0
+              subject = Aggregator.new(prefix: 'foo')
+              subject.add bar: 1
+              subject.add bar: 12
+              expected = {gauges: [
+                { name:'foo.bar',
+                  count: 2,
+                  sum: 13.0,
+                  min: 1.0,
+                  max: 12.0
                   }
                 ]
               }
@@ -112,49 +112,49 @@ module Librato
 
         context "with multiple hash arguments" do
           it "records a single aggregate" do
-            subject.add :foo => 3000
-            subject.add :bar => 30
+            subject.add foo: 3000
+            subject.add bar: 30
             expected = {
-              #:measure_time => @time, TODO: support specific time
-              :gauges => [
-                { :name => 'foo',
-                  :count => 1,
-                  :sum => 3000.0,
-                  :min => 3000.0,
-                  :max => 3000.0},
-                { :name => 'bar',
-                  :count => 1,
-                  :sum => 30.0,
-                  :min => 30.0,
-                  :max => 30.0},
+              #measure_time: @time, TODO: support specific time
+              gauges: [
+                { name: 'foo',
+                  count: 1,
+                  sum: 3000.0,
+                  min: 3000.0,
+                  max: 3000.0},
+                { name: 'bar',
+                  count: 1,
+                  sum: 30.0,
+                  min: 30.0,
+                  max: 30.0},
                 ]
             }
             expect(subject.queued).to equal_unordered(expected)
           end
 
           it "aggregates multiple measurements" do
-            subject.add :foo => 1
-            subject.add :foo => 2
-            subject.add :foo => 3
-            subject.add :foo => 4
-            subject.add :foo => 5
+            subject.add foo: 1
+            subject.add foo: 2
+            subject.add foo: 3
+            subject.add foo: 4
+            subject.add foo: 5
 
-            subject.add :bar => 6
-            subject.add :bar => 7
-            subject.add :bar => 8
-            subject.add :bar => 9
-            subject.add :bar => 10
-            expected = { :gauges => [
-                { :name => 'foo',
-                  :count => 5,
-                  :sum => 15.0,
-                  :min => 1.0,
-                  :max => 5.0},
-                { :name => 'bar',
-                  :count => 5,
-                  :sum => 40.0,
-                  :min => 6.0,
-                  :max => 10.0}
+            subject.add bar: 6
+            subject.add bar: 7
+            subject.add bar: 8
+            subject.add bar: 9
+            subject.add bar: 10
+            expected = { gauges: [
+                { name: 'foo',
+                  count: 5,
+                  sum: 15.0,
+                  min: 1.0,
+                  max: 5.0},
+                { name: 'bar',
+                  count: 5,
+                  sum: 40.0,
+                  min: 6.0,
+                  max: 10.0}
                 ]
             }
             expect(subject.queued).to equal_unordered(expected)
@@ -164,15 +164,15 @@ module Librato
 
       describe "#queued" do
         it "includes global source if set" do
-          a = Aggregator.new(:source => 'blah')
-          a.add :foo => 12
+          a = Aggregator.new(source: 'blah')
+          a.add foo: 12
           expect(a.queued[:source]).to eq('blah')
         end
 
         it "includes global measure_time if set" do
           measure_time = (Time.now-1000).to_i
-          a = Aggregator.new(:measure_time => measure_time)
-          a.add :foo => 12
+          a = Aggregator.new(measure_time: measure_time)
+          a.add foo: 12
           expect(a.queued[:measure_time]).to eq(measure_time)
         end
       end
@@ -185,7 +185,7 @@ module Librato
 
         context "when successful" do
           it "flushes queued metrics and return true" do
-            subject.add :steps => 2042, :distance => 1234
+            subject.add steps: 2042, distance: 1234
             expect(subject.submit).to be true
             expect(subject.empty?).to be true
           end
@@ -193,7 +193,7 @@ module Librato
 
         context "when failed" do
           it "preserves queue and return false" do
-            subject.add :steps => 2042, :distance => 1234
+            subject.add steps: 2042, distance: 1234
             subject.persister.return_value(false)
             expect(subject.submit).to be false
             expect(subject.empty?).to be false
@@ -234,16 +234,16 @@ module Librato
         end
 
         it "does not submit immediately" do
-          timed_agg = Aggregator.new(:client => client, :autosubmit_interval => 1)
-          timed_agg.add :foo => 1
+          timed_agg = Aggregator.new(client: client, autosubmit_interval: 1)
+          timed_agg.add foo: 1
           expect(timed_agg.persister.persisted).to be_nil # nothing sent
         end
 
         it "submits after interval" do
-          timed_agg = Aggregator.new(:client => client, :autosubmit_interval => 1)
-          timed_agg.add :foo => 1
+          timed_agg = Aggregator.new(client: client, autosubmit_interval: 1)
+          timed_agg.add foo: 1
           sleep 1
-          timed_agg.add :foo => 2
+          timed_agg.add foo: 2
           expect(timed_agg.persister.persisted).not_to be_nil # sent
         end
       end

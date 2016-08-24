@@ -7,6 +7,7 @@ Gem::Specification.new do |s|
   s.specification_version = 2 if s.respond_to? :specification_version=
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.rubygems_version = '1.3.5'
+  s.required_ruby_version = '>= 1.9'
 
   s.name        = 'librato-metrics'
   s.version     = Librato::Metrics::VERSION
@@ -25,8 +26,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = %w[LICENSE]
 
   ## runtime dependencies
-  s.add_dependency 'faraday', '~> 0.7'
-  s.add_dependency 'multi_json'
+  s.add_dependency 'faraday'
   s.add_dependency 'aggregate', '~> 0.2.2'
 
   # omitting for now because jruby-19mode can't handle

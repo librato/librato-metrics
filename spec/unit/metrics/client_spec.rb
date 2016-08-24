@@ -108,15 +108,15 @@ module Librato
         it "persists metrics immediately" do
           subject.authenticate 'me@librato.com', 'foo'
           subject.persistence = :test
-          expect(subject.submit(:foo => 123)).to be true
-          expect(subject.persister.persisted).to eq({:gauges => [{:name => 'foo', :value => 123}]})
+          expect(subject.submit(foo: 123)).to be true
+          expect(subject.persister.persisted).to eq({gauges: [{name: 'foo', value: 123}]})
         end
 
         it "tolerates muliple metrics" do
           subject.authenticate 'me@librato.com', 'foo'
           subject.persistence = :test
-          expect { subject.submit :foo => 123, :bar => 456 }.not_to raise_error
-          expected = {:gauges => [{:name => 'foo', :value => 123}, {:name => 'bar', :value => 456}]}
+          expect { subject.submit foo: 123, bar: 456 }.not_to raise_error
+          expected = {gauges: [{name: 'foo', value: 123}, {name: 'bar', value: 456}]}
           expect(subject.persister.persisted).to equal_unordered(expected)
         end
       end

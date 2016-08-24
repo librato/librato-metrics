@@ -31,8 +31,8 @@ module Librato
       def transport
         raise(NoClientProvided, "No client provided.") unless @client
         @transport ||= Faraday::Connection.new(
-          :url => api_endpoint + "/v1/",
-          :request => {:open_timeout => 20, :timeout => 30}) do |f|
+          url: api_endpoint + "/v1/",
+          request: {open_timeout: 20, timeout: 30}) do |f|
 
           f.use Librato::Metrics::Middleware::RequestBody
           f.use Librato::Metrics::Middleware::Retry

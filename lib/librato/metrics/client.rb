@@ -31,7 +31,7 @@ module Librato
       end
 
       def annotator
-        @annotator ||= Annotator.new(:client => self)
+        @annotator ||= Annotator.new(client: self)
       end
 
       # API endpoint to use for queries and direct
@@ -65,8 +65,8 @@ module Librato
       def connection
         # prevent successful creation if no credentials set
         raise CredentialsMissing unless (self.email and self.api_key)
-        @connection ||= Connection.new(:client => self, :api_endpoint => api_endpoint,
-                                       :adapter => faraday_adapter, :proxy => self.proxy)
+        @connection ||= Connection.new(client: self, api_endpoint: api_endpoint,
+                                       adapter: faraday_adapter, proxy: self.proxy)
       end
 
       # Overrride user agent for this client's connections. If you
@@ -92,14 +92,14 @@ module Librato
       #   Librato::Metrics.delete_metrics :foo, :bar
       #
       # @example Delete metrics that start with 'foo' except 'foobar'
-      #   Librato::Metrics.delete_metrics :names => 'foo*', :exclude => ['foobar']
+      #   Librato::Metrics.delete_metrics names: 'foo*', exclude: ['foobar']
       #
       def delete_metrics(*metric_names)
         raise(NoMetricsProvided, 'Metric name missing.') if metric_names.empty?
         if metric_names[0].respond_to?(:keys) # hash form
           params = metric_names[0]
         else
-          params = { :names => metric_names.map(&:to_s) }
+          params = { names: metric_names.map(&:to_s) }
         end
         connection.delete do |request|
           request.url connection.build_url("metrics")
@@ -128,7 +128,7 @@ module Librato
       # @example Get 5m moving average of 'foo'
       #   measurements = Librato::Metrics.get_composite
       #     'moving_average(mean(series("foo", "*"), {size: "5"}))',
-      #     :start_time => Time.now.to_i - 60*60, :resolution => 300
+      #     start_time: Time.now.to_i - 60*60, resolution: 300
       #
       # @param [String] definition Composite definition
       # @param [hash] options Query options
@@ -151,7 +151,7 @@ module Librato
       #   metric = Librato::Metrics.get_metric :temperature
       #
       # @example Get a metric and its 20 most recent data points
-      #   metric = Librato::Metrics.get_metric :temperature, :count => 20
+      #   metric = Librato::Metrics.get_metric :temperature, count: 20
       #   metric['measurements'] # => {...}
       #
       # A full list of query parameters can be found in the API
@@ -181,23 +181,23 @@ module Librato
       # Retrieve data points for a specific metric
       #
       # @example Get 20 most recent data points for metric
-      #   data = Librato::Metrics.get_measurements :temperature, :count => 20
+      #   data = Librato::Metrics.get_measurements :temperature, count: 20
       #
       # @example Get 20 most recent data points for a specific source
-      #   data = Librato::Metrics.get_measurements :temperature, :count => 20,
-      #                                            :source => 'app1'
+      #   data = Librato::Metrics.get_measurements :temperature, count: 20,
+      #                                            source: 'app1'
       #
       # @example Get the 20 most recent 15 minute data point rollups
-      #   data = Librato::Metrics.get_measurements :temperature, :count => 20,
-      #                                            :resolution => 900
+      #   data = Librato::Metrics.get_measurements :temperature, count: 20,
+      #                                            resolution: 900
       #
       # @example Get data points for the last hour
-      #   data = Librato::Metrics.get_measurements :start_time => Time.now-3600
+      #   data = Librato::Metrics.get_measurements start_time: Time.now-3600
       #
       # @example Get 15 min data points from two hours to an hour ago
-      #   data = Librato::Metrics.get_measurements :start_time => Time.now-7200,
-      #                                            :end_time => Time.now-3600,
-      #                                            :resolution => 900
+      #   data = Librato::Metrics.get_measurements start_time: Time.now-7200,
+      #                                            end_time: Time.now-3600,
+      #                                            resolution: 900
       #
       # A full list of query parameters can be found in the API
       # documentation: {http://dev.librato.com/v1/get/metrics/:name}
@@ -223,7 +223,7 @@ module Librato
       #   Librato::Metrics.metrics
       #
       # @example List metrics with 'foo' in the name
-      #   Librato::Metrics.metrics :name => 'foo'
+      #   Librato::Metrics.metrics name: 'foo'
       #
       # @param [Hash] options
       def metrics(options={})
@@ -265,9 +265,9 @@ module Librato
       # Submit all queued metrics.
       #
       def submit(args)
-        @queue ||= Queue.new(:client => self,
-                             :skip_measurement_times => true,
-                             :clear_failures => true)
+        @queue ||= Queue.new(client: self,
+                             skip_measurement_times: true,
+                             clear_failures: true)
         @queue.add args
         @queue.submit
       end
@@ -275,10 +275,10 @@ module Librato
       # Update a single metric with new attributes.
       #
       # @example Update metric 'temperature'
-      #   Librato::Metrics.update_metric :temperature, :period => 15, :attributes => { :color => 'F00' }
+      #   Librato::Metrics.update_metric :temperature, period: 15, attributes: { color: 'F00' }
       #
       # @example Update metric 'humidity', creating it if it doesn't exist
-      #   Librato::Metrics.update_metric 'humidity', :type => :gauge, :period => 60, :display_name => 'Humidity'
+      #   Librato::Metrics.update_metric 'humidity', type: :gauge, period: 60, display_name: 'Humidity'
       #
       def update_metric(metric, options = {})
         url = "metrics/#{metric}"
@@ -291,10 +291,10 @@ module Librato
       # Update multiple metrics.
       #
       # @example Update multiple metrics by name
-      #   Librato::Metrics.update_metrics :names => ["foo", "bar"], :period => 60
+      #   Librato::Metrics.update_metrics names: ["foo", "bar"], period: 60
       #
       # @example Update all metrics that start with 'foo' that aren't 'foobar'
-      #   Librato::Metrics.update_metrics :names => 'foo*', :exclude => ['foobar'], :display_min => 0
+      #   Librato::Metrics.update_metrics names: 'foo*', exclude: ['foobar'], display_min: 0
       #
       def update_metrics(metrics)
         url = "metrics" # update multiple metrics

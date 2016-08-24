@@ -5,8 +5,6 @@ module Librato
   module Metrics
     module Persistence
       class Direct
-        MEASUREMENT_TYPES = [:gauges, :counters]
-
         # Persist the queued metrics directly to the
         # Metrics web API.
         #
@@ -18,9 +16,15 @@ module Librato
             requests = [queued]
           end
           requests.each do |request|
-            payload = SmartJSON.write(request)
+            if client.has_tags?
+              resource = "measurements"
+              payload = SmartJSON.write(request.merge({ tags: client.tags }))
+            else
+              resource = "metrics"
+              payload = SmartJSON.write(request)
+            end
             # expects 200
-            client.connection.post('metrics', payload)
+            client.connection.post(resource, payload)
           end
         end
 
@@ -31,7 +35,7 @@ module Librato
           reqs = []
           # separate metric-containing values from global values
           globals = fetch_globals(queued)
-          MEASUREMENT_TYPES.each do |metric_type|
+          Librato::Metrics::PLURAL_TYPES.each do |metric_type|
             metrics = queued[metric_type]
             next unless metrics
             if metrics.size <= per_request
@@ -52,7 +56,7 @@ module Librato
         end
 
         def fetch_globals(queued)
-          queued.reject {|k, v| MEASUREMENT_TYPES.include?(k)}
+          queued.reject {|k, v| Librato::Metrics::PLURAL_TYPES.include?(k)}
         end
 
         def queue_count(queued)

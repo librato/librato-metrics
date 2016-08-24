@@ -64,8 +64,8 @@ module Librato
   module Metrics
     extend SingleForwardable
 
-    TYPES = [:counter, :gauge]
-    PLURAL_TYPES = [:counters, :gauges]
+    TYPES = [:counter, :gauge, :measurement]
+    PLURAL_TYPES = TYPES.map { |type| "#{type}s".to_sym }
     MIN_MEASURE_TIME = (Time.now-(3600*24*365)).to_i
 
     # Most of the singleton methods of Librato::Metrics are actually

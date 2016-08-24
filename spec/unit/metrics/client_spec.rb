@@ -89,6 +89,23 @@ module Librato
         end
       end
 
+      describe "#has_tags?" do
+        context "when tags are set" do
+          after { Librato::Metrics.client.tags.clear }
+          it "returns true" do
+            subject.add_tags instance: "i-1234567c"
+
+            expect(subject.has_tags?).to eq(true)
+          end
+        end
+
+        context "when tags are not set" do
+          it "returns false" do
+            expect(subject.has_tags?).to eq(false)
+          end
+        end
+      end
+
       describe "#agent_identifier" do
         context "when given a single string argument" do
           it "sets agent_identifier" do

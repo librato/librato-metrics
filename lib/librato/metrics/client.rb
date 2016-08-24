@@ -6,6 +6,8 @@ module Librato
 
       def_delegator :annotator, :add, :annotate
 
+      def_delegator :@tags, :clear, :clear_tags
+
       attr_accessor :email, :api_key, :proxy
 
       def tags

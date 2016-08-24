@@ -78,6 +78,17 @@ module Librato
         end
       end
 
+      describe "#clear_tags" do
+        context "when tags are set" do
+          it "empties Hash" do
+            expected_tags = { instance: "i-1234567c" }
+            subject.add_tags expected_tags
+
+            expect{subject.clear_tags}.to change{subject.tags}.from(expected_tags).to({})
+          end
+        end
+      end
+
       describe "#agent_identifier" do
         context "when given a single string argument" do
           it "sets agent_identifier" do

@@ -77,7 +77,7 @@ Queue up a metric with a specified source:
 
     queue.add cpu: {source: 'app1', value: 92.6}
 
-A complete [list of metric attributes](http://dev.librato.com/v1/metrics) is available in the [API documentation](http://dev.librato.com/v1).
+A complete [list of metric attributes](https://www.librato.com/docs/api/#metric-attributes) is available in the [API documentation](https://www.librato.com/docs/api/).
 
 Send currently queued measurements to Metrics:
 
@@ -85,7 +85,7 @@ Send currently queued measurements to Metrics:
 
 ## Aggregate Measurements
 
-If you are measuring something very frequently e.g. per-request in a web application (order mS)  you may not want to send each individual measurement, but rather periodically send a [single aggregate measurement](http://dev.librato.com/v1/post/metrics#gauge_specific), spanning multiple seconds or even minutes. Use an `Aggregator` for this.
+If you are measuring something very frequently e.g. per-request in a web application (order mS)  you may not want to send each individual measurement, but rather periodically send a [single aggregate measurement](https://www.librato.com/docs/api/#submit-metrics), spanning multiple seconds or even minutes. Use an `Aggregator` for this.
 
 Aggregate a simple gauge metric named `response_latency`:
 
@@ -216,11 +216,12 @@ Get the 5 minute moving average for `temperature` for the last hour, assuming te
 
     data = Librato::Metrics.get_composite 'moving_average(mean(series("temperature", "*"), {size: "5"}))', start_time: Time.now.to_i - 60*60, resolution: 300
 
-There are many more options supported for querying, take a look at the [REST API docs](http://dev.librato.com/v1/get/metrics/:name) or the individual method documentation for more details.
+There are many more options supported for querying, take a look at the 
+[REST API docs](https://www.librato.com/docs/api/#retrieve-metrics) or the individual method documentation for more details.
 
 ## Setting Metric Properties
 
-Setting custom [properties](http://dev.librato.com/v1/metrics#metric_properties) on your metrics is easy:
+Setting custom [properties](https://www.librato.com/docs/api/#metric-attributes) on your metrics is easy:
 
     # assign a period and default color
     Librato::Metrics.update_metric :temperature, period: 15, attributes: { color: 'F00' }

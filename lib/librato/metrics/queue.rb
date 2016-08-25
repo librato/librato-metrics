@@ -42,13 +42,13 @@ module Librato
           end
           type = :measurement if @multidimensional || metric[:tags]
           type = ("#{type}s").to_sym
-          time_key = @multidimensional || metric[:tags] ? :time : :measure_time
+          time_hsh_key = @multidimensional || metric[:tags] ? :time : :measure_time
 
-          if metric[time_key]
-            metric[time_key] = metric[time_key].to_i
+          if metric[time_hsh_key]
+            metric[time_hsh_key] = metric[time_hsh_key].to_i
             check_measure_time(metric)
           elsif !skip_measurement_times
-            metric[time_key] = epoch_time
+            metric[time_hsh_key] = epoch_time
           end
 
           @queued[type] ||= []

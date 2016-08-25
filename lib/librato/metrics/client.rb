@@ -29,11 +29,6 @@ module Librato
         self.tags.merge!(tags)
       end
 
-      def has_tags?
-        !self.tags.empty?
-      end
-      alias :tags? :has_tags?
-
       # Provide agent identifier for the developer program. See:
       # http://support.metrics.librato.com/knowledgebase/articles/53548-developer-program
       #
@@ -264,6 +259,11 @@ module Librato
         self.api_key = nil
         @connection = nil
       end
+
+      def has_tags?
+        !self.tags.empty?
+      end
+      alias :tags? :has_tags?
 
       # List currently existing metrics
       #

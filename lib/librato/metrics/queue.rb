@@ -53,6 +53,7 @@ module Librato
 
           @queued[type] ||= []
           @queued[type] << metric
+          @queued[:multidimensional] = true if @multidimensional || metric[:tags]
         end
         submit_check
         self

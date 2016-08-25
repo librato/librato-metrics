@@ -16,9 +16,14 @@ module Librato
             requests = [queued]
           end
           requests.each do |request|
-            if client.has_tags?
+            if client.has_tags? || queued[:tags] || queued[:multidimensional]
               resource = "measurements"
-              payload = SmartJSON.write(request.merge({ tags: client.tags }))
+              tags_payload = client.tags ? client.tags : queued[:tags]
+              if client.tags && queued[:tags]
+                tags_payload = client.tags.merge(queued[:tags])
+              end
+              queued.delete(:multidimensional) if queued[:multidimensional]
+              payload = SmartJSON.write(request.merge({ tags: tags_payload }))
             else
               resource = "metrics"
               payload = SmartJSON.write(request)
@@ -60,7 +65,8 @@ module Librato
         end
 
         def queue_count(queued)
-          queued.inject(0) { |result, data| result + data.last.size }
+          queued.reject { |key| key == :multidimensional }
+            .inject(0) { |result, data| result + data.last.size }
         end
 
       end

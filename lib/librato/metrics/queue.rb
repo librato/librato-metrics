@@ -150,8 +150,8 @@ module Librato
 
       def check_measure_time(data)
         invalid_time =
-          data[:measure_time] && data[:measure_time]< Metrics::MIN_MEASURE_TIME ||
-            data[:time] && data[:time]< Metrics::MIN_MEASURE_TIME
+          data[:measure_time] && data[:measure_time] < Metrics::MIN_MEASURE_TIME ||
+            data[:time] && data[:time] < Metrics::MIN_MEASURE_TIME
 
         raise InvalidMeasureTime, "Measure time for submitted metric (#{data}) is invalid." if invalid_time
       end

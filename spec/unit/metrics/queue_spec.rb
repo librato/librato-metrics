@@ -295,46 +295,44 @@ module Librato
             end
           end
 
-          context "when multidimensional is false" do
-              it "maintains specified sources" do
-              q1 = Queue.new
-              q1.add neo: {source: 'matrix', value: 123}
-              q2 = Queue.new(source: 'red_pill')
-              q2.merge!(q1)
-              expect(q2.queued[:gauges][0][:source]).to eq('matrix')
-            end
+          it "maintains specified sources" do
+            q1 = Queue.new
+            q1.add neo: {source: 'matrix', value: 123}
+            q2 = Queue.new(source: 'red_pill')
+            q2.merge!(q1)
+            expect(q2.queued[:gauges][0][:source]).to eq('matrix')
+          end
 
-            it "does not change default source" do
-              q1 = Queue.new(source: 'matrix')
-              q1.add neo: 456
-              q2 = Queue.new(source: 'red_pill')
-              q2.merge!(q1)
-              expect(q2.queued[:source]).to eq('red_pill')
-            end
+          it "does not change default source" do
+            q1 = Queue.new(source: 'matrix')
+            q1.add neo: 456
+            q2 = Queue.new(source: 'red_pill')
+            q2.merge!(q1)
+            expect(q2.queued[:source]).to eq('red_pill')
+          end
 
-            it "tracks previous default source" do
-              q1 = Queue.new(source: 'matrix')
-              q1.add neo: 456
-              q2 = Queue.new(source: 'red_pill')
-              q2.add morpheus: 678
-              q2.merge!(q1)
-              q2.queued[:gauges].each do |gauge|
-                if gauge[:name] == 'neo'
-                  expect(gauge[:source]).to eq('matrix')
-                end
+          it "tracks previous default source" do
+            q1 = Queue.new(source: 'matrix')
+            q1.add neo: 456
+            q2 = Queue.new(source: 'red_pill')
+            q2.add morpheus: 678
+            q2.merge!(q1)
+            q2.queued[:gauges].each do |gauge|
+              if gauge[:name] == 'neo'
+                expect(gauge[:source]).to eq('matrix')
               end
             end
           end
+        end
 
-          it "handles empty cases" do
-            q1 = Queue.new
-            q1.add foo: 123, users: {type: :counter, value: 1000}
-            q2 = Queue.new
-            q2.merge!(q1)
-            expected = {counters: [{name:"users", value:1000, measure_time: @time}],
-                        gauges: [{name:"foo", value:123, measure_time: @time}]}
-            expect(q2.queued).to eq(expected)
-          end
+        it "handles empty cases" do
+          q1 = Queue.new
+          q1.add foo: 123, users: {type: :counter, value: 1000}
+          q2 = Queue.new
+          q2.merge!(q1)
+          expected = {counters: [{name:"users", value:1000, measure_time: @time}],
+                      gauges: [{name:"foo", value:123, measure_time: @time}]}
+          expect(q2.queued).to eq(expected)
         end
 
         context "with an aggregator" do

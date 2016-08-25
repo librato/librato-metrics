@@ -40,7 +40,7 @@ module Librato
           if @prefix
             metric[:name] = "#{@prefix}.#{metric[:name]}"
           end
-          type = :measurement if @multidimensional
+          type = :measurement if @multidimensional || metric[:tags]
           type = ("#{type}s").to_sym
           time_key = @multidimensional ? :time : :measure_time
 
@@ -108,7 +108,12 @@ module Librato
         end
         Metrics::PLURAL_TYPES.each do |type|
           if to_merge[type]
-            measurements = reconcile_source(to_merge[type], to_merge[:source])
+            measurements =
+              if @multidimensional
+                reconcile(to_merge[type], to_merge[:tags])
+              else
+                reconcile(to_merge[type], to_merge[:source])
+              end
             if @queued[type]
               @queued[type] += measurements
             else
@@ -146,16 +151,17 @@ module Librato
       def check_measure_time(data)
         invalid_time =
           data[:measure_time] && data[:measure_time]< Metrics::MIN_MEASURE_TIME ||
-          data[:time] && data[:time]< Metrics::MIN_MEASURE_TIME
+            data[:time] && data[:time]< Metrics::MIN_MEASURE_TIME
 
         raise InvalidMeasureTime, "Measure time for submitted metric (#{data}) is invalid." if invalid_time
       end
 
-      def reconcile_source(measurements, source)
-        return measurements if !source || source == @source
+      def reconcile(measurements, val)
+        arr = val.is_a?(Hash) ? [@tags, :tags] : [@source, :source]
+        return measurements if !val || val == arr.first
         measurements.map! do |measurement|
-          unless measurement[:source]
-            measurement[:source] = source
+          unless measurement[arr.last]
+            measurement[arr.last] = val
           end
           measurement
         end

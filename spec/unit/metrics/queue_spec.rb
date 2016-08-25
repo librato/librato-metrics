@@ -264,31 +264,64 @@ module Librato
             expect(q2.queued).to equal_unordered(expected)
           end
 
-          it "maintains specified sources" do
-            q1 = Queue.new
-            q1.add neo: {source: 'matrix', value: 123}
-            q2 = Queue.new(source: 'red_pill')
-            q2.merge!(q1)
-            expect(q2.queued[:gauges][0][:source]).to eq('matrix')
+          context "when multidimensional is true" do
+              it "maintains specified tags" do
+              q1 = Queue.new
+              q1.add test: { tags: { db: "rr1" }, value: 123 }
+              q2 = Queue.new(tags: { db: "rr2" })
+              q2.merge!(q1)
+
+              expect(q2.queued[:measurements].first[:tags][:db]).to eq("rr1")
+            end
+
+            it "does not change default tags" do
+              q1 = Queue.new(tags: { db: "rr1" })
+              q1.add test: 456
+              q2 = Queue.new(tags: { db: "rr2" })
+              q2.merge!(q1)
+
+              expect(q2.queued[:tags][:db]).to eq("rr2")
+            end
+
+            it "tracks previous default tags" do
+              q1 = Queue.new(tags: { db: "rr1" })
+              q1.add test_1: 123
+              q2 = Queue.new(tags: { db: "rr2" })
+              q2.add test_2: 456
+              q2.merge!(q1)
+              metric = q2.measurements.find { |measurement| measurement[:name] == "test_1" }
+
+              expect(metric[:tags][:db]).to eq("rr1")
+            end
           end
 
-          it "does not change default source" do
-            q1 = Queue.new(source: 'matrix')
-            q1.add neo: 456
-            q2 = Queue.new(source: 'red_pill')
-            q2.merge!(q1)
-            expect(q2.queued[:source]).to eq('red_pill')
-          end
+          context "when multidimensional is false" do
+              it "maintains specified sources" do
+              q1 = Queue.new
+              q1.add neo: {source: 'matrix', value: 123}
+              q2 = Queue.new(source: 'red_pill')
+              q2.merge!(q1)
+              expect(q2.queued[:gauges][0][:source]).to eq('matrix')
+            end
 
-          it "tracks previous default source" do
-            q1 = Queue.new(source: 'matrix')
-            q1.add neo: 456
-            q2 = Queue.new(source: 'red_pill')
-            q2.add morpheus: 678
-            q2.merge!(q1)
-            q2.queued[:gauges].each do |gauge|
-              if gauge[:name] == 'neo'
-                expect(gauge[:source]).to eq('matrix')
+            it "does not change default source" do
+              q1 = Queue.new(source: 'matrix')
+              q1.add neo: 456
+              q2 = Queue.new(source: 'red_pill')
+              q2.merge!(q1)
+              expect(q2.queued[:source]).to eq('red_pill')
+            end
+
+            it "tracks previous default source" do
+              q1 = Queue.new(source: 'matrix')
+              q1.add neo: 456
+              q2 = Queue.new(source: 'red_pill')
+              q2.add morpheus: 678
+              q2.merge!(q1)
+              q2.queued[:gauges].each do |gauge|
+                if gauge[:name] == 'neo'
+                  expect(gauge[:source]).to eq('matrix')
+                end
               end
             end
           end

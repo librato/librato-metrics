@@ -29,6 +29,7 @@ module Librato
       def add(measurements)
         measurements.each do |key, value|
           if value.respond_to?(:each)
+            validate_options(value)
             metric = value
             metric[:name] = key.to_s
             type = metric.delete(:type) || metric.delete('type') || 'gauge'
@@ -39,13 +40,17 @@ module Librato
           if @prefix
             metric[:name] = "#{@prefix}.#{metric[:name]}"
           end
+          type = :measurement if @multidimensional
           type = ("#{type}s").to_sym
-          if metric[:measure_time]
-            metric[:measure_time] = metric[:measure_time].to_i
+          time_key = @multidimensional ? :time : :measure_time
+
+          if metric[time_key]
+            metric[time_key] = metric[time_key].to_i
             check_measure_time(metric)
           elsif !skip_measurement_times
-            metric[:measure_time] = epoch_time
+            metric[time_key] = epoch_time
           end
+
           @queued[type] ||= []
           @queued[type] << metric
         end
@@ -79,6 +84,10 @@ module Librato
       # @return Array
       def gauges
         @queued[:gauges] || []
+      end
+
+      def measurements
+        @queued[:measurements] || []
       end
 
       # Combines queueable measures from the given object
@@ -133,9 +142,11 @@ module Librato
     private
 
       def check_measure_time(data)
-        if data[:measure_time] < Metrics::MIN_MEASURE_TIME
-          raise InvalidMeasureTime, "Measure time for submitted metric (#{data}) is invalid."
-        end
+        invalid_time =
+          data[:measure_time] && data[:measure_time]< Metrics::MIN_MEASURE_TIME ||
+          data[:time] && data[:time]< Metrics::MIN_MEASURE_TIME
+
+        raise InvalidMeasureTime, "Measure time for submitted metric (#{data}) is invalid." if invalid_time
       end
 
       def reconcile_source(measurements, source)

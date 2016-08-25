@@ -95,6 +95,7 @@ module Librato
         @create_time = Time.now
         @clear_on_failure = options[:clear_failures] || false
         @prefix = options[:prefix]
+        @multidimensional = @client.has_tags? || @tags || @time
       end
 
       def autosubmit_check

@@ -328,15 +328,15 @@ module Librato
           end
         end
 
-        it "handles empty cases" do
-          q1 = Queue.new
-          q1.add foo: 123, users: {type: :counter, value: 1000}
-          q2 = Queue.new
-          q2.merge!(q1)
-          expected = {counters: [{name:"users", value:1000, measure_time: @time}],
-                      gauges: [{name:"foo", value:123, measure_time: @time}]}
-          expect(q2.queued).to eq(expected)
-        end
+          it "handles empty cases" do
+            q1 = Queue.new
+            q1.add foo: 123, users: {type: :counter, value: 1000}
+            q2 = Queue.new
+            q2.merge!(q1)
+            expected = {counters: [{name:"users", value:1000, measure_time: @time}],
+                        gauges: [{name:"foo", value:123, measure_time: @time}]}
+            expect(q2.queued).to eq(expected)
+          end
 
         context "with an aggregator" do
           it "merges" do

@@ -73,6 +73,7 @@ module Librato
     # Client.
     #
     def_delegators :client, :agent_identifier, :annotate, :api_endpoint,
+                   :add_tags, :clear_tags, :has_tags?,
                    :api_endpoint=, :authenticate, :connection,
                    :proxy, :proxy=,
                    :faraday_adapter, :faraday_adapter=,

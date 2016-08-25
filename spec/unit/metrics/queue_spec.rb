@@ -350,6 +350,25 @@ module Librato
           q.add foo: 12
           expect(q.queued[:measure_time]).to eq(measure_time)
         end
+
+        context "when tags are set" do
+          it "includes global tags" do
+            expected_tags = { region: "us-east-1" }
+            queue = Queue.new(tags: expected_tags)
+            queue.add test: 5
+            expect(queue.queued[:tags]).to eq(expected_tags)
+          end
+        end
+
+        context "when time is set" do
+          it "includes global time" do
+            expected_time = (Time.now-1000).to_i
+            queue = Queue.new(time: expected_time)
+            queue.add test: 10
+            expect(queue.queued[:time]).to eq(expected_time)
+          end
+        end
+
       end
 
       describe "#size" do

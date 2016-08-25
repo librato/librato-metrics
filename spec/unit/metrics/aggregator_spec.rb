@@ -148,7 +148,8 @@ module Librato
                 measurements: [
                   { name: "test", tags: { db: "rr1" }, count: 2, sum: 7.0, min: 1.0, max: 6.0 },
                   { name: "test", count: 2, sum: 15.0, min: 5.0, max: 10.0 }
-                ]
+                ],
+                multidimensional: true
               }
 
               expect(subject.queued).to equal_unordered(expected)

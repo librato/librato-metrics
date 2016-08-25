@@ -132,6 +132,7 @@ module Librato
         req[:tags] = @tags if @tags
         req[:measure_time] = @measure_time if @measure_time
         req[:time] = @time if @time
+        req[:multidimensional] = true if @multidimensional || md_payload
 
         req
       end

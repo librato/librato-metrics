@@ -75,16 +75,19 @@ module Librato
         context "with invalid arguments" do
           it "raises exception" do
             expect {
-              subject.add foo: { source: "metrics-web-stg-1", tags: { hostname: "metrics-web-stg-1" }, value: 123 }
+              subject.add test: { source: "metrics-web-stg-1", tags: { hostname: "metrics-web-stg-1" }, value: 123 }
             }.to raise_error(ArgumentError)
             expect {
-              subject.add foo: { measure_time: Time.now, time: Time.now, value: 123 }
+              subject.add test: { measure_time: Time.now, time: Time.now, value: 123 }
             }.to raise_error(ArgumentError)
             expect {
-              subject.add foo: { source: "metrics-web-stg-1", time: Time.now, value: 123 }
+              subject.add test: { source: "metrics-web-stg-1", time: Time.now, value: 123 }
             }.to raise_error(ArgumentError)
             expect {
-              subject.add foo: { tags: { hostname: "metrics-web-stg-1" }, measure_time: Time.now, value: 123 }
+              subject.add test: { tags: { hostname: "metrics-web-stg-1" }, measure_time: Time.now, value: 123 }
+            }.to raise_error(ArgumentError)
+            expect {
+              subject.add test: { type: "gauge", tags: { hostname: "metrics-web-stg-1" }, value: 123 }
             }.to raise_error(ArgumentError)
           end
         end

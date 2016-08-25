@@ -204,6 +204,28 @@ module Librato
         parsed
       end
 
+      def get_measurement(name, options={})
+        query = options.dup
+        if query[:start_time].respond_to?(:year)
+          query[:start_time] = query[:start_time].to_i
+        end
+        if query[:end_time].respond_to?(:year)
+          query[:end_time] = query[:end_time].to_i
+        end
+        query[:resolution] ||= 1
+        unless query[:start_time] || query[:end_time]
+          query[:duration] ||= 3600
+        end
+        url = connection.build_url("measurements/#{name}", query)
+        response = connection.get(url)
+        SmartJSON.read(response.body)
+      end
+
+      def get_series(name, options={})
+        raise ArgumentError, ":resolution and :duration or :start_time must be set" if options.empty?
+        get_measurement(name, options)["series"]
+      end
+
       # Retrieve data points for a specific metric
       #
       # @example Get 20 most recent data points for metric

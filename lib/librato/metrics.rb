@@ -81,7 +81,7 @@ module Librato
                    :delete_metrics, :update_metric, :update_metrics,
                    :submit,
                    :sources, :get_source, :update_source,
-                   :create_snapshot, :get_snapshot
+                   :create_snapshot, :get_snapshot, :get_measurement, :get_series
 
     # The Librato::Metrics::Client being used by module-level
     # access.

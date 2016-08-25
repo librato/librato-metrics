@@ -102,7 +102,7 @@ module Librato
       #
       def queued
         entries = []
-        md_payload = false
+        contains_measurements = false
 
         @aggregated.each_value do |data|
           entry = {
@@ -116,14 +116,14 @@ module Librato
           }
           entry[:source] = data[:source].to_s if data[:source]
           if data[:tags]
-            md_payload = true
+            contains_measurements = true
             entry[:tags] = data[:tags]
           end
-          md_payload = true if data[:time]
+          contains_measurements = true if data[:time]
           entries << entry
         end
         req =
-          if @multidimensional || md_payload
+          if @multidimensional || contains_measurements
             { measurements: entries }
           else
             { gauges: entries }
@@ -132,7 +132,7 @@ module Librato
         req[:tags] = @tags if @tags
         req[:measure_time] = @measure_time if @measure_time
         req[:time] = @time if @time
-        req[:multidimensional] = true if @multidimensional || md_payload
+        req[:multidimensional] = true if @multidimensional || contains_measurements
 
         req
       end

@@ -265,7 +265,7 @@ module Librato
           end
 
           context "when multidimensional is true" do
-              it "maintains specified tags" do
+            it "maintains specified tags" do
               q1 = Queue.new
               q1.add test: { tags: { db: "rr1" }, value: 123 }
               q2 = Queue.new(tags: { db: "rr2" })

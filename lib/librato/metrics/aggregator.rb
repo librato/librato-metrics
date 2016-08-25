@@ -23,11 +23,11 @@ module Librato
     #   queue.merge!(aggregator)
     #
     class Aggregator
-      SOURCE_SEPARATOR = '%%' # must not be in valid source name criteria
+      SEPARATOR = '%%' # must not be in valid tags and/or source criteria
 
       include Processor
 
-      attr_reader :source
+      attr_reader :source, :tags
 
       # @option opts [Integer] :autosubmit_interval If set the aggregator will auto-submit if the given number of seconds has passed when a new metric is added.
       # @option opts [Boolean] :clear_failures Should the aggregator remove all stored data if it runs into problems with a request? (default: false)
@@ -52,20 +52,33 @@ module Librato
       # @return [Aggregator] returns self
       def add(measurements)
         measurements.each do |metric, data|
+          entry = {}
           if @prefix
             metric = "#{@prefix}.#{metric}"
           end
+          entry[:name] = metric
           if data.respond_to?(:each) # hash form
+            validate_options(data)
             value = data[:value]
             if data[:source]
-              metric = "#{metric}#{SOURCE_SEPARATOR}#{data[:source]}"
+              metric = "#{metric}#{SEPARATOR}#{data[:source]}"
+              entry[:source] = data[:source]
+            end
+            if data[:tags] && data[:tags].respond_to?(:each)
+              metric = metric.to_s
+              data[:tags].each do |key, value|
+                metric = "#{metric}#{SEPARATOR}#{key}#{value}"
+              end
+              entry[:tags] = data[:tags]
             end
           else
             value = data
           end
 
-          @aggregated[metric] ||= Aggregate.new
-          @aggregated[metric] << value
+          @aggregated[metric] = {} unless @aggregated[metric]
+          @aggregated[metric][:aggregate] ||= Aggregate.new
+          @aggregated[metric][:aggregate] << value
+          @aggregated[metric].merge!(entry)
         end
         autosubmit_check
         self
@@ -88,31 +101,37 @@ module Librato
       # Returns currently queued data
       #
       def queued
-        gauges = []
+        entries = []
+        md_payload = false
 
-        @aggregated.each do |metric, data|
-          source = nil
-          metric = metric.to_s
-          if metric.include?(SOURCE_SEPARATOR)
-            metric, source = metric.split(SOURCE_SEPARATOR)
-          end
+        @aggregated.each_value do |data|
           entry = {
-            name: metric,
-            count: data.count,
-            sum: data.sum,
-
+            name: data[:name].to_s,
+            count: data[:aggregate].count,
+            sum: data[:aggregate].sum,
             # TODO: make float/non-float consistent in the gem
-            min: data.min.to_f,
-            max: data.max.to_f
+            min: data[:aggregate].min.to_f,
+            max: data[:aggregate].max.to_f
             # TODO: expose v.sum2 and include
           }
-          entry[:source] = source if source
-          gauges << entry
+          entry[:source] = data[:source].to_s if data[:source]
+          if data[:tags]
+            md_payload = true
+            entry[:tags] = data[:tags]
+          end
+          md_payload = true if data[:time]
+          entries << entry
         end
-
-        req = { gauges: gauges }
+        req =
+          if @multidimensional || md_payload
+            { measurements: entries }
+          else
+            { gauges: entries }
+          end
         req[:source] = @source if @source
+        req[:tags] = @tags if @tags
         req[:measure_time] = @measure_time if @measure_time
+        req[:time] = @time if @time
 
         req
       end

@@ -72,6 +72,23 @@ module Librato
           expect(subject.add(foo: 1234)).to eq(subject)
         end
 
+        context "with invalid arguments" do
+          it "raises exception" do
+            expect {
+              subject.add foo: { source: "metrics-web-stg-1", tags: { hostname: "metrics-web-stg-1" }, value: 123 }
+            }.to raise_error(ArgumentError)
+            expect {
+              subject.add foo: { measure_time: Time.now, time: Time.now, value: 123 }
+            }.to raise_error(ArgumentError)
+            expect {
+              subject.add foo: { source: "metrics-web-stg-1", time: Time.now, value: 123 }
+            }.to raise_error(ArgumentError)
+            expect {
+              subject.add foo: { tags: { hostname: "metrics-web-stg-1" }, measure_time: Time.now, value: 123 }
+            }.to raise_error(ArgumentError)
+          end
+        end
+
         context "with single hash argument" do
           it "records a single aggregate" do
             subject.add foo: 3000
@@ -116,6 +133,23 @@ module Librato
                 sum: 15.0, min: 5.0, max: 10.0 }
             ]}
             expect(subject.queued).to equal_unordered(expected)
+          end
+
+          context "when multidimensional is true" do
+            it "maintains specified tags" do
+              subject.add test: { tags: { db: "rr1" }, value: 1 }
+              subject.add test: 5
+              subject.add test: { tags: { db: "rr1" }, value: 6 }
+              subject.add test: 10
+              expected = {
+                measurements: [
+                  { name: "test", tags: { db: "rr1" }, count: 2, sum: 7.0, min: 1.0, max: 6.0 },
+                  { name: "test", count: 2, sum: 15.0, min: 5.0, max: 10.0 }
+                ]
+              }
+
+              expect(subject.queued).to equal_unordered(expected)
+            end
           end
 
           context "with a prefix set" do
@@ -201,6 +235,26 @@ module Librato
           a = Aggregator.new(measure_time: measure_time)
           a.add foo: 12
           expect(a.queued[:measure_time]).to eq(measure_time)
+        end
+
+        context "when tags are set" do
+          it "includes global tags" do
+            expected_tags = { region: "us-east-1" }
+            subject = Aggregator.new(tags: expected_tags)
+            subject.add test: 5
+
+            expect(subject.queued[:tags]).to eq(expected_tags)
+          end
+        end
+
+        context "when time is set" do
+          it "includes global time" do
+            expected_time = (Time.now-1000).to_i
+            subject = Aggregator.new(time: expected_time)
+            subject.add test: 10
+
+            expect(subject.queued[:time]).to eq(expected_time)
+          end
         end
       end
 

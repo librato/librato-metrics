@@ -111,6 +111,7 @@ module Librato
         check_compatibility(options, [:measure_time, :time])
         check_compatibility(options, [:source, :time])
         check_compatibility(options, [:measure_time, :tags])
+        check_compatibility(options, [:type]) if options[:tags] || options[:time] # multidimensional is typeless
       end
 
       def check_compatibility(options, incompatible_options)

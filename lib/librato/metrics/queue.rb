@@ -42,7 +42,7 @@ module Librato
           end
           type = :measurement if @multidimensional || metric[:tags]
           type = ("#{type}s").to_sym
-          time_key = @multidimensional ? :time : :measure_time
+          time_key = @multidimensional || metric[:tags] ? :time : :measure_time
 
           if metric[time_key]
             metric[time_key] = metric[time_key].to_i

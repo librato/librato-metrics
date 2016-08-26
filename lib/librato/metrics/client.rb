@@ -8,10 +8,9 @@ module Librato
 
       def_delegator :@tags, :clear, :clear_tags
 
-      attr_accessor :email, :api_key, :proxy
+      attr_accessor :email, :api_key, :proxy, :tags
 
       def initialize(options={})
-        raise ArgumentError, ":tags must be a Hash" if options[:tags] && !options[:tags].is_a?(Hash)
         self.tags = options.fetch(:tags, {})
       end
 
@@ -19,13 +18,7 @@ module Librato
         @tags ||= {}
       end
 
-      def tags=(tags)
-        raise ArgumentError, "tags must be a Hash" unless tags.is_a?(Hash)
-        @tags = tags
-      end
-
       def add_tags(tags)
-        raise ArgumentError, "tags must be a Hash" unless tags.is_a?(Hash)
         self.tags.merge!(tags)
       end
 

@@ -17,12 +17,6 @@ module Librato
               expect(client.tags).to eq(expected_tags)
             end
           end
-
-          context "when :tags are invalid" do
-            it "raises exception" do
-              expect { Client.new(tags: "invalid arg") }.to raise_error(ArgumentError)
-            end
-          end
         end
 
         context "when :tags are not present" do
@@ -60,12 +54,6 @@ module Librato
           expect(subject.tags).to be_a(Hash)
           expect(subject.tags).to eq(expected_tags)
         end
-
-        context "when invalid argument" do
-          it "raises exception" do
-            expect { subject.tags = "invalid arg" }.to raise_error(ArgumentError)
-          end
-        end
       end
 
       describe "#add_tags" do
@@ -92,12 +80,6 @@ module Librato
 
             expect(subject.tags).to be_a(Hash)
             expect(subject.tags).to eq(expected_tags)
-          end
-        end
-
-        context "when invalid argument" do
-          it "raises exception" do
-            expect { subject.add_tags "invalid arg" }.to raise_error(ArgumentError)
           end
         end
       end

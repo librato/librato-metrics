@@ -110,12 +110,11 @@ module Librato
         check_compatibility(options, [:measure_time, :time])
         check_compatibility(options, [:source, :time])
         check_compatibility(options, [:measure_time, :tags])
-        check_compatibility(options, [:type]) if options[:tags] || options[:time]
       end
 
       def check_compatibility(options, incompatible_options)
         if incompatible_options.to_set.subset?(options.keys.to_set)
-          raise ArgumentError, "#{incompatible_options} cannot be set"
+          raise ArgumentError, "#{incompatible_options} cannot be simultaneously set"
         end
       end
 

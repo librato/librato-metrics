@@ -27,7 +27,7 @@ module Librato
 
       include Processor
 
-      attr_reader :source, :tags
+      attr_reader :source
 
       # @option opts [Integer] :autosubmit_interval If set the aggregator will auto-submit if the given number of seconds has passed when a new metric is added.
       # @option opts [Boolean] :clear_failures Should the aggregator remove all stored data if it runs into problems with a request? (default: false)
@@ -129,7 +129,7 @@ module Librato
             { gauges: entries }
           end
         req[:source] = @source if @source
-        req[:tags] = @tags if @tags
+        req[:tags] = @tags if !@tags.empty?
         req[:measure_time] = @measure_time if @measure_time
         req[:time] = @time if @time
         req[:multidimensional] = true if @multidimensional || contains_measurements

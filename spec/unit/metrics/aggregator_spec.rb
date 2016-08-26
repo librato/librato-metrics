@@ -267,19 +267,34 @@ module Librato
           end
 
           context "when Aggregator is initialized with a Client with tags" do
-            let(:client) { Client.new(tags: { region: "us-east-1" }) }
+            let(:client) { Librato::Metrics::Client.new(tags: { region: "us-east-1" }) }
             let(:aggregator) { Aggregator.new(client: client) }
 
-            it "applies Client top-level tags" do
-              expected = { name: "test", count: 4, sum: 30.0, min: 6.0, max: 9.0 }
-              aggregator.add test: 6
-              aggregator.add test: 7
-              aggregator.add test: 8
-              aggregator.add test: 9
+            context "during initialization" do
+              it "applies Client top-level tags" do
+                expected = { name: "test", count: 4, sum: 30.0, min: 6.0, max: 9.0 }
+                aggregator.add test: 6
+                aggregator.add test: 7
+                aggregator.add test: 8
+                aggregator.add test: 9
 
-              expect(aggregator.client.tags).to eq({ region: "us-east-1" })
-              expect(aggregator.queued[:measurements].first).to eq(expected)
+                expect(aggregator.queued[:tags]).to eq({ region: "us-east-1" })
+                expect(aggregator.queued[:measurements].first).to eq(expected)
+              end
             end
+
+            context "after initialization" do
+              it "applies Client top-level tags" do
+                expected = { name: "test", count: 2, sum: 3.0, min: 1.0, max: 2.0 }
+                client.add_tags foo: "bar"
+                aggregator.add test: 1
+                aggregator.add test: 2
+
+                expect(aggregator.queued[:tags]).to eq({ region: "us-east-1", foo: "bar" })
+                expect(aggregator.queued[:measurements].first).to eq(expected)
+              end
+            end
+
           end
         end
       end

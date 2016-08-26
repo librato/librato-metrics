@@ -9,7 +9,12 @@ module Librato
       MEASUREMENTS_PER_REQUEST = 500
 
       attr_reader :per_request, :last_submit_time
-      attr_accessor :prefix
+      attr_accessor :prefix, :tags
+
+      def tags
+        @tags ||= {}
+        @tags.merge!(@client.tags)
+      end
 
       # The current Client instance this queue is using to authenticate
       # and connect to Librato Metrics. This will default to the primary
@@ -89,13 +94,14 @@ module Librato
         @client = options[:client] || Librato::Metrics.client
         @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
         @source = options[:source]
-        @tags = options[:tags]
+        @tags = options.fetch(:tags, {})
+        @tags.merge!(@client.tags)
         @measure_time = options[:measure_time] && options[:measure_time].to_i
         @time = options[:time] && options[:time].to_i
         @create_time = Time.now
         @clear_on_failure = options[:clear_failures] || false
         @prefix = options[:prefix]
-        @multidimensional = @client.has_tags? || (@tags && !@tags.empty?) || !@time.nil?
+        @multidimensional = !@tags.empty? || !@time.nil?
       end
 
       def autosubmit_check

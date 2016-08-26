@@ -372,8 +372,6 @@ module Librato
     end
 
     describe "#get_series" do
-      after { delete_all_metrics }
-
       it "gets series" do
         series = Metrics.get_series :test, resolution: 1, duration: 3600
 

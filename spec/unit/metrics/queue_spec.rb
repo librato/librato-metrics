@@ -15,6 +15,7 @@ module Librato
           it "sets to client" do
             barney = Client
             allow(barney).to receive(:has_tags?).and_return(false)
+            allow(barney).to receive(:tags).and_return({})
             queue = Queue.new(client: barney)
             expect(queue.client).to eq(barney)
           end
@@ -224,12 +225,25 @@ module Librato
             let(:client) { Client.new(tags: { region: "us-east-1" }) }
             let(:queue) { Queue.new(client: client) }
 
-            it "applies Client top-level tags" do
-              expected = { name: "test", value: 4, time: @time }
-              queue.add test: 4
+            context "during initialization" do
+              it "applies Client top-level tags" do
+                expected = { name: "test", value: 4, time: @time }
+                queue.add test: 4
 
-              expect(queue.client.tags).to eq({ region: "us-east-1" })
-              expect(queue.queued[:measurements].first).to eq(expected)
+                expect(queue.queued[:tags]).to eq({ region: "us-east-1" })
+                expect(queue.queued[:measurements].first).to eq(expected)
+              end
+            end
+
+            context "after initialization" do
+              it "applies Client top-level tags" do
+                expected = { name: "test", value: 5, time: @time }
+                client.add_tags foo: "bar"
+                queue.add test: 5
+
+                expect(queue.queued[:tags]).to eq({ region: "us-east-1", foo: "bar" })
+                expect(queue.queued[:measurements].first).to eq(expected)
+              end
             end
           end
         end

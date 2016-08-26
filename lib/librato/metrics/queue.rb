@@ -29,7 +29,7 @@ module Librato
       def add(measurements)
         measurements.each do |key, value|
           if value.respond_to?(:each)
-            validate_options(value)
+            validate_multidimensionality(value)
             metric = value
             metric[:name] = key.to_s
             type = metric.delete(:type) || metric.delete('type') || 'gauge'

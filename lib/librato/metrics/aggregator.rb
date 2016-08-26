@@ -62,7 +62,7 @@ module Librato
             value = data[:value]
             if data[:source]
               metric = "#{metric}#{SEPARATOR}#{data[:source]}"
-              entry[:source] = data[:source]
+              entry[:source] = data[:source].to_s
             end
             if data[:tags] && data[:tags].respond_to?(:each)
               metric = metric.to_s
@@ -114,7 +114,7 @@ module Librato
             max: data[:aggregate].max.to_f
             # TODO: expose v.sum2 and include
           }
-          entry[:source] = data[:source].to_s if data[:source]
+          entry[:source] = data[:source] if data[:source]
           if data[:tags]
             contains_measurements = true
             entry[:tags] = data[:tags]

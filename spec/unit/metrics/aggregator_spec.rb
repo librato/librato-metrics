@@ -222,6 +222,66 @@ module Librato
             expect(subject.queued).to equal_unordered(expected)
           end
         end
+
+        context "with tags" do
+          context "when Aggregator is initialized with tags" do
+            let(:aggregator) { Aggregator.new(tags: { region: "us-east-1" }) }
+
+            it "applies top-level tags" do
+              expected = { name: "test", count: 2, sum: 3, min: 1, max: 2 }
+              aggregator.add test: 1
+              aggregator.add test: 2
+
+              expect(aggregator.queued[:tags]).to eq({ region: "us-east-1" })
+              expect(aggregator.queued[:measurements].first).to eq(expected)
+            end
+          end
+
+          context "when tags are used as arguments" do
+            let(:aggregator) { Aggregator.new }
+
+            it "applies per-measurement tags" do
+              expected = { name: "test", count: 2, sum: 3, min: 1, max: 2, tags: { db: "rr1" } }
+              aggregator.add test: { value: 1,  tags: { db: "rr1" } }
+              aggregator.add test: { value: 2,  tags: { db: "rr1" } }
+
+              expect(aggregator.queued[:tags]).to be_nil
+              expect(aggregator.queued[:measurements].first).to eq(expected)
+            end
+          end
+
+          context "when Aggregator is initialized with tags and when tags are used as arguments" do
+            let(:aggregator) { Aggregator.new(tags: { region: "us-east-1" }) }
+
+            it "applies top-level tags and per-measurement tags" do
+              expected = { name: "test", count: 3, sum: 12, min: 3, max: 5, tags: { db: "rr1" } }
+              aggregator.add test: { value: 3,  tags: { db: "rr1" } }
+              aggregator.add test: { value: 4,  tags: { db: "rr1" } }
+              aggregator.add test: { value: 5,  tags: { db: "rr1" } }
+              aggregator.add test: { value: 1,  tags: { db: "rr2" } }
+              aggregator.add test: { value: 2,  tags: { region: "us-tirefire-1" } }
+
+              expect(aggregator.queued[:tags]).to eq({ region: "us-east-1" })
+              expect(aggregator.queued[:measurements].first).to eq(expected)
+            end
+          end
+
+          context "when Aggregator is initialized with a Client with tags" do
+            let(:client) { Client.new(tags: { region: "us-east-1" }) }
+            let(:aggregator) { Aggregator.new(client: client) }
+
+            it "applies Client top-level tags" do
+              expected = { name: "test", count: 4, sum: 30.0, min: 6.0, max: 9.0 }
+              aggregator.add test: 6
+              aggregator.add test: 7
+              aggregator.add test: 8
+              aggregator.add test: 9
+
+              expect(aggregator.client.tags).to eq({ region: "us-east-1" })
+              expect(aggregator.queued[:measurements].first).to eq(expected)
+            end
+          end
+        end
       end
 
       describe "#queued" do

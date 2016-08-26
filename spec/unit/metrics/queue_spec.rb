@@ -228,7 +228,7 @@ module Librato
               expected = { name: "test", value: 4, time: @time }
               queue.add test: 4
 
-              expect(queue.client.tags).to eq({ region: "us-east-1" }) # NOTE: add to queued[:tags] instead?
+              expect(queue.client.tags).to eq({ region: "us-east-1" })
               expect(queue.queued[:measurements].first).to eq(expected)
             end
           end

@@ -182,6 +182,69 @@ module Librato
             }.to raise_error(InvalidMeasureTime)
           end
         end
+
+        context "with tags" do
+          context "when Queue is initialized with tags" do
+            let(:queue) { Queue.new(tags: { region: "us-east-1" }) }
+
+            it "applies top-level tags" do
+              expected = { name: "test", value: 1, time: @time }
+              queue.add test: 1
+
+              expect(queue.queued[:tags]).to eq({ region: "us-east-1" })
+              expect(queue.queued[:measurements].first).to eq(expected)
+            end
+          end
+
+          context "when tags are used as arguments" do
+            let(:queue) { Queue.new }
+
+            it "applies per-measurement tags" do
+              expected = { name: "test", value: 2, tags: { db: "rr1" }, time: @time }
+              queue.add test: { value: 2,  tags: { db: "rr1" } }
+
+              expect(queue.queued[:tags]).to be_nil
+              expect(queue.queued[:measurements].first).to eq(expected)
+            end
+          end
+
+          context "when Queue is initialized with tags and when tags are used as arguments" do
+            let(:queue) { Queue.new(tags: { region: "us-east-1" }) }
+
+            it "applies top-level tags and per-measurement tags" do
+              expected = { name: "test", value: 3, tags: { db: "rr1" }, time: @time }
+              queue.add test: { value: 3,  tags: { db: "rr1" } }
+
+              expect(queue.queued[:tags]).to eq({ region: "us-east-1" })
+              expect(queue.queued[:measurements].first).to eq(expected)
+            end
+          end
+
+          context "when Queue is initialized with a Client with tags" do
+            let(:client) { Client.new(tags: { region: "us-east-1" }) }
+            let(:queue) { Queue.new(client: client) }
+
+            it "applies Client top-level tags" do
+              expected = { name: "test", value: 4, time: @time }
+              queue.add test: 4
+
+              expect(queue.client.tags).to eq({ region: "us-east-1" }) # NOTE: add to queued[:tags] instead?
+              expect(queue.queued[:measurements].first).to eq(expected)
+            end
+          end
+        end
+      end
+
+      describe "#measurements" do
+        it "returns currently queued measurements" do
+          subject.add test_1: { tags: { db: "rr1" }, value: 1 },
+                      test_2: { type: :counter, value: 2 }
+          expect(subject.measurements).to eq([{ name: "test_1", value: 1, tags: { db: "rr1" }, time: @time }])
+        end
+
+        it "returns [] when no queued measurements" do
+          expect(subject.measurements).to be_empty
+        end
       end
 
       describe "#counters" do
@@ -264,7 +327,7 @@ module Librato
             expect(q2.queued).to equal_unordered(expected)
           end
 
-          context "when multidimensional is true" do
+          context "when tags are present" do
             it "maintains specified tags" do
               q1 = Queue.new
               q1.add test: { tags: { db: "rr1" }, value: 123 }
@@ -274,7 +337,7 @@ module Librato
               expect(q2.queued[:measurements].first[:tags][:db]).to eq("rr1")
             end
 
-            it "does not change default tags" do
+            it "does not change top-level tags" do
               q1 = Queue.new(tags: { db: "rr1" })
               q1.add test: 456
               q2 = Queue.new(tags: { db: "rr2" })
@@ -412,6 +475,14 @@ module Librato
           subject.add transactions: {type: :counter, value: 12345},
                       register_cents: {type: :gauge, value: 211101}
           expect(subject.size).to eq(4)
+        end
+
+        context "when measurement added" do
+          it "returns count of measurements" do
+            subject.add test_1: { tags: { db: "rr1" }, value: 1}, test_2: { tags: { db: "rr2" }, value: 2}
+
+            expect(subject.size).to eq(2)
+          end
         end
       end
 

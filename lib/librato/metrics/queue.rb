@@ -143,7 +143,7 @@ module Librato
       #
       # @return Integer
       def size
-        self.queued.inject(0) { |result, data| result + data.last.size }
+        self.queued.reject { |key| key == :multidimensional }.inject(0) { |result, data| result + data.last.size }
       end
       alias :length :size
 

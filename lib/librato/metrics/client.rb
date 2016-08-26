@@ -11,7 +11,7 @@ module Librato
       attr_accessor :email, :api_key, :proxy, :tags
 
       def initialize(options={})
-        self.tags = options.fetch(:tags, {})
+        @tags = options.fetch(:tags, {})
       end
 
       def tags
@@ -19,7 +19,7 @@ module Librato
       end
 
       def add_tags(tags)
-        self.tags.merge!(tags)
+        @tags.merge!(tags)
       end
 
       # Provide agent identifier for the developer program. See:

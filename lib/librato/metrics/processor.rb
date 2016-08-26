@@ -84,7 +84,7 @@ module Librato
       end
 
       def setup_common_options(options)
-        validate_multidimensionality(options)
+        validate_parameters(options)
         @autosubmit_interval = options[:autosubmit_interval]
         @client = options[:client] || Librato::Metrics.client
         @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
@@ -105,16 +105,18 @@ module Librato
         end
       end
 
-      def validate_multidimensionality(options)
-        check_compatibility(options, [:source, :tags])
-        check_compatibility(options, [:measure_time, :time])
-        check_compatibility(options, [:source, :time])
-        check_compatibility(options, [:measure_time, :tags])
-      end
-
-      def check_compatibility(options, incompatible_options)
-        if incompatible_options.to_set.subset?(options.keys.to_set)
-          raise ArgumentError, "#{incompatible_options} cannot be simultaneously set"
+      def validate_parameters(options)
+        invalid_combinations = [
+          [:source, :tags],
+          [:measure_time, :time],
+          [:source, :time],
+          [:measure_time, :tags]
+        ]
+        opts = options.keys.to_set
+        invalid_combinations.each do |combo|
+          if combo.to_set.subset?(opts)
+            raise InvalidParameters, "#{combo} cannot be simultaneously set"
+          end
         end
       end
 

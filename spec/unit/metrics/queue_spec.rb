@@ -42,15 +42,15 @@ module Librato
                 source: "metrics-web-stg-1",
                 tags: { hostname: "metrics-web-stg-1" }
               )
-            }.to raise_error(ArgumentError)
-            expect { Queue.new(measure_time: Time.now, time: Time.now) }.to raise_error(ArgumentError)
-            expect { Queue.new(source: "metrics-web-stg-1", time: Time.now) }.to raise_error(ArgumentError)
+            }.to raise_error(InvalidParameters)
+            expect { Queue.new(measure_time: Time.now, time: Time.now) }.to raise_error(InvalidParameters)
+            expect { Queue.new(source: "metrics-web-stg-1", time: Time.now) }.to raise_error(InvalidParameters)
             expect {
               Queue.new(
                 measure_time: Time.now,
                 tags: { hostname: "metrics-web-stg-1" }
               )
-            }.to raise_error(ArgumentError)
+            }.to raise_error(InvalidParameters)
           end
         end
       end
@@ -64,16 +64,16 @@ module Librato
           it "raises exception" do
             expect {
               subject.add test: { source: "metrics-web-stg-1", tags: { hostname: "metrics-web-stg-1" }, value: 123 }
-            }.to raise_error(ArgumentError)
+            }.to raise_error(InvalidParameters)
             expect {
               subject.add test: { measure_time: Time.now, time: Time.now, value: 123 }
-            }.to raise_error(ArgumentError)
+            }.to raise_error(InvalidParameters)
             expect {
               subject.add test: { source: "metrics-web-stg-1", time: Time.now, value: 123 }
-            }.to raise_error(ArgumentError)
+            }.to raise_error(InvalidParameters)
             expect {
               subject.add test: { tags: { hostname: "metrics-web-stg-1" }, measure_time: Time.now, value: 123 }
-            }.to raise_error(ArgumentError)
+            }.to raise_error(InvalidParameters)
           end
         end
 

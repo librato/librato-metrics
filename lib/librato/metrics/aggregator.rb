@@ -58,7 +58,7 @@ module Librato
           end
           entry[:name] = metric
           if data.respond_to?(:each) # hash form
-            validate_multidimensionality(data)
+            validate_parameters(data)
             value = data[:value]
             if data[:source]
               metric = "#{metric}#{SEPARATOR}#{data[:source]}"

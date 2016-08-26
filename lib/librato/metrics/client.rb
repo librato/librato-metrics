@@ -254,7 +254,7 @@ module Librato
       end
 
       def has_tags?
-        !self.tags.empty?
+        !@tags.empty?
       end
       alias :tags? :has_tags?
 

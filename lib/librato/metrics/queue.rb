@@ -40,9 +40,9 @@ module Librato
           if @prefix
             metric[:name] = "#{@prefix}.#{metric[:name]}"
           end
-          type = :measurement if @multidimensional || metric[:tags]
+          type = :measurement if multidimensional? || metric[:tags]
           type = ("#{type}s").to_sym
-          time = @multidimensional || metric[:tags] ? :time : :measure_time
+          time = multidimensional? || metric[:tags] ? :time : :measure_time
 
           if metric[time]
             metric[time] = metric[time].to_i
@@ -53,7 +53,7 @@ module Librato
 
           @queued[type] ||= []
           @queued[type] << metric
-          @queued[:multidimensional] = true if @multidimensional || metric[:tags]
+          @queued[:multidimensional] = true if multidimensional? || metric[:tags]
         end
         submit_check
         self
@@ -110,7 +110,7 @@ module Librato
         Metrics::PLURAL_TYPES.each do |type|
           if to_merge[type]
             measurements =
-              if @multidimensional
+              if multidimensional?
                 reconcile(to_merge[type], to_merge[:tags])
               else
                 reconcile(to_merge[type], to_merge[:source])

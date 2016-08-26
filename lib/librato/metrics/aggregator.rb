@@ -123,7 +123,7 @@ module Librato
           entries << entry
         end
         req =
-          if @multidimensional || contains_measurements
+          if multidimensional? || contains_measurements
             { measurements: entries }
           else
             { gauges: entries }
@@ -132,7 +132,7 @@ module Librato
         req[:tags] = @tags if !@tags.empty?
         req[:measure_time] = @measure_time if @measure_time
         req[:time] = @time if @time
-        req[:multidimensional] = true if @multidimensional || contains_measurements
+        req[:multidimensional] = true if multidimensional? || contains_measurements
 
         req
       end

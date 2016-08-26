@@ -26,6 +26,10 @@ module Librato
         @client ||= Librato::Metrics.client
       end
 
+      def multidimensional?
+        !@tags.empty? || !@time.nil?
+      end
+
       # The object this MetricSet will use to persist
       #
       def persister
@@ -101,7 +105,6 @@ module Librato
         @create_time = Time.now
         @clear_on_failure = options[:clear_failures] || false
         @prefix = options[:prefix]
-        @multidimensional = !@tags.empty? || !@time.nil?
       end
 
       def autosubmit_check

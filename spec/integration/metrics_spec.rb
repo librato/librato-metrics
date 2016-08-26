@@ -360,6 +360,28 @@ module Librato
 
     end
 
+    describe "#get_measurement" do
+      before { Metrics.submit test: { value: 123, tags: { foo: "bar" } } }
+
+      it "gets measurement" do
+        measurement = Metrics.get_measurement :test, resolution: 1, duration: 3600
+
+        expect(measurement["series"][0]["tags"]["foo"]).to eq("bar")
+        expect(measurement["series"][0]["measurements"][0]["value"]).to eq(123)
+      end
+    end
+
+    describe "#get_series" do
+      after { delete_all_metrics }
+
+      it "gets series" do
+        series = Metrics.get_series :test, resolution: 1, duration: 3600
+
+        expect(series[0]["tags"]["foo"]).to eq("bar")
+        expect(series[0]["measurements"][0]["value"]).to eq(123)
+      end
+    end
+
     # Note: These are challenging to test end-to-end, should probably
     # unit test instead. Disabling for now.
     #

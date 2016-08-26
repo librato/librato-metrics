@@ -56,7 +56,7 @@ module Librato
           if @prefix
             metric = "#{@prefix}.#{metric}"
           end
-          entry[:name] = metric
+          entry[:name] = metric.to_s
           if data.respond_to?(:each) # hash form
             validate_parameters(data)
             value = data[:value]
@@ -106,7 +106,7 @@ module Librato
 
         @aggregated.each_value do |data|
           entry = {
-            name: data[:name].to_s,
+            name: data[:name],
             count: data[:aggregate].count,
             sum: data[:aggregate].sum,
             # TODO: make float/non-float consistent in the gem

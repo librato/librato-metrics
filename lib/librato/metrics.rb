@@ -72,17 +72,15 @@ module Librato
     # being called on a global Client instance. See further docs on
     # Client.
     #
-    def_delegators :client, :agent_identifier, :annotate, :api_endpoint,
-                   :add_tags, :clear_tags, :has_tags?,
-                   :api_endpoint=, :authenticate, :connection,
-                   :proxy, :proxy=,
-                   :faraday_adapter, :faraday_adapter=,
-                   :persistence, :persistence=, :persister,
-                   :get_composite, :get_metric, :get_measurements, :metrics,
-                   :delete_metrics, :update_metric, :update_metrics,
-                   :submit,
-                   :sources, :get_source, :update_source,
-                   :create_snapshot, :get_snapshot, :get_measurement, :get_series
+    def_delegators  :client, :add_tags, :agent_identifier, :annotate,
+                    :api_endpoint, :api_endpoint=, :authenticate, :clear_tags,
+                    :connection, :create_snapshot, :delete_metrics,
+                    :faraday_adapter, :faraday_adapter=, :get_composite,
+                    :get_measurement, :get_measurements, :get_metric,
+                    :get_series, :get_snapshot, :get_source, :metrics,
+                    :persistence, :persistence=, :persister, :proxy, :proxy=,
+                    :sources, :submit, :update_metric, :update_metrics,
+                    :update_source
 
     # The Librato::Metrics::Client being used by module-level
     # access.

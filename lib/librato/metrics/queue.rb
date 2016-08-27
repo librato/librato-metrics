@@ -41,7 +41,7 @@ module Librato
           if @prefix
             metric[:name] = "#{@prefix}.#{metric[:name]}"
           end
-          contains_measurements = contains_measurements || metric[:tags]
+          contains_measurements = true if metric[:tags]
           type = :measurement if contains_measurements
           type = ("#{type}s").to_sym
           time = contains_measurements ? :time : :measure_time
@@ -52,6 +52,7 @@ module Librato
           elsif !skip_measurement_times
             metric[time] = epoch_time
           end
+          contains_measurements = true if metric[:time]
 
           @queued[type] ||= []
           @queued[type] << metric

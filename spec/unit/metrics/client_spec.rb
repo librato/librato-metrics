@@ -8,14 +8,12 @@ module Librato
       describe "#initialize" do
         context "when :tags are present" do
           after { Librato::Metrics.client.tags.clear }
-          context "when :tags are valid" do
-            it "sets @tags" do
-              expected_tags = { environment: "staging" }
-              client = Client.new(tags: expected_tags)
+          it "sets @tags" do
+            expected_tags = { environment: "staging" }
+            client = Client.new(tags: expected_tags)
 
-              expect(client.tags).not_to be_empty
-              expect(client.tags).to eq(expected_tags)
-            end
+            expect(client.tags).not_to be_empty
+            expect(client.tags).to eq(expected_tags)
           end
         end
 
@@ -30,12 +28,12 @@ module Librato
 
       describe "#tags" do
         context "when set" do
-          before { subject.tags = { instance: "i-1234567a" } }
+          before { subject.tags = { instance_id: "i-1234567a" } }
           after { Librato::Metrics.client.tags.clear }
           it "gets @tags" do
             expect(subject.tags).to be_a(Hash)
-            expect(subject.tags.keys).to include(:instance)
-            expect(subject.tags[:instance]).to eq("i-1234567a")
+            expect(subject.tags.keys).to include(:instance_id)
+            expect(subject.tags[:instance_id]).to eq("i-1234567a")
           end
         end
 
@@ -49,7 +47,7 @@ module Librato
       describe "#tags=" do
         after { Librato::Metrics.client.tags.clear }
         it "sets @tags" do
-          expected_tags = { instance: "i-1234567b" }
+          expected_tags = { instance_id: "i-1234567b" }
           expect{subject.tags = expected_tags}.to change{subject.tags}.from({}).to(expected_tags)
           expect(subject.tags).to be_a(Hash)
           expect(subject.tags).to eq(expected_tags)
@@ -61,7 +59,7 @@ module Librato
 
         context "when no existing tags" do
           it "adds top-level tags" do
-            expected_tags = { instance: "i-1234567c" }
+            expected_tags = { instance_id: "i-1234567c" }
             subject.add_tags expected_tags
 
             expect(subject.tags).to be_a(Hash)
@@ -71,8 +69,8 @@ module Librato
 
         context "when existing tags" do
           it "merges tags" do
-            tmp1 = { instance: "i-1234567c" }
-            tmp2 = { region: "us-east-1", elb: "metrics-stg" }
+            tmp1 = { instance_id: "i-1234567d" }
+            tmp2 = { region: "us-east-1", hostname: "metrics-web-stg-1" }
             expected_tags = tmp1.merge(tmp2)
 
             subject.add_tags tmp1
@@ -87,7 +85,7 @@ module Librato
       describe "#clear_tags" do
         context "when tags are set" do
           it "empties Hash" do
-            expected_tags = { instance: "i-1234567d" }
+            expected_tags = { instance_id: "i-1234567e" }
             subject.add_tags expected_tags
 
             expect{subject.clear_tags}.to change{subject.tags}.from(expected_tags).to({})
@@ -99,7 +97,7 @@ module Librato
         context "when tags are set" do
           after { Librato::Metrics.client.tags.clear }
           it "returns true" do
-            subject.add_tags instance: "i-1234567e"
+            subject.add_tags instance_id: "i-1234567f"
 
             expect(subject.has_tags?).to eq(true)
           end

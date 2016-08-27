@@ -14,12 +14,15 @@ module Librato
 
       describe "initialization" do
         context "with specified client" do
-          it "sets to client" do
-            barney = Client
+          let(:barney) { Client }
+          let(:queue) { Queue.new(client: barney) }
+          before do
             allow(barney).to receive(:has_tags?).and_return(false)
             allow(barney).to receive(:tags).and_return({})
             allow(barney).to receive(:add_tags).and_return({})
-            queue = Queue.new(client: barney)
+          end
+
+          it "sets to client" do
             expect(queue.client).to eq(barney)
           end
         end
@@ -204,8 +207,8 @@ module Librato
             let(:queue) { Queue.new }
 
             it "applies per-measurement tags" do
-              expected = { name: "test", value: 2, tags: { db: "rr1" }, time: @time }
-              queue.add test: { value: 2,  tags: { db: "rr1" } }
+              expected = { name: "test", value: 2, tags: { hostname: "metrics-web-stg-1" }, time: @time }
+              queue.add test: { value: 2,  tags: { hostname: "metrics-web-stg-1" } }
 
               expect(queue.queued[:tags]).to be_nil
               expect(queue.queued[:measurements].first).to eq(expected)
@@ -216,8 +219,8 @@ module Librato
             let(:queue) { Queue.new(tags: { region: "us-east-1" }) }
 
             it "applies top-level tags and per-measurement tags" do
-              expected = { name: "test", value: 3, tags: { db: "rr1" }, time: @time }
-              queue.add test: { value: 3,  tags: { db: "rr1" } }
+              expected = { name: "test", value: 3, tags: { hostname: "metrics-web-stg-1" }, time: @time }
+              queue.add test: { value: 3,  tags: { hostname: "metrics-web-stg-1" } }
 
               expect(queue.queued[:tags]).to eq({ region: "us-east-1" })
               expect(queue.queued[:measurements].first).to eq(expected)
@@ -241,10 +244,10 @@ module Librato
             context "after initialization" do
               it "applies Client top-level tags" do
                 expected = { name: "test", value: 5, time: @time }
-                client.add_tags foo: "bar"
+                client.add_tags hostname: "metrics-web-stg-1"
                 queue.add test: 5
 
-                expect(queue.queued[:tags]).to eq({ region: "us-east-1", foo: "bar" })
+                expect(queue.queued[:tags]).to eq({ region: "us-east-1", hostname: "metrics-web-stg-1" })
                 expect(queue.queued[:measurements].first).to eq(expected)
               end
             end
@@ -254,9 +257,9 @@ module Librato
 
       describe "#measurements" do
         it "returns currently queued measurements" do
-          subject.add test_1: { tags: { db: "rr1" }, value: 1 },
+          subject.add test_1: { tags: { region: "us-east-1" }, value: 1 },
                       test_2: { type: :counter, value: 2 }
-          expect(subject.measurements).to eq([{ name: "test_1", value: 1, tags: { db: "rr1" }, time: @time }])
+          expect(subject.measurements).to eq([{ name: "test_1", value: 1, tags: { region: "us-east-1" }, time: @time }])
         end
 
         it "returns [] when no queued measurements" do
@@ -344,23 +347,23 @@ module Librato
             expect(q2.queued).to equal_unordered(expected)
           end
 
-          context "when tags are present" do
+          context "with tags" do
             it "maintains specified tags" do
               q1 = Queue.new
-              q1.add test: { tags: { db: "rr1" }, value: 123 }
-              q2 = Queue.new(tags: { db: "rr2" })
+              q1.add test: { tags: { hostname: "metrics-web-stg-1" }, value: 123 }
+              q2 = Queue.new(tags: { hostname: "metrics-web-stg-2" })
               q2.merge!(q1)
 
-              expect(q2.queued[:measurements].first[:tags][:db]).to eq("rr1")
+              expect(q2.queued[:measurements].first[:tags][:hostname]).to eq("metrics-web-stg-1")
             end
 
             it "does not change top-level tags" do
-              q1 = Queue.new(tags: { db: "rr1" })
+              q1 = Queue.new(tags: { hostname: "metrics-web-stg-1" })
               q1.add test: 456
-              q2 = Queue.new(tags: { db: "rr2" })
+              q2 = Queue.new(tags: { hostname: "metrics-web-stg-2" })
               q2.merge!(q1)
 
-              expect(q2.queued[:tags][:db]).to eq("rr2")
+              expect(q2.queued[:tags][:hostname]).to eq("metrics-web-stg-2")
             end
 
             it "tracks previous default tags" do
@@ -496,9 +499,10 @@ module Librato
           expect(subject.size).to eq(4)
         end
 
-        context "when measurement added" do
+        context "when measurement present" do
           it "returns count of measurements" do
-            subject.add test_1: { tags: { db: "rr1" }, value: 1}, test_2: { tags: { db: "rr2" }, value: 2}
+            subject.add test_1: { tags: { hostname: "metrics-web-stg-1" }, value: 1 },
+                        test_2: { tags: { hostname: "metrics-web-stg-2" }, value: 2}
 
             expect(subject.size).to eq(2)
           end

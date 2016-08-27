@@ -137,21 +137,18 @@ module Librato
             expect(subject.queued).to equal_unordered(expected)
           end
 
-          context "when multidimensional is true" do
+          context "when per-measurement tags" do
             it "maintains specified tags" do
-              subject.add test: { tags: { db: "rr1" }, value: 1 }
+              subject.add test: { tags: { hostname: "metrics-web-stg-1" }, value: 1 }
               subject.add test: 5
-              subject.add test: { tags: { db: "rr1" }, value: 6 }
+              subject.add test: { tags: { hostname: "metrics-web-stg-1" }, value: 6 }
               subject.add test: 10
-              expected = {
-                measurements: [
-                  { name: "test", tags: { db: "rr1" }, count: 2, sum: 7.0, min: 1.0, max: 6.0 },
-                  { name: "test", count: 2, sum: 15.0, min: 5.0, max: 10.0 }
-                ],
-                multidimensional: true
-              }
+              expected = [
+                { name: "test", tags: { hostname: "metrics-web-stg-1" }, count: 2, sum: 7.0, min: 1.0, max: 6.0 },
+                { name: "test", count: 2, sum: 15.0, min: 5.0, max: 10.0 }
+              ]
 
-              expect(subject.queued).to equal_unordered(expected)
+              expect(subject.queued[:measurements]).to equal_unordered(expected)
             end
           end
 
@@ -243,9 +240,9 @@ module Librato
             let(:aggregator) { Aggregator.new }
 
             it "applies per-measurement tags" do
-              expected = { name: "test", count: 2, sum: 3, min: 1, max: 2, tags: { db: "rr1" } }
-              aggregator.add test: { value: 1,  tags: { db: "rr1" } }
-              aggregator.add test: { value: 2,  tags: { db: "rr1" } }
+              expected = { name: "test", count: 2, sum: 3, min: 1, max: 2, tags: { hostname: "metrics-web-stg-1" } }
+              aggregator.add test: { value: 1, tags: { hostname: "metrics-web-stg-1" } }
+              aggregator.add test: { value: 2, tags: { hostname: "metrics-web-stg-1" } }
 
               expect(aggregator.queued[:tags]).to be_nil
               expect(aggregator.queued[:measurements].first).to eq(expected)
@@ -256,12 +253,12 @@ module Librato
             let(:aggregator) { Aggregator.new(tags: { region: "us-east-1" }) }
 
             it "applies top-level tags and per-measurement tags" do
-              expected = { name: "test", count: 3, sum: 12, min: 3, max: 5, tags: { db: "rr1" } }
-              aggregator.add test: { value: 3,  tags: { db: "rr1" } }
-              aggregator.add test: { value: 4,  tags: { db: "rr1" } }
-              aggregator.add test: { value: 5,  tags: { db: "rr1" } }
-              aggregator.add test: { value: 1,  tags: { db: "rr2" } }
-              aggregator.add test: { value: 2,  tags: { region: "us-tirefire-1" } }
+              expected = { name: "test", count: 3, sum: 12, min: 3, max: 5, tags: { hostname: "metrics-web-stg-1" } }
+              aggregator.add test: { value: 3, tags: { hostname: "metrics-web-stg-1" } }
+              aggregator.add test: { value: 4, tags: { hostname: "metrics-web-stg-1" } }
+              aggregator.add test: { value: 5, tags: { hostname: "metrics-web-stg-1" } }
+              aggregator.add test: { value: 1, tags: { hostname: "metrics-web-stg-2" } }
+              aggregator.add test: { value: 2, tags: { region: "us-tirefire-1" } }
 
               expect(aggregator.queued[:tags]).to eq({ region: "us-east-1" })
               expect(aggregator.queued[:measurements].first).to eq(expected)
@@ -288,11 +285,11 @@ module Librato
             context "after initialization" do
               it "applies Client top-level tags" do
                 expected = { name: "test", count: 2, sum: 3.0, min: 1.0, max: 2.0 }
-                client.add_tags foo: "bar"
+                client.add_tags hostname: "metrics-web-stg-1"
                 aggregator.add test: 1
                 aggregator.add test: 2
 
-                expect(aggregator.queued[:tags]).to eq({ region: "us-east-1", foo: "bar" })
+                expect(aggregator.queued[:tags]).to eq({ region: "us-east-1", hostname: "metrics-web-stg-1" })
                 expect(aggregator.queued[:measurements].first).to eq(expected)
               end
             end

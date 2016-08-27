@@ -362,12 +362,12 @@ module Librato
     end
 
     describe "#get_measurement" do
-      before { Metrics.submit test: { value: 123, tags: { foo: "bar" } } }
+      before { Metrics.submit test: { value: 123, tags: { hostname: "metrics-stg-1" } } }
 
       it "gets measurement" do
         measurement = Metrics.get_measurement :test, resolution: 1, duration: 3600
 
-        expect(measurement["series"][0]["tags"]["foo"]).to eq("bar")
+        expect(measurement["series"][0]["tags"]["hostname"]).to eq("metrics-stg-1")
         expect(measurement["series"][0]["measurements"][0]["value"]).to eq(123)
       end
     end
@@ -376,7 +376,7 @@ module Librato
       it "gets series" do
         series = Metrics.get_series :test, resolution: 1, duration: 3600
 
-        expect(series[0]["tags"]["foo"]).to eq("bar")
+        expect(series[0]["tags"]["hostname"]).to eq("metrics-stg-1")
         expect(series[0]["measurements"][0]["value"]).to eq(123)
       end
     end

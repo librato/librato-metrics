@@ -20,7 +20,7 @@ module Librato
               resource = "measurements"
               payload =
                 if queued[:multidimensional]
-                  # request contains at least one measurement with per-measurement tags
+                  # request contains per-measurement tags
                   queued.delete(:multidimensional)
                   SmartJSON.write(request)
                 else

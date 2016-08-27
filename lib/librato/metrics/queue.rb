@@ -28,6 +28,7 @@ module Librato
       # @return [Queue] returns self
       def add(measurements)
         measurements.each do |key, value|
+          contains_measurements = multidimensional?
           if value.respond_to?(:each)
             validate_parameters(value)
             metric = value
@@ -40,9 +41,10 @@ module Librato
           if @prefix
             metric[:name] = "#{@prefix}.#{metric[:name]}"
           end
-          type = :measurement if multidimensional? || metric[:tags]
+          contains_measurements = contains_measurements || metric[:tags]
+          type = :measurement if contains_measurements
           type = ("#{type}s").to_sym
-          time = multidimensional? || metric[:tags] ? :time : :measure_time
+          time = contains_measurements ? :time : :measure_time
 
           if metric[time]
             metric[time] = metric[time].to_i
@@ -53,7 +55,7 @@ module Librato
 
           @queued[type] ||= []
           @queued[type] << metric
-          @queued[:multidimensional] = true if multidimensional? || metric[:tags]
+          @queued[:multidimensional] = true if contains_measurements
         end
         submit_check
         self

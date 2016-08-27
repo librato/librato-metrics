@@ -9,6 +9,8 @@ module Librato
         allow_any_instance_of(Aggregator).to receive(:epoch_time).and_return(@time)
       end
 
+      before(:each) { Librato::Metrics.client.clear_tags }
+
       describe "initialization" do
         context "with specified client" do
           it "sets to client" do

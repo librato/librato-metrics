@@ -5,10 +5,12 @@ module Librato
 
     describe Queue do
 
-      before(:each) do
+      before(:all) do
         @time = (Time.now.to_i - 1*60)
         allow_any_instance_of(Queue).to receive(:epoch_time).and_return(@time)
       end
+
+      before(:each) { Librato::Metrics.client.clear_tags }
 
       describe "initialization" do
         context "with specified client" do
@@ -16,6 +18,7 @@ module Librato
             barney = Client
             allow(barney).to receive(:has_tags?).and_return(false)
             allow(barney).to receive(:tags).and_return({})
+            allow(barney).to receive(:add_tags).and_return({})
             queue = Queue.new(client: barney)
             expect(queue.client).to eq(barney)
           end
@@ -361,14 +364,16 @@ module Librato
             end
 
             it "tracks previous default tags" do
-              q1 = Queue.new(tags: { db: "rr1" })
+              q1 = Queue.new(tags: { instance_id: "i-1234567a" })
               q1.add test_1: 123
-              q2 = Queue.new(tags: { db: "rr2" })
+              q2 = Queue.new(tags: { instance_type: "m3.medium" })
               q2.add test_2: 456
               q2.merge!(q1)
               metric = q2.measurements.find { |measurement| measurement[:name] == "test_1" }
 
-              expect(metric[:tags][:db]).to eq("rr1")
+              expect(metric[:tags][:instance_id]).to eq("i-1234567a")
+              expect(q2.queued[:tags]).to eq({ instance_id: "i-1234567a", instance_type: "m3.medium" })
+
             end
           end
 

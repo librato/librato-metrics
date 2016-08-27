@@ -6,15 +6,14 @@ module Librato
     # Mixin which provides common logic between {Queue} and {Aggregator}
     # objects.
     module Processor
+      extend Forwardable
+
+      def_delegators :@client, :add_tags, :clear_tags, :has_tags?, :tags
+
       MEASUREMENTS_PER_REQUEST = 500
 
       attr_reader :per_request, :last_submit_time
-      attr_accessor :prefix, :tags
-
-      def tags
-        @tags ||= {}
-        @tags.merge!(@client.tags)
-      end
+      attr_accessor :prefix
 
       # The current Client instance this queue is using to authenticate
       # and connect to Librato Metrics. This will default to the primary
@@ -27,7 +26,7 @@ module Librato
       end
 
       def multidimensional?
-        !@tags.empty? || !@time.nil?
+        has_tags? || !@time.nil?
       end
 
       # The object this MetricSet will use to persist
@@ -98,8 +97,7 @@ module Librato
         @client = options[:client] || Librato::Metrics.client
         @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
         @source = options[:source]
-        @tags = options.fetch(:tags, {})
-        @tags.merge!(@client.tags)
+        @client.add_tags(options.fetch(:tags, {}))
         @measure_time = options[:measure_time] && options[:measure_time].to_i
         @time = options[:time] && options[:time].to_i
         @create_time = Time.now

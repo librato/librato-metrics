@@ -129,7 +129,7 @@ module Librato
             { gauges: entries }
           end
         req[:source] = @source if @source
-        req[:tags] = @tags if !@tags.empty?
+        req[:tags] = tags if has_tags?
         req[:measure_time] = @measure_time if @measure_time
         req[:time] = @time if @time
         req[:multidimensional] = true if multidimensional? || contains_measurements

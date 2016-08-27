@@ -5,7 +5,10 @@ module Librato
 
     describe Queue do
       before(:all) { prep_integration_tests }
-      before(:each) { delete_all_metrics }
+      before(:each) do
+        delete_all_metrics
+        Librato::Metrics.client.clear_tags
+      end
 
       context "with a large number of metrics" do
         it "submits them in multiple requests" do

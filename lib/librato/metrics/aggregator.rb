@@ -132,7 +132,7 @@ module Librato
         req[:tags] = tags if has_tags?
         req[:measure_time] = @measure_time if @measure_time
         req[:time] = @time if @time
-        req[:multidimensional] = true if req[:measurements]
+        req[:multidimensional] = true if contains_measurements
 
         req
       end

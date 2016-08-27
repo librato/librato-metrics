@@ -16,13 +16,14 @@ module Librato
             requests = [queued]
           end
           requests.each do |request|
-            if queued[:tags] || queued[:multidimensional]
-              # request contains per-measurement tags
-              queued.delete(:multidimensional) if queued[:multidimensional]
-              resource = "measurements"
-            else
-              resource = "metrics"
-            end
+            resource =
+              if queued[:tags] || queued[:multidimensional]
+                # request contains per-measurement tags
+                queued.delete(:multidimensional) if queued[:multidimensional]
+                "measurements"
+              else
+                "metrics"
+              end
             payload = SmartJSON.write(request)
             # expects 200
             client.connection.post(resource, payload)

@@ -102,7 +102,7 @@ module Librato
       #
       def queued
         entries = []
-        contains_measurements = false
+        contains_measurements = multidimensional?
 
         @aggregated.each_value do |data|
           entry = {
@@ -123,7 +123,7 @@ module Librato
           entries << entry
         end
         req =
-          if multidimensional? || contains_measurements
+          if contains_measurements
             { measurements: entries }
           else
             { gauges: entries }

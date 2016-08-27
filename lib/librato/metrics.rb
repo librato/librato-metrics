@@ -77,7 +77,7 @@ module Librato
                     :connection, :create_snapshot, :delete_metrics,
                     :faraday_adapter, :faraday_adapter=, :get_composite,
                     :get_measurement, :get_measurements, :get_metric,
-                    :get_series, :get_snapshot, :get_source, :metrics,
+                    :get_series, :get_snapshot, :get_source, :has_tags?, :metrics,
                     :persistence, :persistence=, :persister, :proxy, :proxy=,
                     :sources, :submit, :update_metric, :update_metrics,
                     :update_source

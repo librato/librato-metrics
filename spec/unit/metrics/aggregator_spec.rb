@@ -247,6 +247,19 @@ module Librato
               expect(aggregator.queued[:tags]).to be_nil
               expect(aggregator.queued[:measurements].first).to eq(expected)
             end
+
+            context "when tags arguments are not sorted" do
+              let(:aggregator) { Aggregator.new }
+
+              it "uses sorted tags hash key" do
+                expected = { name: "test", count: 2, sum: 3, min: 1, max: 2, tags: { a: 1, b: 2, c: 3 } }
+                aggregator.add test: { value: 1, tags: { c: 3, b: 2, a: 1 } }
+                aggregator.add test: { value: 2, tags: { b: 2, a: 1, c: 3 } }
+
+                expect(aggregator.queued[:tags]).to be_nil
+                expect(aggregator.queued[:measurements].first).to eq(expected)
+              end
+            end
           end
 
           context "when Aggregator is initialized with tags and when tags are used as arguments" do

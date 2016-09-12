@@ -6,21 +6,7 @@ module Librato
 
       def_delegator :annotator, :add, :annotate
 
-      def_delegator :@tags, :clear, :clear_tags
-
-      attr_accessor :email, :api_key, :proxy, :tags
-
-      def initialize(options={})
-        @tags = options.fetch(:tags, {})
-      end
-
-      def tags
-        @tags ||= {}
-      end
-
-      def add_tags(tags)
-        @tags.merge!(tags)
-      end
+      attr_accessor :email, :api_key, :proxy
 
       # Provide agent identifier for the developer program. See:
       # http://support.metrics.librato.com/knowledgebase/articles/53548-developer-program
@@ -252,11 +238,6 @@ module Librato
         self.api_key = nil
         @connection = nil
       end
-
-      def has_tags?
-        !@tags.empty?
-      end
-      alias :tags? :has_tags?
 
       # List currently existing metrics
       #

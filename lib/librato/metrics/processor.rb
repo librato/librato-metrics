@@ -8,12 +8,20 @@ module Librato
     module Processor
       extend Forwardable
 
-      def_delegators :@client, :add_tags, :clear_tags, :has_tags?, :tags
+      def_delegator :@tags, :clear, :clear_tags
 
       MEASUREMENTS_PER_REQUEST = 500
 
       attr_reader :per_request, :last_submit_time
-      attr_accessor :prefix
+      attr_accessor :prefix, :tags
+
+      def tags
+        @tags ||= {}
+      end
+
+      def add_tags(tags)
+        @tags.merge!(tags)
+      end
 
       # The current Client instance this queue is using to authenticate
       # and connect to Librato Metrics. This will default to the primary
@@ -24,6 +32,11 @@ module Librato
       def client
         @client ||= Librato::Metrics.client
       end
+
+      def has_tags?
+        !@tags.empty?
+      end
+      alias :tags? :has_tags?
 
       def multidimensional?
         has_tags? || !@time.nil?
@@ -97,7 +110,7 @@ module Librato
         @client = options[:client] || Librato::Metrics.client
         @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
         @source = options[:source]
-        @client.add_tags(options.fetch(:tags, {}))
+        @tags = options.fetch(:tags, {})
         @measure_time = options[:measure_time] && options[:measure_time].to_i
         @time = options[:time] && options[:time].to_i
         @create_time = Time.now

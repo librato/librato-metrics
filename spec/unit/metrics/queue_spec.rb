@@ -10,8 +10,6 @@ module Librato
         allow_any_instance_of(Queue).to receive(:epoch_time).and_return(@time)
       end
 
-      before(:each) { Librato::Metrics.client.clear_tags }
-
       describe "initialization" do
         context "with specified client" do
           let(:barney) { Client }
@@ -58,6 +56,87 @@ module Librato
                 tags: { hostname: "metrics-web-stg-1" }
               )
             }.to raise_error(InvalidParameters)
+          end
+        end
+      end
+
+      describe "#tags" do
+        context "when set" do
+          let(:queue) { Queue.new(tags: { instance_id: "i-1234567a" }) }
+          it "gets @tags" do
+            expect(queue.tags).to be_a(Hash)
+            expect(queue.tags.keys).to include(:instance_id)
+            expect(queue.tags[:instance_id]).to eq("i-1234567a")
+          end
+        end
+
+        context "when not set" do
+          let(:queue) { Queue.new }
+          it "defaults to empty hash" do
+            expect(queue.tags).to be_a(Hash)
+            expect(queue.tags).to be_empty
+          end
+        end
+      end
+
+      describe "#tags=" do
+        it "sets @tags" do
+          expected_tags = { instance_id: "i-1234567b" }
+          expect{subject.tags = expected_tags}.to change{subject.tags}.from({}).to(expected_tags)
+          expect(subject.tags).to be_a(Hash)
+          expect(subject.tags).to eq(expected_tags)
+        end
+      end
+
+      describe "#add_tags" do
+        context "when no existing tags" do
+          it "adds top-level tags" do
+            expected_tags = { instance_id: "i-1234567c" }
+            subject.add_tags expected_tags
+
+            expect(subject.tags).to be_a(Hash)
+            expect(subject.tags).to eq(expected_tags)
+          end
+        end
+
+        context "when existing tags" do
+          it "merges tags" do
+            tmp1 = { instance_id: "i-1234567d" }
+            tmp2 = { region: "us-east-1", hostname: "metrics-web-stg-1" }
+            expected_tags = tmp1.merge(tmp2)
+
+            subject.add_tags tmp1
+            subject.add_tags tmp2
+
+            expect(subject.tags).to be_a(Hash)
+            expect(subject.tags).to eq(expected_tags)
+          end
+        end
+      end
+
+      describe "#clear_tags" do
+        context "when tags are set" do
+          it "empties Hash" do
+            expected_tags = { instance_id: "i-1234567e" }
+            subject.add_tags expected_tags
+
+            expect{subject.clear_tags}.to change{subject.tags}.from(expected_tags).to({})
+          end
+        end
+      end
+
+      describe "#has_tags?" do
+        context "when tags are set" do
+          it "returns true" do
+            subject.add_tags instance_id: "i-1234567f"
+
+            expect(subject.has_tags?).to eq(true)
+          end
+        end
+
+        context "when tags are not set" do
+          it "returns false" do
+            expect(subject.has_tags?).to eq(false)
           end
         end
       end
@@ -226,32 +305,6 @@ module Librato
               expect(queue.queued[:measurements].first).to eq(expected)
             end
           end
-
-          context "when Queue is initialized with a Client with tags" do
-            let(:client) { Client.new(tags: { region: "us-east-1" }) }
-            let(:queue) { Queue.new(client: client) }
-
-            context "during initialization" do
-              it "applies Client top-level tags" do
-                expected = { name: "test", value: 4, time: @time }
-                queue.add test: 4
-
-                expect(queue.queued[:tags]).to eq({ region: "us-east-1" })
-                expect(queue.queued[:measurements].first).to eq(expected)
-              end
-            end
-
-            context "after initialization" do
-              it "applies Client top-level tags" do
-                expected = { name: "test", value: 5, time: @time }
-                client.add_tags hostname: "metrics-web-stg-1"
-                queue.add test: 5
-
-                expect(queue.queued[:tags]).to eq({ region: "us-east-1", hostname: "metrics-web-stg-1" })
-                expect(queue.queued[:measurements].first).to eq(expected)
-              end
-            end
-          end
         end
       end
 
@@ -375,7 +428,7 @@ module Librato
               metric = q2.measurements.find { |measurement| measurement[:name] == "test_1" }
 
               expect(metric[:tags][:instance_id]).to eq("i-1234567a")
-              expect(q2.queued[:tags]).to eq({ instance_id: "i-1234567a", instance_type: "m3.medium" })
+              expect(q2.queued[:tags]).to eq({ instance_type: "m3.medium" })
 
             end
           end

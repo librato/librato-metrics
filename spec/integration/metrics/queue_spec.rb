@@ -7,7 +7,6 @@ module Librato
       before(:all) { prep_integration_tests }
       before(:each) do
         delete_all_metrics
-        Librato::Metrics.client.clear_tags
       end
 
       context "with a large number of metrics" do

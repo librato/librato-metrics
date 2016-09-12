@@ -3,7 +3,6 @@ require 'spec_helper'
 module Librato
   describe Metrics do
     before(:all) { prep_integration_tests }
-    before(:each) { Librato::Metrics.client.clear_tags }
 
     describe "#annotate" do
       before(:all) { @annotator = Metrics::Annotator.new }

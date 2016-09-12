@@ -9,8 +9,6 @@ module Librato
         allow_any_instance_of(Aggregator).to receive(:epoch_time).and_return(@time)
       end
 
-      before(:each) { Librato::Metrics.client.clear_tags }
-
       describe "initialization" do
         context "with specified client" do
           it "sets to client" do
@@ -65,6 +63,87 @@ module Librato
                 tags: { hostname: "metrics-web-stg-1" }
               )
             }.to raise_error(InvalidParameters)
+          end
+        end
+      end
+
+      describe "#tags" do
+        context "when set" do
+          let(:aggregator) { Aggregator.new(tags: { instance_id: "i-1234567a" }) }
+          it "gets @tags" do
+            expect(aggregator.tags).to be_a(Hash)
+            expect(aggregator.tags.keys).to include(:instance_id)
+            expect(aggregator.tags[:instance_id]).to eq("i-1234567a")
+          end
+        end
+
+        context "when not set" do
+          let(:aggregator) { Aggregator.new }
+          it "defaults to empty hash" do
+            expect(aggregator.tags).to be_a(Hash)
+            expect(aggregator.tags).to be_empty
+          end
+        end
+      end
+
+      describe "#tags=" do
+        it "sets @tags" do
+          expected_tags = { instance_id: "i-1234567b" }
+          expect{subject.tags = expected_tags}.to change{subject.tags}.from({}).to(expected_tags)
+          expect(subject.tags).to be_a(Hash)
+          expect(subject.tags).to eq(expected_tags)
+        end
+      end
+
+      describe "#add_tags" do
+        context "when no existing tags" do
+          it "adds top-level tags" do
+            expected_tags = { instance_id: "i-1234567c" }
+            subject.add_tags expected_tags
+
+            expect(subject.tags).to be_a(Hash)
+            expect(subject.tags).to eq(expected_tags)
+          end
+        end
+
+        context "when existing tags" do
+          it "merges tags" do
+            tmp1 = { instance_id: "i-1234567d" }
+            tmp2 = { region: "us-east-1", hostname: "metrics-web-stg-1" }
+            expected_tags = tmp1.merge(tmp2)
+
+            subject.add_tags tmp1
+            subject.add_tags tmp2
+
+            expect(subject.tags).to be_a(Hash)
+            expect(subject.tags).to eq(expected_tags)
+          end
+        end
+      end
+
+      describe "#clear_tags" do
+        context "when tags are set" do
+          it "empties Hash" do
+            expected_tags = { instance_id: "i-1234567e" }
+            subject.add_tags expected_tags
+
+            expect{subject.clear_tags}.to change{subject.tags}.from(expected_tags).to({})
+          end
+        end
+      end
+
+      describe "#has_tags?" do
+        context "when tags are set" do
+          it "returns true" do
+            subject.add_tags instance_id: "i-1234567f"
+
+            expect(subject.has_tags?).to eq(true)
+          end
+        end
+
+        context "when tags are not set" do
+          it "returns false" do
+            expect(subject.has_tags?).to eq(false)
           end
         end
       end
@@ -276,37 +355,6 @@ module Librato
               expect(aggregator.queued[:tags]).to eq({ region: "us-east-1" })
               expect(aggregator.queued[:measurements].first).to eq(expected)
             end
-          end
-
-          context "when Aggregator is initialized with a Client with tags" do
-            let(:client) { Librato::Metrics::Client.new(tags: { region: "us-east-1" }) }
-            let(:aggregator) { Aggregator.new(client: client) }
-
-            context "during initialization" do
-              it "applies Client top-level tags" do
-                expected = { name: "test", count: 4, sum: 30.0, min: 6.0, max: 9.0 }
-                aggregator.add test: 6
-                aggregator.add test: 7
-                aggregator.add test: 8
-                aggregator.add test: 9
-
-                expect(aggregator.queued[:tags]).to eq({ region: "us-east-1" })
-                expect(aggregator.queued[:measurements].first).to eq(expected)
-              end
-            end
-
-            context "after initialization" do
-              it "applies Client top-level tags" do
-                expected = { name: "test", count: 2, sum: 3.0, min: 1.0, max: 2.0 }
-                client.add_tags hostname: "metrics-web-stg-1"
-                aggregator.add test: 1
-                aggregator.add test: 2
-
-                expect(aggregator.queued[:tags]).to eq({ region: "us-east-1", hostname: "metrics-web-stg-1" })
-                expect(aggregator.queued[:measurements].first).to eq(expected)
-              end
-            end
-
           end
         end
       end

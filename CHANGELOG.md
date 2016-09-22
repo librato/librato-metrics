@@ -1,6 +1,6 @@
 ## Changelog
 
-### Version 2.0.0.beta
+### Version 2.0.0
 * Remove support for deprecated methods (#117)
 * Upgrade rspec from 2.6 to 3.5 (#118)
 * Remove support for ruby 1.8 (#119)

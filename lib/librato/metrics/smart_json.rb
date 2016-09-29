@@ -4,37 +4,21 @@ module Librato
       extend SingleForwardable
 
       if defined?(::MultiJson)
-        if RUBY_VERSION <= "2.3.0"
+        def self.read(json)
           # MultiJSON >= 1.3.0
           if MultiJson.respond_to?(:load)
-            def_delegator MultiJson, :load, :read
+            MultiJson.load(json)
           else
-            def_delegator MultiJson, :decode, :read
+            MultiJson.decode(json)
           end
+        end
 
+        def self.write(json)
           # MultiJSON <= 1.2.0
           if MultiJson.respond_to?(:dump)
-            def_delegator MultiJson, :dump, :write
+            MultiJson.dump(json)
           else
-            def_delegator MultiJson, :encode, :write
-          end
-        else
-          def self.read(json)
-            # MultiJSON >= 1.3.0
-            if MultiJson.respond_to?(:load)
-              MultiJson.load(json)
-            else
-              MultiJson.decode(json)
-            end
-          end
-
-          def self.write(json)
-            # MultiJSON <= 1.2.0
-            if MultiJson.respond_to?(:dump)
-              MultiJson.dump(json)
-            else
-              MultiJson.encode(json)
-            end
+            MultiJson.encode(json)
           end
         end
 
@@ -44,17 +28,12 @@ module Librato
       else
         require "json"
 
-        if RUBY_VERSION <= "2.3.0"
-          def_delegator JSON, :parse, :read
-          def_delegator JSON, :generate, :write
-        else
-          def self.read(json)
-            JSON.parse(json)
-          end
+        def self.read(json)
+          JSON.parse(json)
+        end
 
-          def self.write(json)
-            JSON.generate(json)
-          end
+        def self.write(json)
+          JSON.generate(json)
         end
 
         def self.handler

@@ -1,8 +1,6 @@
 module Librato
   module Metrics
     class SmartJSON
-      extend SingleForwardable
-
       if defined?(::MultiJson)
         def self.read(json)
           # MultiJSON >= 1.3.0

@@ -66,7 +66,7 @@ module Librato
             elsif data[:tags] && data[:tags].respond_to?(:each)
               metric = metric.to_s
               data[:tags].sort.each do |key, value|
-                metric = "#{metric}#{SEPARATOR}#{key}#{SEPARATOR}#{value}"
+                metric = "#{metric}#{SEPARATOR}#{key}=#{value}"
               end
               entry[:tags] = data[:tags]
             end

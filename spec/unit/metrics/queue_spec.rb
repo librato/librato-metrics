@@ -88,47 +88,10 @@ module Librato
         end
       end
 
-      describe "#add_tags" do
-        context "when no existing tags" do
-          it "adds top-level tags" do
-            expected_tags = { instance_id: "i-1234567c" }
-            subject.add_tags expected_tags
-
-            expect(subject.tags).to be_a(Hash)
-            expect(subject.tags).to eq(expected_tags)
-          end
-        end
-
-        context "when existing tags" do
-          it "merges tags" do
-            tmp1 = { instance_id: "i-1234567d" }
-            tmp2 = { region: "us-east-1", hostname: "metrics-web-stg-1" }
-            expected_tags = tmp1.merge(tmp2)
-
-            subject.add_tags tmp1
-            subject.add_tags tmp2
-
-            expect(subject.tags).to be_a(Hash)
-            expect(subject.tags).to eq(expected_tags)
-          end
-        end
-      end
-
-      describe "#clear_tags" do
-        context "when tags are set" do
-          it "empties Hash" do
-            expected_tags = { instance_id: "i-1234567e" }
-            subject.add_tags expected_tags
-
-            expect{subject.clear_tags}.to change{subject.tags}.from(expected_tags).to({})
-          end
-        end
-      end
-
       describe "#has_tags?" do
         context "when tags are set" do
           it "returns true" do
-            subject.add_tags instance_id: "i-1234567f"
+            subject.tags = { instance_id: "i-1234567f" }
 
             expect(subject.has_tags?).to eq(true)
           end

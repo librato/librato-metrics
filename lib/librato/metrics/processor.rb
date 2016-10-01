@@ -8,8 +8,6 @@ module Librato
     module Processor
       extend Forwardable
 
-      def_delegator :@tags, :clear, :clear_tags
-
       MEASUREMENTS_PER_REQUEST = 500
 
       attr_reader :per_request, :last_submit_time
@@ -17,10 +15,6 @@ module Librato
 
       def tags
         @tags ||= {}
-      end
-
-      def add_tags(tags)
-        @tags.merge!(tags)
       end
 
       # The current Client instance this queue is using to authenticate

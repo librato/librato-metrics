@@ -73,20 +73,20 @@ module Librato
       end
 
       context "with tags" do
-        let(:queue) { Queue.new(tags: { hostname: "metrics-web-stg-1" } ) }
+        let(:queue) { Queue.new(tags: { hostname: "metrics-web-stg-1" }) }
 
         it "respects default and individual tags" do
           queue.add test_1: 123
           queue.add test_2: { value: 456, tags: { hostname: "metrics-web-stg-2" }}
           queue.submit
 
-          test_1 = Librato::Metrics.get_measurement :test_1, resolution: 1, duration: 3600
-          expect(test_1["series"][0]["tags"]["hostname"]).to eq("metrics-web-stg-1")
-          expect(test_1["series"][0]["measurements"][0]["value"]).to eq(123)
+          test_1 = Librato::Metrics.get_series :test_1, resolution: 1, duration: 3600
+          expect(test_1[0]["tags"]["hostname"]).to eq("metrics-web-stg-1")
+          expect(test_1[0]["measurements"][0]["value"]).to eq(123)
 
-          test_2 = Librato::Metrics.get_measurement :test_2, resolution: 1, duration: 3600
-          expect(test_2["series"][0]["tags"]["hostname"]).to eq("metrics-web-stg-2")
-          expect(test_2["series"][0]["measurements"][0]["value"]).to eq(456)
+          test_2 = Librato::Metrics.get_series :test_2, resolution: 1, duration: 3600
+          expect(test_2[0]["tags"]["hostname"]).to eq("metrics-web-stg-2")
+          expect(test_2[0]["measurements"][0]["value"]).to eq(456)
         end
       end
 

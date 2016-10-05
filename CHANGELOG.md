@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 2.0.1
+* Fix SmartJSON delegation bug for ruby 2.3.1 (#123)
+
 ### Version 2.0.0
 * Remove support for deprecated methods (#117)
 * Upgrade rspec from 2.6 to 3.5 (#118)

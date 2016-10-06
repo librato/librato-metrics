@@ -13,6 +13,7 @@ require 'metrics/errors'
 require 'metrics/persistence'
 require 'metrics/queue'
 require 'metrics/smart_json'
+require 'metrics/util'
 require 'metrics/version'
 
 module Librato

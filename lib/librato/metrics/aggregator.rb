@@ -64,10 +64,7 @@ module Librato
               metric = "#{metric}#{SEPARATOR}#{data[:source]}"
               entry[:source] = data[:source].to_s
             elsif data[:tags] && data[:tags].respond_to?(:each)
-              metric = metric.to_s
-              data[:tags].sort.each do |key, value|
-                metric = "#{metric}#{SEPARATOR}#{key}=#{value}"
-              end
+              metric = Librato::Metrics::Util.build_key_for(metric.to_s, data[:tags])
               entry[:tags] = data[:tags]
             end
           else

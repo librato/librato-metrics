@@ -37,16 +37,16 @@ module Librato
           reqs = []
           # separate metric-containing values from global values
           globals = fetch_globals(queued)
-          top_level_keys.each do |metric_type|
-            metrics = queued[metric_type]
+          top_level_keys.each do |key|
+            metrics = queued[key]
             next unless metrics
             if metrics.size <= per_request
               # we can fit all of this metric type in a single request
-              reqs << build_request(metric_type, metrics, globals)
+              reqs << build_request(key, metrics, globals)
             else
               # going to have to split things up
               metrics.each_slice(per_request) do |elements|
-                reqs << build_request(metric_type, elements, globals)
+                reqs << build_request(key, elements, globals)
               end
             end
           end

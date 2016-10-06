@@ -28,7 +28,7 @@ module Librato
       # @return [Queue] returns self
       def add(measurements)
         measurements.each do |key, value|
-          contains_measurements = multidimensional?
+          multidimensional = has_tags?
           if value.respond_to?(:each)
             validate_parameters(value)
             metric = value
@@ -41,10 +41,9 @@ module Librato
           if @prefix
             metric[:name] = "#{@prefix}.#{metric[:name]}"
           end
-          contains_measurements = true if metric[:tags]
-          type = :measurement if contains_measurements
+          multidimensional = true if metric[:tags]
           type = ("#{type}s").to_sym
-          time = contains_measurements ? :time : :measure_time
+          time = multidimensional ? :time : :measure_time
 
           if metric[time]
             metric[time] = metric[time].to_i
@@ -52,11 +51,15 @@ module Librato
           elsif !skip_measurement_times
             metric[time] = epoch_time
           end
-          contains_measurements = true if metric[:time]
-
-          @queued[type] ||= []
-          @queued[type] << metric
-          @queued[:multidimensional] = true if contains_measurements
+          multidimensional = true if metric[:time]
+          if multidimensional
+            @queued[:measurements] ||= []
+            @queued[:measurements] << metric
+          else
+            @queued[type] ||= []
+            @queued[type] << metric
+          end
+          @queued[:multidimensional] = true if multidimensional
         end
         submit_check
         self
@@ -112,19 +115,24 @@ module Librato
         end
         Metrics::PLURAL_TYPES.each do |type|
           if to_merge[type]
-            measurements =
-              if multidimensional?
-                reconcile(to_merge[type], to_merge[:tags])
-              else
-                reconcile(to_merge[type], to_merge[:source])
-              end
+            payload = reconcile(to_merge[type], to_merge[:source])
             if @queued[type]
-              @queued[type] += measurements
+              @queued[type] += payload
             else
-              @queued[type] = measurements
+              @queued[type] = payload
             end
           end
         end
+
+        if to_merge[:measurements]
+          payload = reconcile(to_merge[:measurements], to_merge[:tags])
+          if @queued[:measurements]
+            @queued[:measurements] += payload
+          else
+            @queued[:measurements] = payload
+          end
+        end
+
         submit_check
         self
       end

@@ -6,8 +6,6 @@ module Librato
     # Mixin which provides common logic between {Queue} and {Aggregator}
     # objects.
     module Processor
-      extend Forwardable
-
       MEASUREMENTS_PER_REQUEST = 500
 
       attr_reader :per_request, :last_submit_time
@@ -31,10 +29,6 @@ module Librato
         !@tags.empty?
       end
       alias :tags? :has_tags?
-
-      def multidimensional?
-        has_tags? || !@time.nil?
-      end
 
       # The object this MetricSet will use to persist
       #

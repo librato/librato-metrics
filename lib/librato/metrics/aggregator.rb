@@ -101,7 +101,7 @@ module Librato
       #
       def queued
         entries = []
-        contains_measurements = multidimensional?
+        multidimensional = has_tags?
 
         @aggregated.each_value do |data|
           entry = {
@@ -113,16 +113,17 @@ module Librato
             max: data[:aggregate].max.to_f
             # TODO: expose v.sum2 and include
           }
-          entry[:source] = data[:source] if data[:source]
-          if data[:tags]
-            contains_measurements = true
+          if data[:source]
+            entry[:source] = data[:source]
+          elsif data[:tags]
+            multidimensional = true
             entry[:tags] = data[:tags]
           end
-          contains_measurements = true if data[:time]
+          multidimensional = true if data[:time]
           entries << entry
         end
         req =
-          if contains_measurements
+          if multidimensional
             { measurements: entries }
           else
             { gauges: entries }
@@ -131,7 +132,7 @@ module Librato
         req[:tags] = @tags if has_tags?
         req[:measure_time] = @measure_time if @measure_time
         req[:time] = @time if @time
-        req[:multidimensional] = true if contains_measurements
+        req[:multidimensional] = true if multidimensional
 
         req
       end

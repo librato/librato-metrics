@@ -37,7 +37,7 @@ module Librato
           reqs = []
           # separate metric-containing values from global values
           globals = fetch_globals(queued)
-          Librato::Metrics::PLURAL_TYPES.each do |metric_type|
+          top_level_keys.each do |metric_type|
             metrics = queued[metric_type]
             next unless metrics
             if metrics.size <= per_request
@@ -57,8 +57,12 @@ module Librato
           {type => metrics}.merge(globals)
         end
 
+        def top_level_keys
+          [Librato::Metrics::PLURAL_TYPES, :measurements].flatten
+        end
+
         def fetch_globals(queued)
-          queued.reject {|k, v| Librato::Metrics::PLURAL_TYPES.include?(k)}
+          queued.reject { |k, v| top_level_keys.include?(k) }
         end
 
         def queue_count(queued)

@@ -160,11 +160,11 @@ module Librato
     private
 
       def check_measure_time(data)
-        invalid_time =
-          data[:measure_time] && data[:measure_time] < Metrics::MIN_MEASURE_TIME ||
-            data[:time] && data[:time] < Metrics::MIN_MEASURE_TIME
+        time_keys = [:measure_time, :time]
 
-        raise InvalidMeasureTime, "Measure time for submitted metric (#{data}) is invalid." if invalid_time
+        if time_keys.any? { |key| data[key] && data[key] < Metrics::MIN_MEASURE_TIME }
+          raise InvalidMeasureTime, "Measure time for submitted metric (#{data}) is invalid."
+        end
       end
 
       def reconcile(measurements, val)

@@ -99,8 +99,7 @@ module Librato
         @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
         @source = options[:source]
         @tags = options.fetch(:tags, {})
-        @measure_time = options[:measure_time] && options[:measure_time].to_i
-        @time = options[:time] && options[:time].to_i
+        @time = (options[:time] && options[:time].to_i || options[:measure_time] && options[:measure_time].to_i)
         @create_time = Time.now
         @clear_on_failure = options[:clear_failures] || false
         @prefix = options[:prefix]
@@ -116,9 +115,6 @@ module Librato
       def validate_parameters(options)
         invalid_combinations = [
           [:source, :tags],
-          [:measure_time, :time],
-          [:source, :time],
-          [:measure_time, :tags]
         ]
         opts = options.keys.to_set
         invalid_combinations.each do |combo|

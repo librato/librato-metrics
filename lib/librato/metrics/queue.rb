@@ -59,7 +59,6 @@ module Librato
             @queued[type] ||= []
             @queued[type] << metric
           end
-          @queued[:multidimensional] = true if multidimensional
         end
         submit_check
         self
@@ -143,10 +142,10 @@ module Librato
       def queued
         return {} if @queued.empty?
         globals = {}
+        time = has_tags? ? :time : :measure_time
+        globals[time] = @time if @time
         globals[:source] = @source if @source
         globals[:tags] = @tags if has_tags?
-        globals[:measure_time] = @measure_time if @measure_time
-        globals[:time] = @time if @time
         @queued.merge(globals)
       end
 
@@ -154,7 +153,7 @@ module Librato
       #
       # @return Integer
       def size
-        self.queued.reject { |key| key == :multidimensional }.inject(0) { |result, data| result + data.last.size }
+        self.queued.inject(0) { |result, data| result + data.last.size }
       end
       alias :length :size
 

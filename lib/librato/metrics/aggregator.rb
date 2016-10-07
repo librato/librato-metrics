@@ -119,6 +119,7 @@ module Librato
           multidimensional = true if data[:time]
           entries << entry
         end
+        time = multidimensional ? :time : :measure_time
         req =
           if multidimensional
             { measurements: entries }
@@ -127,9 +128,7 @@ module Librato
           end
         req[:source] = @source if @source
         req[:tags] = @tags if has_tags?
-        req[:measure_time] = @measure_time if @measure_time
-        req[:time] = @time if @time
-        req[:multidimensional] = true if multidimensional
+        req[time] = @time if @time
 
         req
       end

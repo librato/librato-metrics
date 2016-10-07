@@ -48,14 +48,6 @@ module Librato
                 tags: { hostname: "metrics-web-stg-1" }
               )
             }.to raise_error(InvalidParameters)
-            expect { Queue.new(measure_time: Time.now, time: Time.now) }.to raise_error(InvalidParameters)
-            expect { Queue.new(source: "metrics-web-stg-1", time: Time.now) }.to raise_error(InvalidParameters)
-            expect {
-              Queue.new(
-                measure_time: Time.now,
-                tags: { hostname: "metrics-web-stg-1" }
-              )
-            }.to raise_error(InvalidParameters)
           end
         end
       end
@@ -113,15 +105,6 @@ module Librato
           it "raises exception" do
             expect {
               subject.add test: { source: "metrics-web-stg-1", tags: { hostname: "metrics-web-stg-1" }, value: 123 }
-            }.to raise_error(InvalidParameters)
-            expect {
-              subject.add test: { measure_time: Time.now, time: Time.now, value: 123 }
-            }.to raise_error(InvalidParameters)
-            expect {
-              subject.add test: { source: "metrics-web-stg-1", time: Time.now, value: 123 }
-            }.to raise_error(InvalidParameters)
-            expect {
-              subject.add test: { tags: { hostname: "metrics-web-stg-1" }, measure_time: Time.now, value: 123 }
             }.to raise_error(InvalidParameters)
           end
         end
@@ -478,7 +461,7 @@ module Librato
 
         it "includes global measure_time if set" do
           measure_time = (Time.now-1000).to_i
-          q = Queue.new(measure_time: measure_time)
+          q = Queue.new(source: "foo", measure_time: measure_time)
           q.add foo: 12
           expect(q.queued[:measure_time]).to eq(measure_time)
         end
@@ -495,7 +478,7 @@ module Librato
         context "when time is set" do
           it "includes global time" do
             expected_time = (Time.now-1000).to_i
-            queue = Queue.new(time: expected_time)
+            queue = Queue.new(tags: { foo: "bar" }, time: expected_time)
             queue.add test: 10
             expect(queue.queued[:time]).to eq(expected_time)
           end

@@ -17,12 +17,10 @@ module Librato
           end
           requests.each do |request|
             resource =
-              if queued[:tags] || queued[:multidimensional]
-                # request contains per-measurement tags
-                queued.delete(:multidimensional) if queued[:multidimensional]
-                "measurements"
-              else
+              if queued[:gauges] || queued[:counters]
                 "metrics"
+              else
+                "measurements"
               end
             payload = SmartJSON.write(request)
             # expects 200
@@ -66,8 +64,7 @@ module Librato
         end
 
         def queue_count(queued)
-          queued.reject { |key| key == :multidimensional }
-            .inject(0) { |result, data| result + data.last.size }
+          queued.inject(0) { |result, data| result + data.last.size }
         end
 
       end

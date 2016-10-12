@@ -15,8 +15,10 @@ module Librato
             raise NotFound, response_values(env)
           when 422
             raise EntityAlreadyExists, response_values(env)
-          when 400..599
+          when 400..499
             raise ClientError, response_values(env)
+          when 500..599
+            raise ServerError, response_values(env)
           end
         end
 

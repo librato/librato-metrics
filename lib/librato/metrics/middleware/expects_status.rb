@@ -8,17 +8,17 @@ module Librato
           # TODO: make exception output prettier
           case env[:status]
           when 401
-            raise Unauthorized, "unauthorized", response_values(env)
+            raise Unauthorized.new("unauthorized", response_values(env))
           when 403
-            raise Forbidden, "forbidden", response_values(env)
+            raise Forbidden.new("forbidden", response_values(env))
           when 404
-            raise NotFound, "not_found", response_values(env)
+            raise NotFound.new("not_found", response_values(env))
           when 422
-            raise EntityAlreadyExists, "entity_already_exists", response_values(env)
+            raise EntityAlreadyExists.new("entity_already_exists", response_values(env))
           when 400..499
-            raise ClientError, "client_error", response_values(env)
+            raise ClientError.new("client_error", response_values(env))
           when 500..599
-            raise ServerError, "server_error", response_values(env)
+            raise ServerError.new("server_error", response_values(env))
           end
         end
 

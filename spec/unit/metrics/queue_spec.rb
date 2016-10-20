@@ -238,6 +238,20 @@ module Librato
               expect(queue.queued[:tags]).to be_nil
               expect(queue.queued[:measurements].first).to eq(expected)
             end
+
+            it "converts legacy measure_time to time" do
+              expected_time = Time.now.to_i
+              expected_tags = { foo: "bar" }
+              expected = {
+                measurements: [{
+                  name: "test", value: 1, tags: expected_tags, time: expected_time
+                }]
+              }
+
+              subject.add test: { value: 1, tags: expected_tags, measure_time: expected_time }
+
+              expect(subject.queued).to equal_unordered(expected)
+            end
           end
 
           context "when Queue is initialized with tags and when tags are used as arguments" do

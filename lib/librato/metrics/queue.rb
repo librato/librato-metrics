@@ -41,17 +41,17 @@ module Librato
           if @prefix
             metric[:name] = "#{@prefix}.#{metric[:name]}"
           end
-          multidimensional = true if metric[:tags]
+          multidimensional = true if metric[:tags] || metric[:time]
           type = ("#{type}s").to_sym
-          time = multidimensional ? :time : :measure_time
+          time_key = multidimensional ? :time : :measure_time
+          metric[:time] = metric.delete(:measure_time) if multidimensional && metric[:measure_time]
 
-          if metric[time]
-            metric[time] = metric[time].to_i
+          if metric[time_key]
+            metric[time_key] = metric[time_key].to_i
             check_measure_time(metric)
           elsif !skip_measurement_times
-            metric[time] = epoch_time
+            metric[time_key] = epoch_time
           end
-          multidimensional = true if metric[:time]
           if multidimensional
             @queued[:measurements] ||= []
             @queued[:measurements] << metric

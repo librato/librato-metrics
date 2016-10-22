@@ -85,7 +85,7 @@ Send currently queued measurements to Metrics:
 
 ## Aggregate Measurements
 
-If you are measuring something very frequently e.g. per-request in a web application (order mS)  you may not want to send each individual measurement, but rather periodically send a [single aggregate measurement](https://www.librato.com/docs/api/#submit-metrics), spanning multiple seconds or even minutes. Use an `Aggregator` for this.
+If you are measuring something very frequently e.g. per-request in a web application (order mS)  you may not want to send each individual measurement, but rather periodically send a [single aggregate measurement](https://www.librato.com/docs/api/#gauge-specific-parameters), spanning multiple seconds or even minutes. Use an `Aggregator` for this.
 
 Aggregate a simple gauge metric named `response_latency`:
 

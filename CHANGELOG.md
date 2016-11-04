@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 2.1.0.beta
+* Add support for tagged measurements (#121)
+
 ### Version 2.0.1
 * Fix SmartJSON delegation bug for ruby 2.3.1 (#123)
 

@@ -28,7 +28,9 @@ module Librato
       # @return [Queue] returns self
       def add(measurements)
         measurements.each do |key, value|
+          multidimensional = has_tags?
           if value.respond_to?(:each)
+            validate_parameters(value)
             metric = value
             metric[:name] = key.to_s
             type = metric.delete(:type) || metric.delete('type') || 'gauge'
@@ -39,15 +41,24 @@ module Librato
           if @prefix
             metric[:name] = "#{@prefix}.#{metric[:name]}"
           end
+          multidimensional = true if metric[:tags] || metric[:time]
           type = ("#{type}s").to_sym
-          if metric[:measure_time]
-            metric[:measure_time] = metric[:measure_time].to_i
+          time_key = multidimensional ? :time : :measure_time
+          metric[:time] = metric.delete(:measure_time) if multidimensional && metric[:measure_time]
+
+          if metric[time_key]
+            metric[time_key] = metric[time_key].to_i
             check_measure_time(metric)
           elsif !skip_measurement_times
-            metric[:measure_time] = epoch_time
+            metric[time_key] = epoch_time
           end
-          @queued[type] ||= []
-          @queued[type] << metric
+          if multidimensional
+            @queued[:measurements] ||= []
+            @queued[:measurements] << metric
+          else
+            @queued[type] ||= []
+            @queued[type] << metric
+          end
         end
         submit_check
         self
@@ -81,6 +92,10 @@ module Librato
         @queued[:gauges] || []
       end
 
+      def measurements
+        @queued[:measurements] || []
+      end
+
       # Combines queueable measures from the given object
       # into this queue.
       #
@@ -99,14 +114,24 @@ module Librato
         end
         Metrics::PLURAL_TYPES.each do |type|
           if to_merge[type]
-            measurements = reconcile_source(to_merge[type], to_merge[:source])
+            payload = reconcile(to_merge[type], to_merge[:source])
             if @queued[type]
-              @queued[type] += measurements
+              @queued[type] += payload
             else
-              @queued[type] = measurements
+              @queued[type] = payload
             end
           end
         end
+
+        if to_merge[:measurements]
+          payload = reconcile(to_merge[:measurements], to_merge[:tags])
+          if @queued[:measurements]
+            @queued[:measurements] += payload
+          else
+            @queued[:measurements] = payload
+          end
+        end
+
         submit_check
         self
       end
@@ -117,8 +142,10 @@ module Librato
       def queued
         return {} if @queued.empty?
         globals = {}
+        time = has_tags? ? :time : :measure_time
+        globals[time] = @time if @time
         globals[:source] = @source if @source
-        globals[:measure_time] = @measure_time if @measure_time
+        globals[:tags] = @tags if has_tags?
         @queued.merge(globals)
       end
 
@@ -133,16 +160,19 @@ module Librato
     private
 
       def check_measure_time(data)
-        if data[:measure_time] < Metrics::MIN_MEASURE_TIME
+        time_keys = [:measure_time, :time]
+
+        if time_keys.any? { |key| data[key] && data[key] < Metrics::MIN_MEASURE_TIME }
           raise InvalidMeasureTime, "Measure time for submitted metric (#{data}) is invalid."
         end
       end
 
-      def reconcile_source(measurements, source)
-        return measurements if !source || source == @source
+      def reconcile(measurements, val)
+        arr = val.is_a?(Hash) ? [@tags, :tags] : [@source, :source]
+        return measurements if !val || val == arr.first
         measurements.map! do |measurement|
-          unless measurement[:source]
-            measurement[:source] = source
+          unless measurement[arr.last]
+            measurement[arr.last] = val
           end
           measurement
         end

@@ -9,6 +9,7 @@ module Librato
     class NoClientProvided < MetricsError; end
     class InvalidMeasureTime < MetricsError; end
     class NotMergeable < MetricsError; end
+    class InvalidParameters < MetricsError; end
 
     class NetworkError < StandardError
       attr_reader :response

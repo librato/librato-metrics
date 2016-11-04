@@ -5,8 +5,6 @@ module Librato
   module Metrics
     module Persistence
       class Direct
-        MEASUREMENT_TYPES = [:gauges, :counters]
-
         # Persist the queued metrics directly to the
         # Metrics web API.
         #
@@ -18,9 +16,15 @@ module Librato
             requests = [queued]
           end
           requests.each do |request|
+            resource =
+              if queued[:gauges] || queued[:counters]
+                "metrics"
+              else
+                "measurements"
+              end
             payload = SmartJSON.write(request)
             # expects 200
-            client.connection.post('metrics', payload)
+            client.connection.post(resource, payload)
           end
         end
 
@@ -31,16 +35,16 @@ module Librato
           reqs = []
           # separate metric-containing values from global values
           globals = fetch_globals(queued)
-          MEASUREMENT_TYPES.each do |metric_type|
-            metrics = queued[metric_type]
+          top_level_keys.each do |key|
+            metrics = queued[key]
             next unless metrics
             if metrics.size <= per_request
               # we can fit all of this metric type in a single request
-              reqs << build_request(metric_type, metrics, globals)
+              reqs << build_request(key, metrics, globals)
             else
               # going to have to split things up
               metrics.each_slice(per_request) do |elements|
-                reqs << build_request(metric_type, elements, globals)
+                reqs << build_request(key, elements, globals)
               end
             end
           end
@@ -51,8 +55,12 @@ module Librato
           {type => metrics}.merge(globals)
         end
 
+        def top_level_keys
+          [Librato::Metrics::PLURAL_TYPES, :measurements].flatten
+        end
+
         def fetch_globals(queued)
-          queued.reject {|k, v| MEASUREMENT_TYPES.include?(k)}
+          queued.reject { |k, v| top_level_keys.include?(k) }
         end
 
         def queue_count(queued)

@@ -1,3 +1,5 @@
+require "set"
+
 module Librato
   module Metrics
 
@@ -7,7 +9,11 @@ module Librato
       MEASUREMENTS_PER_REQUEST = 500
 
       attr_reader :per_request, :last_submit_time
-      attr_accessor :prefix
+      attr_accessor :prefix, :tags
+
+      def tags
+        @tags ||= {}
+      end
 
       # The current Client instance this queue is using to authenticate
       # and connect to Librato Metrics. This will default to the primary
@@ -18,6 +24,11 @@ module Librato
       def client
         @client ||= Librato::Metrics.client
       end
+
+      def has_tags?
+        !@tags.empty?
+      end
+      alias :tags? :has_tags?
 
       # The object this MetricSet will use to persist
       #
@@ -82,11 +93,13 @@ module Librato
       end
 
       def setup_common_options(options)
+        validate_parameters(options)
         @autosubmit_interval = options[:autosubmit_interval]
         @client = options[:client] || Librato::Metrics.client
         @per_request = options[:per_request] || MEASUREMENTS_PER_REQUEST
         @source = options[:source]
-        @measure_time = options[:measure_time] && options[:measure_time].to_i
+        @tags = options.fetch(:tags, {})
+        @time = (options[:time] && options[:time].to_i || options[:measure_time] && options[:measure_time].to_i)
         @create_time = Time.now
         @clear_on_failure = options[:clear_failures] || false
         @prefix = options[:prefix]
@@ -96,6 +109,18 @@ module Librato
         if @autosubmit_interval
           last = @last_submit_time || @create_time
           self.submit if (Time.now - last).to_i >= @autosubmit_interval
+        end
+      end
+
+      def validate_parameters(options)
+        invalid_combinations = [
+          [:source, :tags],
+        ]
+        opts = options.keys.to_set
+        invalid_combinations.each do |combo|
+          if combo.to_set.subset?(opts)
+            raise InvalidParameters, "#{combo} cannot be simultaneously set"
+          end
         end
       end
 

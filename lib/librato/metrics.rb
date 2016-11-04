@@ -13,6 +13,7 @@ require 'metrics/errors'
 require 'metrics/persistence'
 require 'metrics/queue'
 require 'metrics/smart_json'
+require 'metrics/util'
 require 'metrics/version'
 
 module Librato
@@ -65,23 +66,22 @@ module Librato
     extend SingleForwardable
 
     TYPES = [:counter, :gauge]
-    PLURAL_TYPES = [:counters, :gauges]
+    PLURAL_TYPES = TYPES.map { |type| "#{type}s".to_sym }
     MIN_MEASURE_TIME = (Time.now-(3600*24*365)).to_i
 
     # Most of the singleton methods of Librato::Metrics are actually
     # being called on a global Client instance. See further docs on
     # Client.
     #
-    def_delegators :client, :agent_identifier, :annotate, :api_endpoint,
-                   :api_endpoint=, :authenticate, :connection,
-                   :proxy, :proxy=,
-                   :faraday_adapter, :faraday_adapter=,
-                   :persistence, :persistence=, :persister,
-                   :get_composite, :get_metric, :get_measurements, :metrics,
-                   :delete_metrics, :update_metric, :update_metrics,
-                   :submit,
-                   :sources, :get_source, :update_source,
-                   :create_snapshot, :get_snapshot
+    def_delegators  :client, :agent_identifier, :annotate,
+                    :api_endpoint, :api_endpoint=, :authenticate,
+                    :connection, :create_snapshot, :delete_metrics,
+                    :faraday_adapter, :faraday_adapter=, :get_composite,
+                    :get_measurements, :get_metric, :get_series,
+                    :get_snapshot, :get_source, :metrics,
+                    :persistence, :persistence=, :persister, :proxy, :proxy=,
+                    :sources, :submit, :update_metric, :update_metrics,
+                    :update_source
 
     # The Librato::Metrics::Client being used by module-level
     # access.

@@ -5,7 +5,9 @@ module Librato
 
     describe Queue do
       before(:all) { prep_integration_tests }
-      before(:each) { delete_all_metrics }
+      before(:each) do
+        delete_all_metrics
+      end
 
       context "with a large number of metrics" do
         it "submits them in multiple requests" do
@@ -68,6 +70,24 @@ module Librato
 
         bar = Metrics.get_measurements :bar, count: 2
         expect(bar['barsource'][0]['value']).to eq(456)
+      end
+
+      context "with tags" do
+        let(:queue) { Queue.new(tags: { hostname: "metrics-web-stg-1" }) }
+
+        it "respects default and individual tags" do
+          queue.add test_1: 123
+          queue.add test_2: { value: 456, tags: { hostname: "metrics-web-stg-2" }}
+          queue.submit
+
+          test_1 = Librato::Metrics.get_series :test_1, resolution: 1, duration: 3600
+          expect(test_1[0]["tags"]["hostname"]).to eq("metrics-web-stg-1")
+          expect(test_1[0]["measurements"][0]["value"]).to eq(123)
+
+          test_2 = Librato::Metrics.get_series :test_2, resolution: 1, duration: 3600
+          expect(test_2[0]["tags"]["hostname"]).to eq("metrics-web-stg-2")
+          expect(test_2[0]["measurements"][0]["value"]).to eq(456)
+        end
       end
 
     end

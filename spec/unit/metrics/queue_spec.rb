@@ -5,16 +5,22 @@ module Librato
 
     describe Queue do
 
-      before(:each) do
+      before(:all) do
         @time = (Time.now.to_i - 1*60)
         allow_any_instance_of(Queue).to receive(:epoch_time).and_return(@time)
       end
 
       describe "initialization" do
         context "with specified client" do
+          let(:barney) { Client }
+          let(:queue) { Queue.new(client: barney) }
+          before do
+            allow(barney).to receive(:has_tags?).and_return(false)
+            allow(barney).to receive(:tags).and_return({})
+            allow(barney).to receive(:add_tags).and_return({})
+          end
+
           it "sets to client" do
-            barney = Client
-            queue = Queue.new(client: barney)
             expect(queue.client).to eq(barney)
           end
         end
@@ -25,11 +31,82 @@ module Librato
             expect(queue.client).to eq(Librato::Metrics.client)
           end
         end
+
+        context "with valid arguments" do
+          it "initializes Queue" do
+            expect { Queue.new }.not_to raise_error
+            expect { Queue.new(source: "metrics-web-stg-1") }.not_to raise_error
+            expect { Queue.new(tags: { hostname: "metrics-web-stg-1" }) }.not_to raise_error
+          end
+        end
+
+        context "with invalid arguments" do
+          it "raises exception" do
+            expect {
+              Queue.new(
+                source: "metrics-web-stg-1",
+                tags: { hostname: "metrics-web-stg-1" }
+              )
+            }.to raise_error(InvalidParameters)
+          end
+        end
+      end
+
+      describe "#tags" do
+        context "when set" do
+          let(:queue) { Queue.new(tags: { instance_id: "i-1234567a" }) }
+          it "gets @tags" do
+            expect(queue.tags).to be_a(Hash)
+            expect(queue.tags.keys).to include(:instance_id)
+            expect(queue.tags[:instance_id]).to eq("i-1234567a")
+          end
+        end
+
+        context "when not set" do
+          let(:queue) { Queue.new }
+          it "defaults to empty hash" do
+            expect(queue.tags).to be_a(Hash)
+            expect(queue.tags).to be_empty
+          end
+        end
+      end
+
+      describe "#tags=" do
+        it "sets @tags" do
+          expected_tags = { instance_id: "i-1234567b" }
+          expect{subject.tags = expected_tags}.to change{subject.tags}.from({}).to(expected_tags)
+          expect(subject.tags).to be_a(Hash)
+          expect(subject.tags).to eq(expected_tags)
+        end
+      end
+
+      describe "#has_tags?" do
+        context "when tags are set" do
+          it "returns true" do
+            subject.tags = { instance_id: "i-1234567f" }
+
+            expect(subject.has_tags?).to eq(true)
+          end
+        end
+
+        context "when tags are not set" do
+          it "returns false" do
+            expect(subject.has_tags?).to eq(false)
+          end
+        end
       end
 
       describe "#add" do
         it "allows chaining" do
           expect(subject.add(foo: 123)).to eq(subject)
+        end
+
+        context "with invalid arguments" do
+          it "raises exception" do
+            expect {
+              subject.add test: { source: "metrics-web-stg-1", tags: { hostname: "metrics-web-stg-1" }, value: 123 }
+            }.to raise_error(InvalidParameters)
+          end
         end
 
         context "with single hash argument" do
@@ -137,6 +214,70 @@ module Librato
             }.to raise_error(InvalidMeasureTime)
           end
         end
+
+        context "with tags" do
+          context "when Queue is initialized with tags" do
+            let(:queue) { Queue.new(tags: { region: "us-east-1" }) }
+
+            it "applies top-level tags" do
+              expected = { name: "test", value: 1, time: @time }
+              queue.add test: 1
+
+              expect(queue.queued[:tags]).to eq({ region: "us-east-1" })
+              expect(queue.queued[:measurements].first).to eq(expected)
+            end
+          end
+
+          context "when tags are used as arguments" do
+            let(:queue) { Queue.new }
+
+            it "applies per-measurement tags" do
+              expected = { name: "test", value: 2, tags: { hostname: "metrics-web-stg-1" }, time: @time }
+              queue.add test: { value: 2,  tags: { hostname: "metrics-web-stg-1" } }
+
+              expect(queue.queued[:tags]).to be_nil
+              expect(queue.queued[:measurements].first).to eq(expected)
+            end
+
+            it "converts legacy measure_time to time" do
+              expected_time = Time.now.to_i
+              expected_tags = { foo: "bar" }
+              expected = {
+                measurements: [{
+                  name: "test", value: 1, tags: expected_tags, time: expected_time
+                }]
+              }
+
+              subject.add test: { value: 1, tags: expected_tags, measure_time: expected_time }
+
+              expect(subject.queued).to equal_unordered(expected)
+            end
+          end
+
+          context "when Queue is initialized with tags and when tags are used as arguments" do
+            let(:queue) { Queue.new(tags: { region: "us-east-1" }) }
+
+            it "applies top-level tags and per-measurement tags" do
+              expected = { name: "test", value: 3, tags: { hostname: "metrics-web-stg-1" }, time: @time }
+              queue.add test: { value: 3,  tags: { hostname: "metrics-web-stg-1" } }
+
+              expect(queue.queued[:tags]).to eq({ region: "us-east-1" })
+              expect(queue.queued[:measurements].first).to eq(expected)
+            end
+          end
+        end
+      end
+
+      describe "#measurements" do
+        it "returns currently queued measurements" do
+          subject.add test_1: { tags: { region: "us-east-1" }, value: 1 },
+                      test_2: { type: :counter, value: 2 }
+          expect(subject.measurements).to eq([{ name: "test_1", value: 1, tags: { region: "us-east-1" }, time: @time }])
+        end
+
+        it "returns [] when no queued measurements" do
+          expect(subject.measurements).to be_empty
+        end
       end
 
       describe "#counters" do
@@ -219,6 +360,39 @@ module Librato
             expect(q2.queued).to equal_unordered(expected)
           end
 
+          context "with tags" do
+            it "maintains specified tags" do
+              q1 = Queue.new
+              q1.add test: { tags: { hostname: "metrics-web-stg-1" }, value: 123 }
+              q2 = Queue.new(tags: { hostname: "metrics-web-stg-2" })
+              q2.merge!(q1)
+
+              expect(q2.queued[:measurements].first[:tags][:hostname]).to eq("metrics-web-stg-1")
+            end
+
+            it "does not change top-level tags" do
+              q1 = Queue.new(tags: { hostname: "metrics-web-stg-1" })
+              q1.add test: 456
+              q2 = Queue.new(tags: { hostname: "metrics-web-stg-2" })
+              q2.merge!(q1)
+
+              expect(q2.queued[:tags][:hostname]).to eq("metrics-web-stg-2")
+            end
+
+            it "tracks previous default tags" do
+              q1 = Queue.new(tags: { instance_id: "i-1234567a" })
+              q1.add test_1: 123
+              q2 = Queue.new(tags: { instance_type: "m3.medium" })
+              q2.add test_2: 456
+              q2.merge!(q1)
+              metric = q2.measurements.find { |measurement| measurement[:name] == "test_1" }
+
+              expect(metric[:tags][:instance_id]).to eq("i-1234567a")
+              expect(q2.queued[:tags]).to eq({ instance_type: "m3.medium" })
+
+            end
+          end
+
           it "maintains specified sources" do
             q1 = Queue.new
             q1.add neo: {source: 'matrix', value: 123}
@@ -247,6 +421,7 @@ module Librato
               end
             end
           end
+        end
 
           it "handles empty cases" do
             q1 = Queue.new
@@ -257,7 +432,6 @@ module Librato
                         gauges: [{name:"foo", value:123, measure_time: @time}]}
             expect(q2.queued).to eq(expected)
           end
-        end
 
         context "with an aggregator" do
           it "merges" do
@@ -301,10 +475,29 @@ module Librato
 
         it "includes global measure_time if set" do
           measure_time = (Time.now-1000).to_i
-          q = Queue.new(measure_time: measure_time)
+          q = Queue.new(source: "foo", measure_time: measure_time)
           q.add foo: 12
           expect(q.queued[:measure_time]).to eq(measure_time)
         end
+
+        context "when tags are set" do
+          it "includes global tags" do
+            expected_tags = { region: "us-east-1" }
+            queue = Queue.new(tags: expected_tags)
+            queue.add test: 5
+            expect(queue.queued[:tags]).to eq(expected_tags)
+          end
+        end
+
+        context "when time is set" do
+          it "includes global time" do
+            expected_time = (Time.now-1000).to_i
+            queue = Queue.new(tags: { foo: "bar" }, time: expected_time)
+            queue.add test: 10
+            expect(queue.queued[:time]).to eq(expected_time)
+          end
+        end
+
       end
 
       describe "#size" do
@@ -317,6 +510,15 @@ module Librato
           subject.add transactions: {type: :counter, value: 12345},
                       register_cents: {type: :gauge, value: 211101}
           expect(subject.size).to eq(4)
+        end
+
+        context "when measurement present" do
+          it "returns count of measurements" do
+            subject.add test_1: { tags: { hostname: "metrics-web-stg-1" }, value: 1 },
+                        test_2: { tags: { hostname: "metrics-web-stg-2" }, value: 2}
+
+            expect(subject.size).to eq(2)
+          end
         end
       end
 

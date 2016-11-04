@@ -360,6 +360,17 @@ module Librato
 
     end
 
+    describe "#get_series" do
+      before { Metrics.submit test_series: { value: 123, tags: { hostname: "metrics-web-stg-1" } } }
+
+      it "gets series" do
+        series = Metrics.get_series :test_series, resolution: 1, duration: 3600
+
+        expect(series[0]["tags"]["hostname"]).to eq("metrics-web-stg-1")
+        expect(series[0]["measurements"][0]["value"]).to eq(123)
+      end
+    end
+
     # Note: These are challenging to test end-to-end, should probably
     # unit test instead. Disabling for now.
     #

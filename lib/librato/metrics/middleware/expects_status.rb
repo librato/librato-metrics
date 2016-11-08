@@ -5,28 +5,30 @@ module Librato
       class ExpectsStatus < Faraday::Response::Middleware
 
         def on_complete(env)
-          # TODO: make exception output prettier
           case env[:status]
           when 401
-            raise Unauthorized.new("unauthorized", response_values(env))
+            raise Unauthorized, sanitize_request(env)
           when 403
-            raise Forbidden.new("forbidden", response_values(env))
+            raise Forbidden, sanitize_request(env)
           when 404
-            raise NotFound.new("not_found", response_values(env))
+            raise NotFound, sanitize_request(env)
           when 422
-            raise EntityAlreadyExists.new("entity_already_exists", response_values(env))
+            raise EntityAlreadyExists, sanitize_request(env)
           when 400..499
-            raise ClientError.new("client_error", response_values(env))
+            raise ClientError, sanitize_request(env)
           when 500..599
-            raise ServerError.new("server_error", response_values(env))
+            raise ServerError, sanitize_request(env)
           end
         end
 
-        def response_values(env)
+        def sanitize_request(env)
           {
             status: env.status,
-            headers: env.response_headers,
-            body: env.body
+            url: env.url.to_s,
+            user_agent: env.request_headers["User-Agent"],
+            request_body: env[:request_body],
+            response_headers: env.response_headers,
+            response_body: env.body
           }
         end
       end

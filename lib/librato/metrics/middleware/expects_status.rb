@@ -5,19 +5,20 @@ module Librato
       class ExpectsStatus < Faraday::Response::Middleware
 
         def on_complete(env)
+          sanitized = sanitize_request(env)
           case env[:status]
           when 401
-            raise Unauthorized, sanitize_request(env)
+            raise Unauthorized.new(sanitized.to_s, sanitized)
           when 403
-            raise Forbidden, sanitize_request(env)
+            raise Forbidden.new(sanitized.to_s, sanitized)
           when 404
-            raise NotFound, sanitize_request(env)
+            raise NotFound.new(sanitized.to_s, sanitized)
           when 422
-            raise EntityAlreadyExists, sanitize_request(env)
+            raise EntityAlreadyExists.new(sanitized.to_s, sanitized)
           when 400..499
-            raise ClientError, sanitize_request(env)
+            raise ClientError.new(sanitized.to_s, sanitized)
           when 500..599
-            raise ServerError, sanitize_request(env)
+            raise ServerError.new(sanitized.to_s, sanitized)
           end
         end
 

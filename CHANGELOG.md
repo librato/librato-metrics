@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 2.0.2
+* Filter sensitive headers in exception output (#130, Yannick Schutz)
+
 ### Version 2.0.1
 * Fix SmartJSON delegation bug for ruby 2.3.1 (#123)
 

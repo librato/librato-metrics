@@ -220,7 +220,7 @@ module Librato
         Metrics.submit foo: {type: :counter, value: 12}
         expect {
           Metrics.submit foo: 15 # submitting as gauge
-        }.to raise_error
+        }.to raise_error(Librato::Metrics::ClientError)
         expect {
           Metrics.submit foo: {type: :counter, value: 17}
         }.not_to raise_error
@@ -273,7 +273,7 @@ module Librato
                                           attributes: {
                                             display_max: 1000
                                           }
-            }.to raise_error
+            }.to raise_error(Librato::Metrics::ClientError)
           end
         end
 

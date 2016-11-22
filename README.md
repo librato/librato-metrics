@@ -184,6 +184,33 @@ Both options are driven by the addition of measurements. *If you are adding meas
 
 If your goal is to collect metrics every _x_ seconds and submit them, [check out this code example](https://github.com/librato/librato-metrics/blob/master/examples/submit_every.rb).
 
+## Submitting tagged measurements (beta)
+
+**Tagged measurements are only available in the Tags Beta. Please [contact Librato support](mailto:support@librato.com) to join the beta.**
+
+Librato Metrics supports tagged measurements that are associated with a metric, one or more tag pairs, and a point in time.
+
+**Tags** are a set of name=value tag pairs that describe the particular data stream. Tags behave as extra dimensions that data streams can be filtered and aggregated along.
+
+### Top-Level Tags
+
+You can initialize `Queue` and/or `Aggregator` with top-level tags that will be applied to every measurement:
+
+```ruby
+queue = Librato::Metrics::Queue.new(tags: { service: 'auth', environment: 'prod', host: 'auth-prod-1' })
+queue.add my_metric: 10
+```
+
+### Per-Measurement Tags
+
+Optionally, you can submit per-measurement tags by passing a tags Hash when adding measurements:
+
+```ruby
+queue.add my_other_metric: { value: 25, tags: { db: 'rr1' } }
+```
+
+For more information, visit the [API documentation](https://www.librato.com/docs/api/#create-a-measurement).
+
 ## Querying Metrics
 
 Get name and properties for all metrics you have in the system:
@@ -218,6 +245,25 @@ Get the 5 minute moving average for `temperature` for the last hour, assuming te
 
 There are many more options supported for querying, take a look at the 
 [REST API docs](https://www.librato.com/docs/api/#retrieve-metrics) or the individual method documentation for more details.
+
+## Retrieving tagged measurements (beta)
+
+**Tagged measurements are only available in the Tags Beta. Please [contact Librato support](mailto:support@librato.com) to join the beta.**
+
+Get the series for `exceptions` in **production** grouped by **sum** within the **last hour**:
+
+```ruby
+query = {
+  resolution: 1,
+  duration: 3600,
+  group_by: "environment",
+  group_by_function: "sum",
+  tags_search: "environment=prod*"
+}
+Librato::Metrics.get_series :exceptions, query
+```
+
+For more information, visit the [API documentation](https://www.librato.com/docs/api/#retrieve-a-measurement).
 
 ## Setting Metric Properties
 
@@ -292,4 +338,4 @@ We also maintain a set of [examples of common uses](https://github.com/librato/l
 
 ## Copyright
 
-Copyright (c) 2011-2015 [Librato Inc.](http://librato.com) See LICENSE for details.
+Copyright (c) 2011-2016 [Librato Inc.](http://librato.com) See LICENSE for details.

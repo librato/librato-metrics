@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.description = "An easy to use ruby wrapper for Librato's Metrics API"
 
   s.authors  = ["Matt Sanders"]
-  s.email    = 'matt@librato.com'
+  s.email    = ['matt@librato.com', 'ruby@librato.com']
   s.homepage = 'https://github.com/librato/librato-metrics'
 
   s.require_paths = %w[lib]

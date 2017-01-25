@@ -184,9 +184,7 @@ Both options are driven by the addition of measurements. *If you are adding meas
 
 If your goal is to collect metrics every _x_ seconds and submit them, [check out this code example](https://github.com/librato/librato-metrics/blob/master/examples/submit_every.rb).
 
-## Submitting tagged measurements (beta)
-
-**Tagged measurements are only available in the Tags Beta. Please [contact Librato support](mailto:support@librato.com) to join the beta.**
+## Submitting tagged measurements
 
 Librato Metrics supports tagged measurements that are associated with a metric, one or more tag pairs, and a point in time.
 
@@ -243,12 +241,10 @@ Get the 5 minute moving average for `temperature` for the last hour, assuming te
 
     data = Librato::Metrics.get_composite 'moving_average(mean(series("temperature", "*"), {size: "5"}))', start_time: Time.now.to_i - 60*60, resolution: 300
 
-There are many more options supported for querying, take a look at the 
+There are many more options supported for querying, take a look at the
 [REST API docs](https://www.librato.com/docs/api/#retrieve-metrics) or the individual method documentation for more details.
 
 ## Retrieving tagged measurements (beta)
-
-**Tagged measurements are only available in the Tags Beta. Please [contact Librato support](mailto:support@librato.com) to join the beta.**
 
 Get the series for `exceptions` in **production** grouped by **sum** within the **last hour**:
 

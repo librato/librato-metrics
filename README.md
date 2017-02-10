@@ -334,4 +334,4 @@ We also maintain a set of [examples of common uses](https://github.com/librato/l
 
 ## Copyright
 
-Copyright (c) 2011-2016 [Librato Inc.](http://librato.com) See LICENSE for details.
+Copyright (c) 2011-2017 [Librato Inc.](http://librato.com) See LICENSE for details.

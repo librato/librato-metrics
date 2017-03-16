@@ -75,7 +75,7 @@ module Librato
       #
       # @return Boolean
       def empty?
-        @queued.empty?
+        gauges.empty? && counters.empty? && measurements.empty?
       end
 
       # Remove all queued metrics

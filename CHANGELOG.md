@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 2.1.1
+* Fix `#empty?` to check queued payload (#137, Cyril David)
+
 ### Version 2.1.0
 * Add support for tagged measurements (#121)
 

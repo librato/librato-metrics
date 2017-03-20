@@ -301,6 +301,11 @@ module Librato
           subject.add foo: {type: :gauge, value: 121212}
           expect(subject.empty?).to be false
         end
+
+        it "returns true when nothing merged" do
+          subject.merge!(Librato::Metrics::Aggregator.new)
+          expect(subject.empty?).to be true
+        end
       end
 
       describe "#gauges" do
@@ -312,6 +317,14 @@ module Librato
 
         it "returns [] when no queued gauges" do
           expect(subject.gauges).to be_empty
+        end
+
+        context "when there are no metrics" do
+          it "it does not persist and returns true" do
+            subject.merge!(Librato::Metrics::Aggregator.new)
+            subject.persister.return_value(false)
+            expect(subject.submit).to be true
+          end
         end
       end
 

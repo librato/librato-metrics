@@ -40,7 +40,7 @@ module Librato
       #
       # @return Boolean
       def submit
-        return true if self.queued.empty?
+        return true if self.empty?
         options = {per_request: @per_request}
         if persister.persist(self.client, self.queued, options)
           @last_submit_time = Time.now

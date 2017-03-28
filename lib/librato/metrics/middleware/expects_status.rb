@@ -24,12 +24,12 @@ module Librato
 
         def sanitize_request(env)
           {
-            status: env.status,
-            url: env.url.to_s,
-            user_agent: env.request_headers["User-Agent"],
+            status: env[:status],
+            url: env[:url].to_s,
+            user_agent: (env[:request_headers] || {})["User-Agent"],
             request_body: env[:request_body],
-            response_headers: env.response_headers,
-            response_body: env.body
+            response_headers: env[:response_headers],
+            response_body: env[:body]
           }
         end
       end

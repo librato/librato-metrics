@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.extra_rdoc_files = %w[LICENSE]
 
   ## runtime dependencies
-  s.add_dependency 'faraday'
+  s.add_dependency 'faraday', '>= 0.9.0'
   s.add_dependency 'aggregate', '~> 0.2.2'
 
   # omitting for now because jruby-19mode can't handle

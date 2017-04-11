@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 2.1.2
+* Add `Faraday` 0.8.x support to `ExpectsStatus` (#138, George Ogata)
+
 ### Version 2.1.1
 * Fix `#empty?` to check queued payload (#137, Cyril David)
 

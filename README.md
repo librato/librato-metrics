@@ -7,6 +7,8 @@ A convenient Ruby wrapper for the Librato Metrics API.
 
 ---
 
+## Important note on breaking change
+
 **NOTE:** Starting with version 2.1.0 librato-metrics requires a Librato account that [supports tagged metrics](https://www.librato.com/docs/kb/faq/account_questions/tags_or_sources/). If your Librato account doesn't yet support tagged metrics please use the [1.6.1 version](https://rubygems.org/gems/librato-metrics/versions/1.6.1).
 
 ---

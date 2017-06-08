@@ -252,7 +252,7 @@ Get the 5 minute moving average for `temperature` for the last hour, assuming te
 There are many more options supported for querying, take a look at the
 [REST API docs](https://www.librato.com/docs/api/#retrieve-metrics) or the individual method documentation for more details.
 
-## Retrieving tagged measurements (beta)
+## Retrieving tagged measurements
 
 Get the series for `exceptions` in **production** grouped by **sum** within the **last hour**:
 

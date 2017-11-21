@@ -7,7 +7,7 @@
 * Fix `#empty?` to check queued payload (#137, Cyril David)
 
 ### Version 2.1.0
-* Add support for tagged measurements (#121)
+* Add support for tagged measurements (#121). **NOTE**: This version introduces breaking changes for legacy sources. Please contact support@librato.com to learn more.
 
 ### Version 2.0.2
 * Filter sensitive headers in exception output (#130, Yannick Schutz)

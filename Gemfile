@@ -19,6 +19,8 @@ gemspec
 
 gem 'rake'
 
+gem 'typhoeus'
+
 # docs
 gem 'yard'
 

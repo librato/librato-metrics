@@ -16,7 +16,7 @@ module Librato
             env[:body] = request_body # after failure is set to response body
             @app.call(env)
           rescue Librato::Metrics::ServerError, Timeout::Error,
-                 Faraday::Error::ConnectionFailed
+                 Faraday::ConnectionFailed
             if retries > 0
               retries -= 1 and retry
             end

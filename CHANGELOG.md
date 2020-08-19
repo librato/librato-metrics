@@ -1,5 +1,8 @@
 ## Changelog
 
+### Version 1.6.2
+* Relax Faraday version constraint (#143) (Jason Rudolph)
+
 ### Version 1.6.1
 * Fix bugs with listing sources (#116)
 

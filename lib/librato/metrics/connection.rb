@@ -44,7 +44,7 @@ module Librato
         end.tap do |transport|
           transport.headers[:user_agent] = user_agent
           transport.headers[:content_type] = 'application/json'
-          transport.basic_auth @client.email, @client.api_key
+          transport.request :basic_auth, @client.email, @client.api_key
         end
       end
 

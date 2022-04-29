@@ -44,7 +44,12 @@ module Librato
         end.tap do |transport|
           transport.headers[:user_agent] = user_agent
           transport.headers[:content_type] = 'application/json'
-          transport.basic_auth @client.email, @client.api_key
+          # The Basic Auth middleware usage differs before and after Faraday v2
+          if Gem::Version.new(Faraday::VERSION).segments.first >= 2
+            transport.request :authorization, :basic, @client.email, @client.api_key
+          else
+            transport.request :basic_auth, @client.email, @client.api_key
+          end          
         end
       end
 

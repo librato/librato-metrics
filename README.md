@@ -39,8 +39,10 @@ If you are using jruby, you need to ensure [jruby-openssl](https://github.com/jr
 
 If you are looking for the quickest possible route to getting a data into Metrics, you only need two lines:
 
-    Librato::Metrics.authenticate 'email', 'api_key'
-    Librato::Metrics.submit my_metric: { value: 42, tags: { host: 'localhost' } }
+```ruby
+Librato::Metrics.authenticate 'email', 'api_key'
+Librato::Metrics.submit my_metric: { value: 42, tags: { host: 'localhost' } }
+```
 
 While this is all you need to get started, if you are sending a number of metrics regularly a queue may be easier/more performant so read on...
 
@@ -49,8 +51,9 @@ While this is all you need to get started, if you are sending a number of metric
 
 Make sure you have [an account for Librato](https://metrics.librato.com/) and then authenticate with your email and API key (on your account page):
 
-    Librato::Metrics.authenticate 'email', 'api_key'
-
+```ruby
+Librato::Metrics.authenticate 'email', 'api_key'
+```
 
 ## Sending Measurements
 
@@ -58,24 +61,30 @@ A measurement includes a metric name, value, and one or more tags. Tags include 
 
 Queue up a simple metric named `temperature`:
 
-    queue = Librato::Metrics::Queue.new
-    queue.add temperature: {value: 77, tags: { city: 'oakland' }}
-    queue.submit
+```ruby
+queue = Librato::Metrics::Queue.new
+queue.add temperature: {value: 77, tags: { city: 'oakland' }}
+queue.submit
+```
 
 ### Top-Level Tags
 
 You can initialize `Queue` and/or `Aggregator` with top-level tags that will be applied to every measurement:
 
-    queue = Librato::Metrics::Queue.new(tags: { service: 'auth', environment: 'prod', host: 'auth-prod-1' })
-    queue.add my_metric: 10
-    queue.submit
+```ruby
+queue = Librato::Metrics::Queue.new(tags: { service: 'auth', environment: 'prod', host: 'auth-prod-1' })
+queue.add my_metric: 10
+queue.submit
+```
 
 ### Per-Measurement Tags
 
 Optionally, you can submit per-measurement tags by passing a tags Hash when adding measurements:
 
-    queue.add my_other_metric: { value: 25, tags: { db: 'rr1' } }
-    queue.submit
+```ruby
+queue.add my_other_metric: { value: 25, tags: { db: 'rr1' } }
+queue.submit
+```
 
 For more information, visit the [API documentation](https://www.librato.com/docs/api/#create-a-measurement).
 
@@ -84,12 +93,15 @@ For more information, visit the [API documentation](https://www.librato.com/docs
 
 Get name and properties for all metrics you have in the system:
 
-    metrics = Librato::Metrics.metrics
+```ruby
+metrics = Librato::Metrics.metrics
+```
 
 Get only metrics whose name includes `time`:
 
-    metrics = Librato::Metrics.metrics name: 'time'
-
+```ruby
+metrics = Librato::Metrics.metrics name: 'time'
+```
 
 ## Retrieving Measurements
 
@@ -115,44 +127,58 @@ If you are measuring something very frequently e.g. per-request in a web applica
 
 Aggregate a simple gauge metric named `response_latency`:
 
-    aggregator = Librato::Metrics::Aggregator.new
-    aggregator.add response_latency: 85.0
-    aggregator.add response_latency: 100.5
-    aggregator.add response_latency: 150.2
-    aggregator.add response_latency: 90.1
-    aggregator.add response_latency: 92.0
+```ruby
+aggregator = Librato::Metrics::Aggregator.new
+aggregator.add response_latency: 85.0
+aggregator.add response_latency: 100.5
+aggregator.add response_latency: 150.2
+aggregator.add response_latency: 90.1
+aggregator.add response_latency: 92.0
+```
 
 Which would result in a gauge measurement like:
 
-    {name: "response_latency", count: 5, sum: 517.8, min: 85.0, max: 150.2}
+```ruby
+{name: "response_latency", count: 5, sum: 517.8, min: 85.0, max: 150.2}
+```
 
 You can specify a source during aggregate construction:
 
-    aggregator = Librato::Metrics::Aggregator.new(tags: { service: 'auth', environment: 'prod', host: 'auth-prod-1' })
+```ruby
+aggregator = Librato::Metrics::Aggregator.new(tags: { service: 'auth', environment: 'prod', host: 'auth-prod-1' })
+```
 
 You can aggregate multiple metrics at once:
 
-    aggregator.add app_latency: 35.2, db_latency: 120.7
+```ruby
+aggregator.add app_latency: 35.2, db_latency: 120.7
+```
 
 Send the currently aggregated metrics to Metrics:
 
-    aggregator.submit
+```ruby
+aggregator.submit
+```
 
 ## Benchmarking
 
 If you have operations in your application you want to record execution time for, both `Queue` and `Aggregator` support the `#time` method:
 
-    aggregator.time :my_measurement do
-      # do work...
-    end
+```ruby
+aggregator.time :my_measurement do
+  # do work...
+end
+```
 
 The difference between the two is that `Queue` submits each timing measurement individually, while `Aggregator` submits a single timing measurement spanning all executions.
 
 If you need extra attributes for a `Queue` timing measurement, simply add them on:
 
-    queue.time :my_measurement do
-      # do work...
-    end
+```ruby
+queue.time :my_measurement do
+  # do work...
+end
+```
 
 ## Annotations
 
@@ -160,32 +186,40 @@ Annotation streams are a great way to track events like deploys, backups or anyt
 
 At a minimum each annotation needs to be assigned to a stream and to have a title. Let's add an annotation for deploying `v45` of our app to the `deployments` stream:
 
-    Librato::Metrics.annotate :deployments, 'deployed v45'
+```ruby
+Librato::Metrics.annotate :deployments, 'deployed v45'
+```
 
 There are a number of optional fields which can make annotations even more powerful:
 
-    Librato::Metrics.annotate :deployments, 'deployed v46', source: 'frontend',
-        start_time: 1354662596, end_time: 1354662608,
-        description: 'Deployed 6f3bc6e67682: fix lotsa bugs…'
+```ruby
+Librato::Metrics.annotate :deployments, 'deployed v46', source: 'frontend',
+    start_time: 1354662596, end_time: 1354662608,
+    description: 'Deployed 6f3bc6e67682: fix lotsa bugs…'
+```
 
 You can also automatically annotate the start and end time of an action by using `annotate`'s block form:
 
-    Librato::Metrics.annotate :deployments, 'deployed v46' do
-      # do work..
-    end
+```ruby
+Librato::Metrics.annotate :deployments, 'deployed v46' do
+  # do work..
+end
+```
 
 More fine-grained control of annotations is available via the `Annotator` object:
 
-    annotator = Librato::Metrics::Annotator.new
+```ruby
+annotator = Librato::Metrics::Annotator.new
 
-    # list annotation streams
-    streams = annotator.list
+# list annotation streams
+streams = annotator.list
 
-    # fetch a list of events in the last hour from a stream
-    annotator.fetch :deployments, start_time: (Time.now.to_i-3600)
+# fetch a list of events in the last hour from a stream
+annotator.fetch :deployments, start_time: (Time.now.to_i-3600)
 
-    # delete an event
-    annotator.delete_event 'deployments', 23
+# delete an event
+annotator.delete_event 'deployments', 23
+```
 
 See the documentation of `Annotator` for more details and examples of use.
 
@@ -193,16 +227,20 @@ See the documentation of `Annotator` for more details and examples of use.
 
 Both `Queue` and `Aggregator` support automatically submitting measurements on a given time interval:
 
-    # submit once per minute
-    timed_queue = Librato::Metrics::Queue.new(autosubmit_interval: 60)
+```ruby
+# submit once per minute
+timed_queue = Librato::Metrics::Queue.new(autosubmit_interval: 60)
 
-    # submit every 5 minutes
-    timed_aggregator = Librato::Metrics::Aggregator.new(autosubmit_interval: 300)
+# submit every 5 minutes
+timed_aggregator = Librato::Metrics::Aggregator.new(autosubmit_interval: 300)
+```
 
 `Queue` also supports auto-submission based on measurement volume:
 
-    # submit when the 400th measurement is queued
-    volume_queue = Librato::Metrics::Queue.new(autosubmit_count: 400)
+```ruby
+# submit when the 400th measurement is queued
+volume_queue = Librato::Metrics::Queue.new(autosubmit_count: 400)
+```
 
 These options can also be combined for more flexible behavior.
 
@@ -214,20 +252,26 @@ If your goal is to collect metrics every _x_ seconds and submit them, [check out
 
 Setting custom [properties](https://www.librato.com/docs/api/#metric-attributes) on your metrics is easy:
 
-    # assign a period and default color
-    Librato::Metrics.update_metric :temperature, period: 15, attributes: { color: 'F00' }
+```ruby
+# assign a period and default color
+Librato::Metrics.update_metric :temperature, period: 15, attributes: { color: 'F00' }
+```
 
 ## Deleting Metrics
 
 If you ever need to remove a metric and all of its measurements, doing so is easy:
 
-    # delete the metrics 'temperature' and 'humidity'
-    Librato::Metrics.delete_metrics :temperature, :humidity
+```ruby
+# delete the metrics 'temperature' and 'humidity'
+Librato::Metrics.delete_metrics :temperature, :humidity
+```
 
 You can also delete using wildcards:
 
-    # delete metrics that start with cpu. except for cpu.free
-    Librato::Metrics.delete_metrics names: 'cpu.*', exclude: ['cpu.free']
+```ruby
+# delete metrics that start with cpu. except for cpu.free
+Librato::Metrics.delete_metrics names: 'cpu.*', exclude: ['cpu.free']
+```
 
 Note that deleted metrics and their measurements are unrecoverable, so use with care.
 
@@ -235,27 +279,35 @@ Note that deleted metrics and their measurements are unrecoverable, so use with 
 
 If you need to use metrics with multiple sets of authentication credentials simultaneously, you can do it with `Client`:
 
-    joe = Librato::Metrics::Client.new
-    joe.authenticate 'email1', 'api_key1'
+```ruby
+joe = Librato::Metrics::Client.new
+joe.authenticate 'email1', 'api_key1'
 
-    mike = Librato::Metrics::Client.new
-    mike.authenticate 'email2', 'api_key2'
+mike = Librato::Metrics::Client.new
+mike.authenticate 'email2', 'api_key2'
+```
 
 All of the same operations you can call directly from `Librato::Metrics` are available per-client:
 
-    # list Joe's metrics
-    joe.metrics
+```ruby
+# list Joe's metrics
+joe.metrics
+```
 
 There are two ways to associate a new queue with a client:
 
-    # these are functionally equivalent
-    joe_queue = Librato::Metrics::Queue.new(client: joe)
-    joe_queue = joe.new_queue
+```ruby
+# these are functionally equivalent
+joe_queue = Librato::Metrics::Queue.new(client: joe)
+joe_queue = joe.new_queue
+```
 
 Once the queue is associated you can use it normally:
 
-    joe_queue.add temperature: { value: 65.2, tags: { city: 'san francisco' } }
-    joe_queue.submit
+```ruby
+joe_queue.add temperature: { value: 65.2, tags: { city: 'san francisco' } }
+joe_queue.submit
+```
 
 ## Thread Safety
 

@@ -2,7 +2,7 @@ module Librato
   module Metrics
     module Middleware
 
-      class ExpectsStatus < Faraday::Response::Middleware
+      class ExpectsStatus < Faraday::Middleware
 
         def on_complete(env)
           sanitized = sanitize_request(env)

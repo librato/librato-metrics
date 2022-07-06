@@ -2,7 +2,7 @@ module Librato
   module Metrics
     module Middleware
 
-      class RequestBody < Faraday::Response::Middleware
+      class RequestBody < Faraday::Middleware
 
         def call(env)
           # duplicate request body so it is preserved through request

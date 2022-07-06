@@ -2,7 +2,7 @@ module Librato
   module Metrics
     module Middleware
 
-      class CountRequests < Faraday::Response::Middleware
+      class CountRequests < Faraday::Middleware
         @total_requests = 0
 
         class << self
